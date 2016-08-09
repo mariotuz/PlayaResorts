@@ -145,9 +145,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -182,102 +179,111 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new company list of users-->
-                                      <%
-                                          If (ViewData("idseccion4subseccion6new_permission") IsNot Nothing And ViewData("idseccion4subseccion6new_permission") > 0) Then
-                                              Response.Write("<li role=""presentation"" id=""newcmp_head""><a href=""#newcmp"" aria-controls=""newcmp"" role=""tab"" data-toggle=""tab"">Add New Company</a></li>")
-                                          End If
-                                          
-                                          If (ViewData("idseccion4subseccion6consult_permission") IsNot Nothing And ViewData("idseccion4subseccion6consult_permission") > 0) Then
-                                              Response.Write("<li role=""presentation"" id=""companylist_head"" ><a href=""#companylist"" aria-controls=""companylist"" role=""tab"" data-toggle=""tab"">Companies List</a></li>")
-                                          End If
-                                      %>
+                                      <li role="presentation" id="newcmp_head" class="active"><a href="#newcmp" aria-controls="newcmp" role="tab" data-toggle="tab">Add New Company</a></li>
+                                      <li role="presentation" id="companylist_head" ><a href="#companylist" aria-controls="companylist" role="tab" data-toggle="tab">Companies List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add company list sections-->
-                                        <div role="tabpanel" class="tab-pane" id="newcmp"><!--Star tab form copmanywholesale-->
+
+                                        
+
+                                            <div role="tabpanel" class="tab-pane active" id="newcmp"><!--Star tab form copmanywholesale-->
+
+                                                
                                             <% Using Ajax.BeginForm("CatalogCompanies", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>   
-                                               <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 alert-wrap" > 
+
+
+                                                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 alert-wrap" > 
+
                                                       <%: Html.ValidationMessageFor(Function(m) m.CompanieName)%>
                                                       <%: Html.ValidationMessageFor(Function(m) m.CompanieKey)%>
-                                                </div>
+
+
+                                                    <div class="clear"></div>
+                                                </div> 
+
                                                 
-                                                <div class="clear"></div>
+
 
                                                 <header class="encabezado"><h2 class="md-display-2">Add New Company</h2><p> </p></header>
 
                                                 <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12 form-catalog"><!--form-->
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+
+                                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                                         <span><small>Company Name *</small></span>
                                                         <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <%: Html.TextBoxFor(Function(m) m.CompanieName, New With {.class = "form-control input-custom corners-inputs"})%>
+                                                           <%: Html.TextBoxFor(Function(m) m.CompanieName, New With {.class = "form-control input-custom corners-inputs"})%>
                                                         </div>
-                                                    </div>
+                                                      </div>
 
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                                         <span><small>Key Company *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">  
-                                                            <%: Html.TextBoxFor(Function(m) m.CompanieKey, New With {.class = "form-control input-custom corners-inputs"})%>
+                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
+                                                        
+                                                          <%: Html.TextBoxFor(Function(m) m.CompanieKey, New With {.class = "form-control input-custom corners-inputs"})%>
                                                         </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                                      </div>
+                                                      
+
+                                                     <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                                         <span><small>IATA *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">   
-                                                            <input type="text" id="CompanieIATA" name="CompanieIATA" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>Postal Code *</small></span>
                                                         <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="CompanieZipCode" name="CompanieZipCode" class="form-control input-custom corners-inputs" placeholder="" >
+                                                        
+                                                          <input type="text" id="CompanieIATA" name="CompanieIATA" class="form-control input-custom corners-inputs" placeholder="" >
                                                         </div>
-                                                    </div>
-                                                    
-                                                    <div class="btn-group col-xs-12 col-sm-4 col-md-4 col-lg-4" role="group">
-                                                        <span><small>Country *</small></span>
-                                                        <select class="selectpicker" name="companycountry" id="companycountry" data-width="100%">
-                                                            <%
-                                                        Dim i As Integer
-                                                        For i = 0 To Model.ListCountryin.Count - 1
-                                                            %>
-                                                            <option  value="<%:Model.ListCountryin.Item(i).Value%>"><%:Model.ListCountryin.Item(i).Text%></option>             
-                                                            <% Next %>
-                                                        </select>
-                                                    </div>
+                                                      </div>
+
+
+                                                     <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                                        <span><small>Zip Code *</small></span>
+                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
+                                                        
+                                                         <input type="text" id="CompanieZipCode" name="CompanieZipCode" class="form-control input-custom corners-inputs" placeholder="" >
+                                                        </div>
+                                                      </div>
+                                                       
 
                                                     <div class="btn-group col-xs-12 col-sm-4 col-md-4 col-lg-4" role="group">
-                                                        <span><small>State *</small></span>
-                                                        <select class="selectpicker" name="companystate" id="companystate" data-width="100%">
-                                                            <%
-                                                        For i = 0 To Model.ListStatein.Count - 1
-                                                            %>
-                                                            <option  value="<%:Model.ListStatein.Item(i).Value%>"><%:Model.ListStatein.Item(i).Text%></option>             
-                                                            <% Next%>
-                                                        </select>
-                                                    </div>
+                                                         <span><small>Country * <%--<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>--%></small></span>
+                                                           <select class="selectpicker" name="companycountry" id="companycountry" data-width="100%">
+                                                              <%--<option value="0">Country 1</option>--%>
+                                                               <%
+                                                                                  Dim i As Integer
+                
+                                                                                 For i = 0 To Model.ListCountryin.Count - 1
+                                                                                     %>
+                                                                                      <option  value="<%:Model.ListCountryin.Item(i).Value%>"><%:Model.ListCountryin.Item(i).Text%></option>             
+                                                                                    <%        
+                                                                                        Next
+                                                                                    %>
+                                                              
+                                                            </select>
+                                                      </div>
 
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>City *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="City" name="City" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
+                                                      <div class="btn-group col-xs-12 col-sm-4 col-md-4 col-lg-4" role="group">
+                                                         <span><small>State *</small></span>
+                                                           <select class="selectpicker" name="companystate" id="companystate" data-width="100%">
+                                                              <%--<option value="0">State 1</option>--%>
+                                                                <%
+                                                                                 
+                
+                                                                    For i = 0 To Model.ListStatein.Count - 1
+                                                                                     %>
+                                                                                      <option  value="<%:Model.ListStatein.Item(i).Value%>"><%:Model.ListStatein.Item(i).Text%></option>             
+                                                                                    <%        
+                                                                                        Next
+                                                                                    %>
+                                                             
+                                                            </select>
+                                                      </div>
 
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>Address *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="Address" name="Address" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
 
-                                                    <input type="hidden" name="user" value="<%: Session.Item("UserName")%>"/>
 
-                                                    <div class="clear"></div>
-
-                                                    <div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                                        <button  id="InsertCompany" value="Insert_Company" name="CompanyButtons" class="btn btn-success">Save New Company</button>
-                                                    </div>
+                                                      <div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                        <br>
+                  
+                                                          <button  id="InsertCompany" value="Insert_Company" name="CompanyButtons" class="btn btn-success">Save New Company</button>
+                                                      </div>
 
                                                    <div class="clear"></div>
                                                 </div><!--end form-->

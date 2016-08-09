@@ -1,6 +1,4 @@
 ﻿Namespace Querys
-    ' Version 1.0.1 Querys 
-
     Public Class Qrys
         Public Function GetQuery(ByVal qryId As String, ByVal file As String) As String
             Dim url = IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.GetName.CodeBase.ToString.ToLower).Replace("file:\c:\", "c:\").Replace("\bin", "\Content\xml\")
@@ -18,10 +16,10 @@
             Dim key As String
 
             For Each xEle As XElement In qry.Descendants("parameter")
-                If xEle.Attribute("dbname") Is Nothing Then
+                If xEle.Attribute("dbParamName") Is Nothing Then
                     key = CStr(xEle)
                 Else
-                    key = xEle.Attribute("dbname").Value
+                    key = xEle.Attribute("dbParamName").Value
                 End If
 
                 Try
@@ -55,7 +53,7 @@
 
                 If arrayString.Length > 1 Then
                     itemString = item.Key
-
+                   
                     Select Case item.Value().ToString().Split("\")(1)
                         Case "c"
                             Dim paramBase64 As Byte() = Convert.FromBase64String(requestObject(item.Key))
@@ -93,29 +91,9 @@
             Dim item As System.Collections.DictionaryEntry
             Dim Type As Integer
             Dim Direction As Integer
-            Dim rqObj As Object
+
             'For Each item In listParameters
-
-
-            'Parque para convertir un request a dictionary
-            Select Case requestObject.GetType().Name
-                Case "HttpRequestWrapper"
-                    Dim rqo As System.Web.HttpRequestWrapper
-                    Dim _requestObject As New Dictionary(Of String, String)
-
-                    rqo = requestObject
-                    For Each keyRq In listParameters
-                        If Not rqo Is Nothing Then
-                            _requestObject.Add(keyRq.key, rqo(keyRq.value))
-                        End If
-                    Next
-                    requestObject = _requestObject
-            End Select
-            'Fin de parche
-
-            ' -- INICIO -- Asigna parametros segun valores del dictionary
             For Each rqObj In requestObject
-                ' lECTURA DE LLAVES
                 For Each item In listParameters
                     If item.Key = rqObj.ToString().Split("[")(1).Split(",")(0) Then Exit For
                 Next
@@ -128,7 +106,6 @@
                 ' Default Direction
                 Direction = 1 ' Input
 
-                ' Paresea el valor del request a la codificación especifica, o sacar el nombre del campo en la base de datos
                 If arrayString.Length > 1 Then
                     itemString = item.Key
 
@@ -145,7 +122,7 @@
 
                 Else
                     itemString = item.Key
-                    valueItemString = requestObject(item.Key)
+                    valueItemString = requestObject(item.Value)
                 End If
 
                 Dim param As System.Data.SqlClient.SqlParameter
@@ -162,7 +139,6 @@
 
                 End If
             Next
-            ' -- FINAL -- Asigna parametros segun valores del dictionary
 
             stringQuery = GetQuery(qryId, file)
 
@@ -177,6 +153,7 @@
                 Return Obj.Length
             End If
         End Function
+
 
     End Class
 

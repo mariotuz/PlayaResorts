@@ -3,11 +3,14 @@
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Data.Common" %>
-
+<script src="/Scripts/Accounting.js"></script>
+<script src="/Scripts/Funciones.js"></script>
 <script type="text/javascript">
     function NextInput(e, _elemento, _eValid, _nextElemento) {
         var tecla = (document.all) ? e.keyCode : e.which;
         var $elemento = $(_elemento);
+
+        
 
         if (tecla == 13) {
             e.preventDefault();
@@ -97,6 +100,11 @@
         });
 
 
+        //Funciones nuevas
+        Formatea();
+        
+        Valida_Descuento_Usuario();
+
     });
 
 </script>
@@ -125,25 +133,25 @@
           $("#rateshead").addClass("active");
           $("#rates").addClass("active");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
           $('#selectratetype').selectpicker();
           $('#ComissionAgency').selectpicker();
@@ -177,25 +185,25 @@
           $("#rateshead").addClass("active");
           $("#rates").addClass("active");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
           $('#selectratetype').selectpicker();
           $('#ComissionAgency').selectpicker();
@@ -229,25 +237,25 @@
           $("#rateshead").addClass("active");
           $("#rates").addClass("active");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
           $('#selectratetype').selectpicker();
           $('#ComissionAgency').selectpicker();
@@ -274,7 +282,7 @@
 
           for (i = 0 ; i < res.length - 1; i++) {
 
-              idresults += '<a  target="_blank" href="<%: Url.Content("~/Groups/GroupDetail")%>?id=' + res[i] + '" class="btn btn-default" ><%:Model.GroupHotelNew + "000"%>' + res[i] + '</a>  ';
+              idresults += '<a  target="_blank" href="/Groups/GroupDetail?id=' + res[i] + '" class="btn btn-default" ><%:Model.GroupHotelNew + "000"%>' + res[i] + '</a>  ';
           }
 
           $('#existgroupmodalids').html(idresults);
@@ -288,31 +296,31 @@
           $("#rates").removeClass("active");
 
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("editbreakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("breakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("grupohotelevents").value = "<%:Model.GroupIdLabel%>"
 
 
 
@@ -341,31 +349,31 @@
 
           $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("editbreakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("breakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("grupohotelevents").value = "<%:Model.GroupIdLabel%>"
 
 
           $('#selectratetype').selectpicker();
@@ -402,34 +410,32 @@
           $("#rateshead").addClass("active");
           $("#rates").addClass("active");
 
-          //alert($("#grupoidlabeltext").value);
+          //alert(document.getElementById("grupoidlabeltext").value);
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          console.info("<%:Model.GroupId%>");
+          if (document.getElementById("grupoidlabeltext").value == "0" || document.getElementById("grupoidlabeltext").value == 0 || document.getElementById("grupoidlabeltext").value == "") {
 
-          if ($("#grupoidlabeltext").val() == "0" || $("#grupoidlabeltext").val() == 0 || $("#grupoidlabeltext").val() == "") {
-
-              $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
+              $('#grupoidlabel').html("<%:Model.GroupHotelNew%>");
           }
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
           $('#selectratetype').selectpicker();
           $('#ComissionAgency').selectpicker();
@@ -457,34 +463,33 @@
 
           $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000" + Model.GroupId.ToString%>");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("editbreakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("breakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("grupohotelevents").value = "<%:Model.GroupIdLabel%>"
 
       });
-
      </script>
 
 <%  End If%>
@@ -495,31 +500,31 @@
   <script type="text/javascript">
       $(document).ready(function () {
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("editbreakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("breakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("grupohotelevents").value = "<%:Model.GroupIdLabel%>"
 
       });
 
@@ -531,7 +536,6 @@
 
   <script type="text/javascript">
       $(document).ready(function () {
-
           //$("#form-grouphead-info").addClass("active");
           //$("#form-group-info").addClass("active");
 
@@ -540,31 +544,31 @@
 
           $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlabeltext").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddoc").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupdate").value = "<%:Model.GroupId%>"
 
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
+          document.getElementById("grupoiddocupload").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdown").value = "<%:Model.GroupId%>"
 
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidbreakdowngroupby").value = "<%:Model.GroupId%>"
 
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("editbreakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("breakdownhotel").value = "<%:Model.GroupIdLabel%>"
 
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidlogbook").value = "<%:Model.GroupId%>"
 
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidpayments").value = "<%:Model.GroupId%>"
 
-          $("#grupoidevents").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidevents").value = "<%:Model.GroupId%>"
 
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
+          document.getElementById("grupoidstatus").value = "<%:Model.GroupId%>"
 
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
+          document.getElementById("grupohotelevents").value = "<%:Model.GroupIdLabel%>"
 
 
           $('#selectratetype').selectpicker();
@@ -584,7 +588,7 @@
                                                                           <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                                                                             <span><small>Percentage Discount Rate</small></span>
                                                                             <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                                              <input type="text" id="DiscountRate" name="DiscountRate" value="<%:Model.EditGroupData7%>" class="form-control input-custom corners-inputs"  >
+                                                                              <input type="text" id="DiscountRate" name="DiscountRate" value="<%:Model.EditGroupData7%>" class="form-control input-custom corners-inputs" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" >
                                                                             </div>
                                                                           </div>
 
@@ -614,7 +618,7 @@
                                                                                <select class="selectpicker" id="selectratetype" name="selectratetype" data-width="100%">
 
                    
-                                                                                  <option  <% If Model.GroupTypeRate = "4" Then%> selected <% End if%> value="4">Modelo de Compensacion</option>
+                                                                                  <option  <% If Model.GroupTypeRate = "4" Then%> selected <% End if%> value="4">CoMa</option>
                                                                                   <option  <% If Model.GroupTypeRate = "5" Then%> selected <% End if%> value="5">MICE</option>
                                                                                   <option  <% If Model.GroupTypeRate = "2" Then%> selected <% End if%> value="2">Tarifario Manual</option>
                                                                                   <option  <% If Model.GroupTypeRate = "3" Then%> selected <% End if%> value="3">Tarifario Semiautomatico</option>
@@ -659,16 +663,15 @@
 <input type="text" id="grupoidlabeltext" name="grupoidlabeltext" hidden value="0"   >
 
 
+            <!-- 
+                Original:If Model.GroupTypeRate = 4 Or Model.GroupTypeRate = 5 Or Model.GroupTypeRate = 2 Or Model.GroupTypeRate = 3 Then
+                **Revisar por que no permite cuando es tipo 1
+                 -->
 
 <% If Model.GroupTypeRate = 4 Or Model.GroupTypeRate = 5 Or Model.GroupTypeRate = 2 Or Model.GroupTypeRate = 3 Then%>
 
-
-
     <%If Model.ListGroupRatesin.Count = 0 Then%>
-
-
                 <h2> RATES NOT AVAILABLE </h2>
-        
     <%Else%> 
 
             <ul class="nav nav-tabs nav-justified dual-select" role="tablist" >
@@ -682,6 +685,7 @@
                     Dim Date2 As Date
                     Dim Commission As String
                     Dim Discount As String
+                    Dim Formato_Moneda As String
         
         
         
@@ -703,9 +707,9 @@
                             Else
                                 
                                 If z = 0 Then
-                                    Response.Write("<li role=""presentation"" class="" col-xs-3 col-md-3 active""><a href=""#promotion-" + i.ToString + """ aria-controls=""rates"" role=""tab"" data-toggle=""tab"">Rate " + (i + 1).ToString + "(" + Date1.ToString("yyyy-MM-dd") + " to " + Date2.ToString("yyyy-MM-dd") + ", C:" + FormatNumber(Commission, 2, , , TriState.True) + " ,P: " + FormatNumber(Discount, 2, , , TriState.True) + ")</a></li>")
+                                    Response.Write("<li role=""presentation"" class="" col-xs-3 col-md-3 active""><a href=""#promotion-" + i.ToString + """ aria-controls=""rates"" role=""tab"" data-toggle=""tab"">Rate " + (i + 1).ToString + "(" + Date1.ToString("yyyy-MM-dd") + " to " + Date2.ToString("yyyy-MM-dd") + ", C:" + FormatNumber(Commission * 100, 0, , , TriState.True) + "% ,P: " + FormatNumber(Discount * 100, 0, , , TriState.True) + "%)</a></li>")
                                 Else
-                                    Response.Write("<li role=""presentation"" class="" col-xs-3 col-md-3 ""><a href=""#promotion-" + i.ToString + """ aria-controls=""rates"" role=""tab"" data-toggle=""tab"">Rate " + (i + 1).ToString + "(" + Date1.ToString("yyyy-MM-dd") + " to " + Date2.ToString("yyyy-MM-dd") + ", C:" + FormatNumber(Commission, 2, , , TriState.True) + " ,P: " + FormatNumber(Discount, 2, , , TriState.True) + ")</a></li>")
+                                    Response.Write("<li role=""presentation"" class="" col-xs-3 col-md-3 ""><a href=""#promotion-" + i.ToString + """ aria-controls=""rates"" role=""tab"" data-toggle=""tab"">Rate " + (i + 1).ToString + "(" + Date1.ToString("yyyy-MM-dd") + " to " + Date2.ToString("yyyy-MM-dd") + ", C:" + FormatNumber(Commission * 100, 0, , , TriState.True) + "% ,P: " + FormatNumber(Discount * 100, 0, , , TriState.True) + "%)</a></li>")
                                 End If
                                 
                             End If
@@ -742,11 +746,12 @@
                  
                                  Response.Write("<tr class=""no-hover""> <td></td> <td></td><td></td><td></td>  <td></td> <td></td> <td></td> <td></td> <td></td>")
              
-                                 Response.Write("<td class=""rate-total"">Total Price</td>")
+                                 Response.Write("<td class=""rate-total"">Total Price <td>")
              
-                                 Response.Write("<td class=""rate-price"">$ " + FormatNumber(Math.Ceiling(Model.RevenueFinal), 0, , , TriState.True) + "</td>")
+                                 Response.Write("<td class=""rate-price"">$ " + CStr(Model.RevenueFinal) + "</td>")
              
                                  Response.Write("</tr>  </tbody> </table> </div>   </div><!--first tab--> ")
+                                 'hoy
                  
                              End If
                  
@@ -779,6 +784,11 @@
                              Response.Write("<th >Room Night <div>Room Night</div></th>")
                              Response.Write("<th >Rate Per Room <div>Rate Per Room</div></th>")
                              Response.Write("<th>Total Price <div>Total Price</div></th>")
+                             
+                             If Model.EditGroupData7 > 0 Then
+                                 Response.Write("<th>Discounted Rate <div>Discounted Rate</div></th>")
+                             End If
+                             
                              Response.Write("</tr>")
                              Response.Write("</thead>")
                              Response.Write("<tbody>")
@@ -788,16 +798,15 @@
                  
                  
                          End If
-             
+                         'aqui
                          If Model.ListGroupRatesin.Item(j).Availability = "Available" Then
                              Response.Write("<tr>")
                          Else
                          
                              Response.Write("<tr class=""disable"" >")
                          End If
-                    
                  
-                         Response.Write("<td>")
+                         Response.Write("<td class=""tip"" data-tip=""" + Model.ListGroupRatesin.Item(j).Tip + """>")
                          Response.Write(Model.ListGroupRatesin.Item(j).SuiteCode)
                          Response.Write("</td>")
                      
@@ -817,7 +826,6 @@
                              Response.Write("<input type=""text"" class=""form-control input-custom corners-inputs"" value=""" + Model.ListGroupRatesin.Item(j).RatePax.ToString + """ name=""List_Pax" + i.ToString + """ placeholder=""0"" style=""text-align: center !important;"" disabled=""disabled"" >")
                          End If
                      
-            
                     
                          Response.Write("</div>")
                          Response.Write("</td>")
@@ -825,116 +833,115 @@
                          Response.Write("<td>")
                          Response.Write(" <a class=""btn btn-primary StartAvailability"" href=""#" + Model.ListGroupRatesin.Item(j).SuiteCode.ToString + """  >View</a>")
                          Response.Write("</td>")
-                    
-                         'Response.Write("<td>")
-                         'Response.Write(Model.ListGroupRatesin.Item(j).SuiteCode)
-                         'Response.Write("</td>")
-                    
-                         Response.Write("<td>")
-                 
+                         
+                         Formato_Moneda = Model.ListGroupRatesin.Item(j).Formato
+                         
+                         Response.Write("<td class=""" + Formato_Moneda + """>")
+                       
                          If Model.ListGroupRatesin.Item(j).RateSingle = 0 Then
                              Response.Write("N/A")
                          Else
-                             Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateSingle), 0, , , TriState.True))
+                             Response.Write(Model.ListGroupRatesin.Item(j).RateSingle)
                          End If
                  
                          Response.Write("</td>")
-                     
-                         Response.Write("<td style=""max-width:160px"">")
                  
                          If Model.GroupTypeRate = 2 Or Model.GroupTypeRate = 3 Then
-                         
+                             Response.Write("<td style=""max-width:160px""  >")
                              Response.Write("<div class=""input-group  btn-group col-xs-4"" style=""width:100px"" >")
-                         
-                                 
                              Response.Write("<input type=""text"" class=""form-control input-custom corners-inputs doublehabs"" value=""" + FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateDouble), 0, , , TriState.True).Replace(",", "").ToString + """ name=""List_DoubleRate"" placeholder=""0"" style=""text-align: center !important;"" onkeypress=""NextInput(event,this,'doublehabs');"">")
-                                    
-                         
                              Response.Write("</div>")
-                             
-                             
-                        
+                          
                          Else
-                             
+                             Response.Write("<td style=""max-width:160px""  class=""" + Formato_Moneda + """>")
                              If Model.ListGroupRatesin.Item(j).RateDouble = 0 Then
                                  Response.Write("N/A")
                              Else
-                                 Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateDouble), 0, , , TriState.True))
+                                 Response.Write(Model.ListGroupRatesin.Item(j).RateDouble)
                              End If
                              
                          End If
                  
                          Response.Write("</td>")
                      
-                         Response.Write("<td>")
+                         Response.Write("<td  class=""" + Formato_Moneda + """>")
                  
                          If Model.ListGroupRatesin.Item(j).RateTripleandFour = 0 Then
                              Response.Write("N/A")
                          Else
-                             Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateTripleandFour), 0, , , TriState.True))
+                             Response.Write(Model.ListGroupRatesin.Item(j).RateTripleandFour)
                          End If
                 
                          Response.Write("</td>")
                      
                      
-                         Response.Write("<td>")
+                         Response.Write("<td  class=""" + Formato_Moneda + """>")
                  
                          If Model.ListGroupRatesin.Item(j).RateTeensValue = 0 Then
                              Response.Write("N/A")
                          Else
-                             Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateTeensValue), 0, , , TriState.True))
+                               Response.Write(Model.ListGroupRatesin.Item(j).RateTeensValue)
                          End If
                  
                          Response.Write("</td>")
                      
-                         Response.Write("<td>")
+                         Response.Write("<td  class=""" + Formato_Moneda + """>")
                  
                          If Model.ListGroupRatesin.Item(j).RateChildrens = 0 Then
                              Response.Write("N/A")
                          Else
-                             Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateChildrens), 0, , , TriState.True))
+                             Response.Write(Model.ListGroupRatesin.Item(j).RateChildrens)
                          End If
              
                          Response.Write("</td>")
                     
-                         Response.Write("<td >")
+                         Response.Write("<td  class=""" + Formato_Moneda + """>")
                     
-                         Response.Write(FormatNumber( Math.Ceiling(Model.ListGroupRatesin.Item(j).RateDouble) *2, 0, , , TriState.True))
+                         Response.Write(Model.ListGroupRatesin.Item(j).RateDouble)
                          Response.Write("</td>")
              
                          Response.Write("</td>")
                     
-                         Response.Write("<td>")
-                    
-                         Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateRevenuePerRoom), 0, , , TriState.True))
+                         Response.Write("<td  class=""" + Formato_Moneda + """>")
+                         Response.Write(Model.ListGroupRatesin.Item(j).RateRevenuePerRoom)
                          Response.Write("</td>")
                  
                          Response.Write("</td>")
-                    
-                         Response.Write("<td class=""rate-price"">")
-                    
-                         Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(j).RateRevenue), 0, , , TriState.True))
+                         Dim classes As String = Formato_Moneda + " hoy rate-price"
+                         Response.Write("<td class=""" + classes + """>")       
+                         Response.Write(Model.ListGroupRatesin.Item(j).RateRevenue)
                          Response.Write("</td>")
-                  
-                    
+                         
+                         If Model.EditGroupData7 > 0 Then
+                             Dim precio_descuento As Double = (Model.ListGroupRatesin.Item(j).RateRevenue * (1 - (Model.EditGroupData7 / 100)))
+                             Response.Write("<td class=""" + classes + """>")
+                             Response.Write(precio_descuento)
+                             Response.Write("</td>")
+                         End If
                          Response.Write("</tr>")
-             
-            
+                     
                      Next
-         
-         
+    
                      Response.Write("<tr class=""no-hover""> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>")
-             
                      Response.Write("<td class=""rate-total"">Total Price</td>")
-             
-                     Response.Write("<td class=""rate-price"">$ " + FormatNumber(Math.Ceiling(Model.RevenueFinal), 0, , , TriState.True) + "</td>")
-             
-                     Response.Write("</tr>  </tbody> </table> </div>   </div><!--first tab--> ")
-                
-  
-                     %>
-                                                                                                                         
-
+                     
+                     Response.Write("<td class=""rate-price Total hoy " + Formato_Moneda + """>" + CStr(Model.RevenueFinal) + "</td> </tr> ")
+                     
+                     If Model.EditGroupData7 > 0 Then
+                         Response.Write("<tr class=""no-hover""> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>")
+                         Response.Write("<td class=""rate-total"">Discount(" + CStr(CDbl(Model.EditGroupData7)) + "%)</td>")
+                         Dim descuento As Double = (Model.RevenueFinal) * (Model.EditGroupData7 / 100)
+                         Response.Write("<td class=""rate-price Total hoy " + Formato_Moneda + """>" + CStr(descuento) + "</td> </tr> ")
+                         
+                         Response.Write("<tr class=""no-hover""> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>")
+                         Response.Write("<td class=""rate-total"">Final Price</td>")
+                     
+                         Response.Write("<td class=""rate-price Total hoy " + Formato_Moneda + """>" + CStr(Model.RevenueFinal - descuento) + "</td> </tr> ")
+                     End If
+                   
+                     Response.Write(" </tbody> </table> </div>   </div><!--first tab--> ")
+     
+                     %>                                                                                                                   
                </div><!-- Ende Nav tabs  promos-->
 
 
@@ -945,16 +952,28 @@
 
 
 
-<% If Model.GroupTypeRate = 1  Then%>
+<% If Model.GroupTypeRate = 1 Then
+        Dim Date1 As Date
+        Dim Date2 As Date
+        Dim Commission As String
+        Dim Discount As String
+        
+        If Model.ListGroupRatesin.Count = 0 Then
+        
+            Response.Write(" <h2> RATES NOT AVAILABLE </h2>")
+        Else
+            Date1 = Model.ListGroupRatesin.Item(0).InitDateRate
+            Date2 = Model.ListGroupRatesin.Item(0).EndDateRate
+            Commission = Model.ListGroupRatesin.Item(0).CommissionRate
+            Discount = Model.ListGroupRatesin.Item(0).DiscountRate
+        
+        %>
 
-
-<ul class="nav nav-tabs nav-justified dual-select" role="tablist" >
-                  <li role="presentation" class=" col-xs-4 col-md-4 active"><a href="#promotion-0" aria-controls="rates" role="tab" data-toggle="tab">Rate 1</a></li>
-                 <%-- <li role="presentation" class=" col-xs-4 col-md-4"><a href="#promotion-two" aria-controls="pays" role="tab" data-toggle="tab">Rate 2</a></li>--%>
-                                                                     
-</ul>
-
-
+        <ul class="nav nav-tabs nav-justified dual-select" role="tablist" >
+                  <li role="presentation" class=" col-xs-4 col-md-4 active">
+                      <a href="#promotion-0" aria-controls="rates" role="tab" data-toggle="tab">Rate 1 <% Response.Write("(" + Date1.ToString("yyyy-MM-dd") + " to " + Date2.ToString("yyyy-MM-dd") + ") Promo: " + Model.ListGroupRatesin.Item(0).RateCveValue)%></a>
+                  </li>
+        </ul>
                                                                     <!-- Tab panes -->
                                                                     <div class="tab-content scroll-x">
                                                                           <div role="tabpanel" class="tab-pane active " id="promotion-0" style=" min-width:1077px; "><!--first tab-->
@@ -973,7 +992,13 @@
                                                                                               <th >3th & 4th <div>3th & 4th</div></th>
                                                                                               <th >Teenagers <div>Teenagers</div></th>
                                                                                               <th >Childs <div>Childs</div></th>
+                                                                                              <th >Room Night <div>Room Night</div></th>
+                                                                                              <th >Rate Per Room <div>Rate Per Room</div></th>
                                                                                               <th>Total Price <div>Total Price</div></th>
+                                                                                                 <%If Model.EditGroupData7 > 0 Then%>
+                                                                                 
+                                                                                            <th>Discounted Rate <div>Discounted Rate</div></th>
+                                                                                               <% End If%>
                                                                                             </tr>
                                                                                           </thead>
                                                                                           <tbody>
@@ -981,26 +1006,12 @@
                                                                                  
              <% 
                  
-                 
-                 
-                 
-                 'Response.Write("   <th >Type of Suite <div>Type of Suite</div></th>")
-                 'Response.Write("   <th >Number of Rooms <div>Number of Rooms</div></th>")
-                 'Response.Write("   <th >Availability <div>Availability</div></th>")
-                 ''Response.Write("   <th >Code <div>Code</div></th>")
-                 'Response.Write("   <th >Single <div>Single</div></th>")
-                 'Response.Write("    <th >Double <div>Double</div></th>")
-                 'Response.Write("    <th >3th & 4th <div>3th & 4th</div></th>")
-                 'Response.Write("    <th >Teenagers <div>Teenagers</div></th>")
-                 'Response.Write("  <th >Childs <div>Childs</div></th>")
-                 'Response.Write("  <th >Room Night <div>Room Night</div></th>")
-                 'Response.Write("  <th >Rate Per Room <div>Rate Per Room</div></th>")
-                 'Response.Write("  <th>Total Price <div>Total Price</div></th>")
-                 
                 Dim i As Integer
-                
+                 Dim Formato_Moneda As String
    
                  For i = 0 To Model.ListGroupRatesin.Count - 1
+                     
+                     Formato_Moneda = Model.ListGroupRatesin.Item(i).Formato
                      
                      If Model.ListGroupRatesin.Item(i).Availability = "Available" Then
                          Response.Write("<tr>")
@@ -1010,7 +1021,7 @@
                      End If
                     
                     
-                     Response.Write("<td>")
+                     Response.Write("<td class=""tip"" data-tip=""" + Model.ListGroupRatesin.Item(i).Tip + """>")
                      Response.Write(Model.ListGroupRatesin.Item(i).SuiteCode)
                      Response.Write("</td>")
                      
@@ -1020,6 +1031,9 @@
                      If Model.ListGroupRatesin.Item(i).Availability = "Available" Then
                          
                          Response.Write("<input type=""text"" class=""form-control input-custom corners-inputs numhabitaciones"" value=""" + Model.ListGroupRatesin.Item(i).RatePax.ToString + """ name=""List_Pax"" placeholder=""0"" style=""text-align: center !important;"" >")
+                    
+                         Response.Write("<input type=""text""  value=""" + Model.ListGroupRatesin.Item(i).SuiteCode.ToString + """ name=""List_Suites"" placeholder=""0"" hidden  >")
+                     
                      Else
                          
                          Response.Write("<input type=""text"" class=""form-control input-custom corners-inputs"" value=""" + Model.ListGroupRatesin.Item(i).RatePax.ToString + """ name=""List_Pax"" placeholder=""0"" style=""text-align: center !important;"" disabled=""disabled"" >")
@@ -1034,8 +1048,8 @@
                      If Model.GroupTypeRate = 2 or Model.GroupTypeRate = 3 Then
                          Response.Write(" <button type=""button"" class=""btn btn-primary"" disabled data-toggle=""modal"" data-target=""#modalPeriodos"">View</button>")
                      Else
-                         
-                         Response.Write(" <button type=""button"" class=""btn btn-primary"" data-toggle=""modal"" data-target=""#modalPeriodos"">View</button>")
+                         Response.Write(" <a class=""btn btn-primary StartAvailability"" href=""#" + Model.ListGroupRatesin.Item(i).SuiteCode.ToString + """  >View</a>")
+                        'Response.Write(" <button type=""button"" class=""btn btn-primary"" data-toggle=""modal"" data-target=""#modalPeriodos"">View</button>")
                          
                      End If
                    
@@ -1045,12 +1059,12 @@
                      Response.Write(Model.ListGroupRatesin.Item(i).SuiteCode)
                      Response.Write("</td>")
                     
-                     Response.Write("<td>")
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
                      
-                     Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateSingle), 0, , , TriState.True))
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateSingle)
                      Response.Write("</td>")
                      
-                     Response.Write("<td>")
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
                      
                      If Model.GroupTypeRate = 2  or Model.GroupTypeRate = 3 Then
                          
@@ -1065,36 +1079,53 @@
                      
                      
                      If Model.GroupTypeRate = 1  Then
-                         
-                         
-                         Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateDouble), 0, , , TriState.True))
+                  
+                         Response.Write(Model.ListGroupRatesin.Item(i).RateDouble)
                       
-                         
-                         
                      End If
                      
                     
                      Response.Write("</td>")
                      
-                     Response.Write("<td>")
-                     Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateTripleandFour) , 0, , , TriState.True))
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateTripleandFour)
                      Response.Write("</td>")
                      
                      
-                     Response.Write("<td>")
-                     Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateChildrens), 0, , , TriState.True))
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateChildrens)
                      Response.Write("</td>")
                      
-                     Response.Write("<td>")
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
                    
-                     Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateTeensValue), 0, , , TriState.True))
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateTeensValue)
+                     Response.Write("</td>")
+                 
+                     'Columnas nuevas
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
+                    
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateDouble)
+                     Response.Write("</td>")
+             
                      Response.Write("</td>")
                     
-                     Response.Write("<td class=""rate-price"">")
-                    
-                     Response.Write(FormatNumber(Math.Ceiling(Model.ListGroupRatesin.Item(i).RateRevenue), 0, , , TriState.True))
+                     Response.Write("<td class=""" + Formato_Moneda + """>")
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateRevenuePerRoom)
                      Response.Write("</td>")
-                  
+                     ' Fin de columnas nuevas
+                     
+                     Dim classes As String = Formato_Moneda + " hoy rate-price"
+                     Response.Write("<td class=""" + classes + """>")
+                    
+                     Response.Write(Model.ListGroupRatesin.Item(i).RateRevenue)
+                     Response.Write("</td>")
+                     
+                     If Model.EditGroupData7 > 0 Then
+                         Dim precio_descuento As Double = (Model.ListGroupRatesin.Item(i).RateRevenue * (1 - (Model.EditGroupData7 / 100)))
+                         Response.Write("<td class=""" + classes + """>")
+                         Response.Write(precio_descuento)
+                         Response.Write("</td>")
+                     End If
                     
                      Response.Write("</tr>")
                  Next
@@ -1110,23 +1141,27 @@
                                                                                               <td></td>
                                                                                               <td></td>
                                                                                               <td></td>
-                                                                                              <td class="rate-total">Total Price</td>
-                                                                                              <td class="rate-price">$ <%:FormatNumber(Math.Ceiling(Model.RevenueFinal), 0, , , TriState.True) %></td>
-                                                                                            </tr>
+                                                                                              <td></td>
+                                                                                              <td></td>
+                                                                                              <td class="rate-total">Total Price </td>
+                                                                                                <%Response.Write("<td class='rate-price Total hoy " + Formato_Moneda + "'>" + CStr(Model.RevenueFinal) + "</td>")%>
+                                                                                             </tr>
+                                                                                               <% If Model.EditGroupData7 > 0 Then
+                                                                                                       Response.Write("<tr class='no-hover'> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td><td></td>")
+                                                                                                       Response.Write("<td class='rate-total'>Discount(" + CStr(CDbl(Model.EditGroupData7)) + "%)</td>")
+                                                                                                       Dim descuento As Double = (Model.RevenueFinal) * (Model.EditGroupData7 / 100)
+                                                                                                       Response.Write("<td class='rate-price Total hoy " + Formato_Moneda + "'>" + CStr(descuento) + "</td> </tr> ")
+                         
+                                                                                                       Response.Write("<tr class=""no-hover""> <td></td> <td></td><td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>")
+                                                                                                       Response.Write("<td class=""rate-total"">Final Price</td>")
+                     
+                                                                                                       Response.Write("<td class='rate-price Total hoy " + Formato_Moneda + "'>" + CStr(Model.RevenueFinal - descuento) + "</td> </tr> ")
+                                                                                                   End If%>
+
                                                                                           </tbody>
                                                                                       </table>
                                                                                   </div>
                                                                           </div><!--first tab-->
-
-                                                                        <%--  <div role="tabpanel" class="tab-pane" id="promotion-two"><!--fsecond tab-->
-
-                                                                          </div><!--second tab-->--%>
-
-                                                                        
-
-                                                                    </div><!-- Ende Nav tabs  promos-->
-
-
+                                                                    </div>
+    <% End If%>
 <% End If%>
-
-

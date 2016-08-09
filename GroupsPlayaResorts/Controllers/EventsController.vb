@@ -18,10 +18,9 @@ Imports Microsoft.Reporting.WebForms
 
 Namespace GroupsPlayaResorts
     Public Class EventsController
-        'Inherits System.Web.Mvc.Controller
-        'Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
-        'Public conn = New SqlConnection(coonString)
-        Inherits ApplicationController
+        Inherits System.Web.Mvc.Controller
+        Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
+        Public conn = New SqlConnection(coonString)
 
         '
         ' GET: /Events
@@ -34,7 +33,7 @@ Namespace GroupsPlayaResorts
         ' GET: /Events/EventsList
         <Authorize()> _
         Function EventsList() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New GroupsList
 
             conn.Open()

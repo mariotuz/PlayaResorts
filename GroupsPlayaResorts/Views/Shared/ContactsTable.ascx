@@ -33,15 +33,11 @@
 
 
  <div id="toolbar">
-     <%
-         If (ViewData("idseccion4subseccion7edit_permission") IsNot Nothing And ViewData("idseccion4subseccion7edit_permission") > 0) Then
-             Response.Write("<button id=""EditRequestContact""  name=""ContactButtons"" value=""Edit_Request_Contact"" class=""btn btn-default"" ><i class=""fa fa-pencil-square-o""></i> Edit</button>")
-         End If
-                                            
-         If (ViewData("idseccion4subseccion7delete_permission") IsNot Nothing And ViewData("idseccion4subseccion7delete_permission") > 0) Then
-             Response.Write("<a id=""DeleteRequestContact""  class=""btn btn-default"">Delete</a>")
-         End If
-    %>                                                                                     
+
+                                                  <button id="EditRequestContact"  name="ContactButtons" value="Edit_Request_Contact" class="btn btn-default" ><i class="fa fa-pencil-square-o"></i> Edit</button>
+                                                  
+                                                  <a id="DeleteRequestContact"  class="btn btn-default">Delete</a>
+                                                                                           
  </div> 
 
                                         <table class="table-no-bordered" id="table-list"

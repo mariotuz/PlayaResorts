@@ -41,25 +41,29 @@
 
 
 
-<div class=" breack-down-list col-xs-12 col-sm-12 col-md-12 nopadding">
-    <ul class="col-xs-12 col-sm-12 col-md-6 col-lg-4 nopadding">
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Total Rooms</span>     <span class="dp number"><%: model.TotalNumRooms %></span> <div class="deploy">-<%: model.TotalDeployRooms %> <i class="fa fa-caret-down"></i><br> <div class="txt-dploy">Deployment</div></div> </li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Tentative Rooms</span> <span class="number"><%: model.TotalTentativeRooms %></span></li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Adults</span>       <span class="number"><%: model.TotalAdults %></span></li>
-    </ul>
-    <ul class="col-xs-12 col-sm-12 col-md-6 col-lg-3 nopadding">
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Teenager</span>       <span class="number"><%: Model.TotalTeens%></span></li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Childs</span>       <span class="number"><%: Model.TotalChildrens%></span></li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Infants</span>       <span class="number"><%: model.TotalInfants %></span></li>
-    </ul>
-    <ul class="col-xs-12 col-sm-12 col-md-12 col-lg-5 nopadding">
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Total Of Deposits</span><span class="number">$ <%: FormatNumber(Model.TotalDeposit, 0, , , TriState.True)%></span></li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Balance</span>       <span class="number">$ <%: FormatNumber(Model.TotalBalance, 0, , , TriState.True)%></span></li>
-        <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Estimated Revenue</span>        <span class="number">$ <%: FormatNumber(model.TotalRevenue, 0, , , TriState.True) %></span></li>
-    </ul>
-</div>
+                                        <div class=" breack-down-list col-xs-12 col-sm-12 col-md-12 nopadding">
+                                            <ul class="col-xs-12 col-sm-12 col-md-6 col-lg-4 nopadding">
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Total Rooms</span>     <span class="dp number"><%: model.TotalNumRooms %></span> <div class="deploy">-<%: model.TotalDeployRooms %> <i class="fa fa-caret-down"></i><br> <div class="txt-dploy">Deployment</div></div> </li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Tentative Rooms</span> <span class="number"><%: model.TotalTentativeRooms %></span></li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Adults</span>       <span class="number"><%: model.TotalAdults %></span></li>
+                                            </ul>
+                                            <ul class="col-xs-12 col-sm-12 col-md-6 col-lg-3 nopadding">
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Teenager</span>       <span class="number"><%: Model.TotalTeens%></span></li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Childs</span>       <span class="number"><%: Model.TotalChildrens%></span></li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">No. Infants</span>       <span class="number"><%: model.TotalInfants %></span></li>
+                                            </ul>
+                                            <ul class="col-xs-12 col-sm-12 col-md-12 col-lg-5 nopadding">
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Total Of Deposits</span><span class="number">$ <%: FormatNumber(Model.TotalDeposit, 0, , , TriState.True)%></span></li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Balance</span>       <span class="number">$ <%: FormatNumber(Model.TotalBalance, 0, , , TriState.True)%></span></li>
+                                              <li class="col-xs-4 col-sm-4 col-md-4 col-lg-4 nopadding"><span class="title-number">Estimated Revenue</span>        <span class="number">$ <%: FormatNumber(model.TotalRevenue, 0, , , TriState.True) %></span></li>
+                                            </ul>
+                                          </div>
 
-<div class="clear"></div>
+                                         
+
+                                                              
+
+                                          <div class="clear"></div>
 
 
 <% Using Ajax.BeginForm("GroupDetail", "Groups", New AjaxOptions With {.OnBegin="OnBegin",.OnComplete="OnComplete",.OnSuccess = "OnSuccessBreakDownEdit", .OnFailure = "OnFailureBreakDownEdit", .UpdateTargetId = "AJAX_ContainerBreakDownDos"})%>

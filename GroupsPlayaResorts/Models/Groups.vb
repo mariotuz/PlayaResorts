@@ -11,6 +11,7 @@ Public Class GroupsList
     Private ListaGroupMarket As List(Of SelectListItem)
     Private ListaGroupType As List(Of SelectListItem)
     Private ListaAgencyType As List(Of SelectListItem)
+    Private ListHotelPermissions As List(Of SelectListItem)
 
 
     Public TotalRevenueValue As Double
@@ -40,6 +41,14 @@ Public Class GroupsList
         End Get
         Set(ByVal value As List(Of SelectListItem))
             ListGroupCordinator = value
+        End Set
+    End Property
+    Public Property ListHotelPermissionsin() As List(Of SelectListItem)
+        Get
+            Return ListHotelPermissions
+        End Get
+        Set(ByVal value As List(Of SelectListItem))
+            ListHotelPermissions = value
         End Set
     End Property
 
@@ -352,11 +361,6 @@ Public Class GroupsDetail
     Private ListGroupDocuments As List(Of GroupsDocList)
     Private ListGroupBreakdown As List(Of GroupsBreakList)
     Private ListGroupBreakdownGroupBy As List(Of GroupsBreakList)
-
-    'BEGIN: Lista para breakdown virtual
-    Private ListVirtualBreakdown As List(Of GroupsBreakList)
-    'END: Lista para breakdown virtual
-
     Private ListGroupLogBook As List(Of GroupsLogBookList)
     Private ListGroupPayments As List(Of GroupsPaymentsList)
     Private ListGroupEvents As List(Of GroupsEventsList)
@@ -367,10 +371,11 @@ Public Class GroupsDetail
     Private ListaGroupMarket As List(Of SelectListItem)
     Private ListaAgencyType As List(Of SelectListItem)
     Private ListaSchemePayments As List(Of SelectListItem)
-    Private ListaSuite As List(Of SuitesList)
+    Private ListaSuite As List(Of SelectListItem)
     Private ListaBreakdownPax As List(Of SelectListItem)
 
     Private ListGroupCordinator As List(Of SelectListItem)
+    Private ListHotelPermissions As List(Of SelectListItem)
     Private ListOnsiteCordinator As List(Of SelectListItem)
     Private ListEventCordinator As List(Of SelectListItem)
     Private ListEventSeller As List(Of SelectListItem)
@@ -638,6 +643,14 @@ Public Class GroupsDetail
             ListGroupCordinator = value
         End Set
     End Property
+    Public Property ListHotelPermissionsin() As List(Of SelectListItem)
+        Get
+            Return ListHotelPermissions
+        End Get
+        Set(ByVal value As List(Of SelectListItem))
+            ListHotelPermissions = value
+        End Set
+    End Property
 
     Public Property ListOnsiteCordinatorin() As List(Of SelectListItem)
         Get
@@ -666,11 +679,11 @@ Public Class GroupsDetail
         End Set
     End Property
 
-    Public Property ListaSuitein() As List(Of SuitesList)
+    Public Property ListaSuitein() As List(Of SelectListItem)
         Get
             Return ListaSuite
         End Get
-        Set(ByVal value As List(Of SuitesList))
+        Set(ByVal value As List(Of SelectListItem))
             ListaSuite = value
         End Set
     End Property
@@ -751,17 +764,6 @@ Public Class GroupsDetail
         End Set
     End Property
 
-    'BEGIN: lista publica de breakdown virtual
-    Public Property ListVirtualBreakdownin() As List(Of GroupsBreakList)
-        Get
-            Return ListVirtualBreakdown
-        End Get
-        Set(ByVal value As List(Of GroupsBreakList))
-            ListVirtualBreakdown = value
-        End Set
-    End Property
-    'END: lista publica de breakdown virtual
-
     Public Property ListGroupDocumentsin() As List(Of GroupsDocList)
         Get
             Return ListGroupDocuments
@@ -824,6 +826,7 @@ Public Class GroupsDetail
             EditGroupData50Value = value
         End Set
     End Property
+
 
     Public Property EditGroupData49() As String
         Get
@@ -1392,48 +1395,6 @@ Public Class GroupsDetail
 
 End Class
 
-Public Class SuitesList
-    Private ValueValue As String
-    Private TextValue As String
-    Private SelectedValue As Boolean
-    Private StatusValue As String
-
-    Public Property Value() As String
-        Get
-            Return ValueValue
-        End Get
-        Set(value As String)
-            ValueValue = value
-        End Set
-    End Property
-
-    Public Property Text() As String
-        Get
-            Return TextValue
-        End Get
-        Set(value As String)
-            TextValue = value
-        End Set
-    End Property
-
-    Public Property Selected() As Boolean
-        Get
-            Return SelectedValue
-        End Get
-        Set(value As Boolean)
-            SelectedValue = value
-        End Set
-    End Property
-
-    Public Property Status() As String
-        Get
-            Return StatusValue
-        End Get
-        Set(value As String)
-            StatusValue = value
-        End Set
-    End Property
-End Class
 
 Public Class GroupsRatesList
 
@@ -1466,7 +1427,25 @@ Public Class GroupsRatesList
     Public NinosGMaxValue As String
     Public Alias_PromoValue As String
     Public Description_PromoValue As String
+    Private FormatoValue As String
+    Private TipValue As String
 
+    Public Property Formato() As String
+        Get
+            Return FormatoValue
+        End Get
+        Set(ByVal value As String)
+            FormatoValue = value
+        End Set
+    End Property
+    Public Property Tip() As String
+        Get
+            Return TipValue
+        End Get
+        Set(ByVal value As String)
+            TipValue = value
+        End Set
+    End Property
 
     Public Property Description_Promo() As String
         Get
@@ -2132,6 +2111,7 @@ Public Class GroupsReportRoomRatesList
     Public Code_RoomValue As String
     Public Description_PromoValue As String
     Public AvailabilityValue As String
+    Public FormatoValue As String
 
 
     Public Property Availability() As String
@@ -2205,6 +2185,14 @@ Public Class GroupsReportRoomRatesList
         End Get
         Set(ByVal value As Double)
             Rate_1Value = value
+        End Set
+    End Property
+    Public Property R_Show() As String
+        Get
+            Return FormatoValue
+        End Get
+        Set(ByVal value As String)
+            FormatoValue = value
         End Set
     End Property
 
@@ -2336,6 +2324,7 @@ Public Class GroupsReportRoomingList
     Public DateNightValue As Date
     Public FlagValue As Integer
     Public NumberNigthsValue As Integer
+    Public FormatoValue As String
 
 
     Public Property NumberNigths() As Integer
@@ -2579,6 +2568,15 @@ Public Class GroupsReportRoomingList
         End Set
     End Property
 
+
+    Public Property R_Show() As String
+        Get
+            Return FormatoValue
+        End Get
+        Set(ByVal value As String)
+            FormatoValue = value
+        End Set
+    End Property
   
 
 End Class
@@ -2717,6 +2715,10 @@ Public Class GroupsReportGCRList
 
 End Class
 
+
+
+
+
 Public Class GroupsReportRevenueList
 
 
@@ -2725,6 +2727,7 @@ Public Class GroupsReportRevenueList
     Public RevenueValue As Double
     Public PeopleValue As Double
     Public TotalValue As Double
+    Public FormatoValue As String
 
 
     Public Property Num_Rooms() As Integer
@@ -2761,6 +2764,16 @@ Public Class GroupsReportRevenueList
         End Get
         Set(ByVal value As Double)
             TotalValue = value
+        End Set
+    End Property
+
+
+    Public Property R_Show() As String
+        Get
+            Return FormatoValue
+        End Get
+        Set(ByVal value As String)
+            FormatoValue = value
         End Set
     End Property
 

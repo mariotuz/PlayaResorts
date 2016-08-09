@@ -611,10 +611,6 @@ input {
   overflow-x: hidden;
 }
 
-.header-fixed2{
-  overflow-x: auto;
-}
-
 .header-fixed .table{
   border-spacing: 0;
   width:80%;
@@ -1442,7 +1438,7 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active){
     background-color:#0c3a6d;
     color:#b8e6f8;
     height:35px;
-    /*width:auto;*/
+    width:auto;
     padding:5px;
     font-weight:normal;
     
@@ -1456,11 +1452,6 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active){
     border-spacing:5px;
     font-weight:normal;
     
-}
-
-.bootstrap-datetimepicker-widget table tr {
-    border: 0px solid #fff;
-    background-color:#FFF ;    
 }
 
 .table_break tr.detail-view {
@@ -1481,7 +1472,7 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active){
     background-color:#0c3a6d;
     color:#b8e6f8;
     height:35px;
-    /*width:auto;*/
+    width:auto;
     padding:3px;
     font-weight:normal;
     
@@ -1505,35 +1496,4 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active){
 .table_breakgroup tr.detail-view {
      background-color:#23527C;
 
-}
-
-.inline {
-    background: transparent !important;
-    border: 0px solid #113f6f !important;
-    border-bottom: 1px solid #113f6f !important;
-    border-left: 1px solid #113f6f !important;
-    padding: 5px;
-    margin-left: 3px;
-    margin-bottom: 5px;
-    margin-top: 4px;
-    width:100%;
-}
-
-.inline:focus {
-    outline: none !important;
-    background:rgba(184, 230, 248,0.1) !important;
-}
-
-select.inline {
-    color: #fff !important;
-}
-
-option[disabled]{
-  color: #fff !important;
-  background: #a9a9a9;
-  cursor:not-allowed !important;
-}
-
-.tCen {
-    text-align:center;
-}
+    }

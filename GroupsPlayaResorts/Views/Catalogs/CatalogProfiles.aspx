@@ -133,95 +133,12 @@
     </script>
 
     <script type="text/javascript">
-        function CheckPermissions(_input2) {
-            var arrayPermission = [
-                    { input: "permgeneralview", idseccion: "1", idsubseccion: "1" },
-                    { input: "permdocuments", idseccion: "1", idsubseccion: "2" },
-                    { input: "permbreak", idseccion: "1", idsubseccion: "3" },
-                    { input: "permlogbook", idseccion: "1", idsubseccion: "4" },
-                    { input: "permevent", idseccion: "2", idsubseccion: "1" },
-                    { input: "permservicesandproducts", idseccion: "2", idsubseccion: "2" },
-                    { input: "permpayments", idseccion: "3", idsubseccion: "1" },
-                    { input: "permusers", idseccion: "4", idsubseccion: "1" },
-                    { input: "permprofiles", idseccion: "4", idsubseccion: "2" },
-                    { input: "permmarkets", idseccion: "4", idsubseccion: "3" },
-                    { input: "permgrouptypes", idseccion: "4", idsubseccion: "4" },
-                    { input: "permpromotions", idseccion: "4", idsubseccion: "5" },
-                    { input: "permcompanies", idseccion: "4", idsubseccion: "6" },
-                    { input: "permcontacts", idseccion: "4", idsubseccion: "7" },
-                    { input: "permservicesandproductscat", idseccion: "4", idsubseccion: "8" },
-                    { input: "permchannels", idseccion: "4", idsubseccion: "9" },
-                    { input: "permagencytypes", idseccion: "4", idsubseccion: "10" },
-                    { input: "permsuppliers", idseccion: "4", idsubseccion: "11" },
-                    { input: "permdistribution", idseccion: "4", idsubseccion: "12" },
-                    { input: "permunitsmeasure", idseccion: "4", idsubseccion: "13" }
-            ]
 
-            if (_input2) {
-                $('#frmProfileEdit').find('#DivPermisos').html('');
-            } else {
-                $('#DivPermisos').html('');
-            }
-
-            var xmlpermissions = '';
-
-            for (var i = 0; i < arrayPermission.length; i++) {
-                var inputPermisoActual = arrayPermission[i].input;
-                var idseccion = arrayPermission[i].idseccion;
-                var idsubseccion = arrayPermission[i].idsubseccion;
-                var arraySeccion1Sub1 = (_input2) ? $('#frmProfileEdit').find('input[name="' + inputPermisoActual + '"]') : $('input[name="' + inputPermisoActual + '"]');
-
-                var valuePermission = '';
-                var tienePermiso = 0;
-
-                for (var j = 0; j < arraySeccion1Sub1.length; j++) {
-                    if (_input2) {
-                        var valActual = ($('#frmProfileEdit').find(arraySeccion1Sub1[j]).is(":checked")) ? $(arraySeccion1Sub1[j]).val() : '';
-                    } else {
-                        var valActual = ($(arraySeccion1Sub1[j]).is(":checked")) ? $(arraySeccion1Sub1[j]).val() : '';
-                    }
-
-                    if (valActual != '')
-                        tienePermiso++;
-
-                    if (valActual != '') {
-                        if (valuePermission == '')
-                            valuePermission = '<seccion idseccion="' + idseccion + '" idsubseccion="' + idsubseccion + '"';
-
-                        switch (valActual) {
-                            case "1": valuePermission = valuePermission + ' new_permission="1"'; break;
-                            case "2": valuePermission = valuePermission + ' edit_permission="1"'; break;
-                            case "3": valuePermission = valuePermission + ' delete_permission="1"'; break;
-                            case "4": valuePermission = valuePermission + ' consult_permission="1"'; break;
-                            case "5": valuePermission = valuePermission + ' upload_permission="1"'; break;
-                            case "6": valuePermission = valuePermission + ' validate_permission="1"'; break;
-                        }
-                    }
-                }
-
-                if (tienePermiso > 0) {
-                    valuePermission = valuePermission + '/>';
-                    xmlpermissions = xmlpermissions + valuePermission
-                }
-            }
-
-            var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
-
-            if (_input2) {
-                $('#frmProfileEdit').find('#DivPermisos').append('<input type="hidden" name="xml" value="' + Base64.encode(xmlpermissions) + '"/>');
-                $('#UpdateProfileEnd').click();
-            } else {
-                $('#DivPermisos').append('<input type="hidden" name="xml" value="' + Base64.encode(xmlpermissions) + '"/>');
-                $('#InsertProfileEnd').click();
-            }
-        }
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
+
           });
 
     </script>
@@ -253,24 +170,17 @@
                                 <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 124-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new user & list of users-->
-                                        <% 
-                                            If (ViewData("idseccion4subseccion2new_permission") IsNot Nothing And ViewData("idseccion4subseccion2new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newprofile_head""><a href=""#newprofile"" aria-controls=""newprofile"" role=""tab"" data-toggle=""tab"">Add New Profile</a></li>")
-                                            End If
-                                      
-                                            If (ViewData("idseccion4subseccion2consult_permission") IsNot Nothing And ViewData("idseccion4subseccion2consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""profilelist_head""><a href=""#profilelist"" aria-controls=""profilelist"" role=""tab"" data-toggle=""tab"">Profiles List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newprofile_head" class="active"><a href="#newprofile" aria-controls="newprofile" role="tab" data-toggle="tab">Add New Profile</a></li>
+                                      <li role="presentation" id="profilelist_head"><a href="#profilelist" aria-controls="profilelist" role="tab" data-toggle="tab">Profiles List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add profile list sections-->
 
-                                            <div role="tabpanel" class="tab-pane" id="newprofile"><!--Star tab form user-->
+                                            <div role="tabpanel" class="tab-pane active" id="newprofile"><!--Star tab form user-->
 
 
-                                                <% Using Ajax.BeginForm("CatalogProfiles", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"}, New With {.id = "FormProfile"})%>
-                                                 <div id="DivPermisos"></div>
+                                                <% Using Ajax.BeginForm("CatalogProfiles", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>
+                                                 
                                                  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 alert-wrap" > 
 
                                                      <%: Html.ValidationMessageFor(Function(m) m.ProfileName)%>
@@ -284,7 +194,6 @@
                                                 <header class="encabezado"><h2 class="md-display-2">Add Profile</h2><p> </p></header>
 
                                                 <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12 form-catalog"><!--form-->
-                                                     <input type="hidden" name="Id_User" value="<%: Session("IDUser")%>" />
 
                                                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                                         <span><small>Profile Name *</small></span>
@@ -314,28 +223,28 @@
                                                                         <div role="tabpanel" class="tab-pane active" id="prms-profile-group"><!-- Start Tab permission Profile --> 
                                                                                    
                                                                              
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="1" idsubseccion="1">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>General View </p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" permission="deletepermission" value="3"><label class="check"></label><span>Cancelled</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" value="3"><label class="check"></label><span>Cancelled</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permgeneralview" value="4"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>
 
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="1" idsubseccion="2">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>Document & formats</p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" permission="uploadpermission" value="5"><label class="check"></label><span>Upload</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permdocuments" value="5"><label class="check"></label><span>Upload</span></div>
                                                                                   <%--<div class="" style="display:inline-block;"><input type="checkbox" name="consult" value="Bike"><label class="check"></label><span>Consult</span></div>--%>
                                                                                 </div>
 
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="1" idsubseccion="3">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>Breakdown</p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" permission="deletepermission" value="3"><label class="check"></label><span>Cancelled</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" value="3"><label class="check"></label><span>Cancelled</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permbreak" value="4"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>
 
                                                                                <%-- <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -346,12 +255,12 @@
                                                                                   <div class="" style="display:inline-block;"><input type="checkbox" name="consult" value="Bike"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>--%>
                                                                                 
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="1" idsubseccion="4">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>LogBook</p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permlogbook" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permlogbook" value="1"><label class="check"></label><span>New</span></div>
                                                                                 <%--  <div class="" style="display:inline-block;"><input type="checkbox" name="edit" value="Bike"><label class="check"></label><span>Edit</span></div>
                                                                                   <div class="" style="display:inline-block;"><input type="checkbox" name="delete" value="Bike"><label class="check"></label><span>Delete</span></div>--%>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permlogbook" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permlogbook" value="4"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>
 
                                                                              
@@ -371,20 +280,20 @@
                                                                                   <div class="" style="display:inline-block;"><input type="checkbox" name="consult" value="Bike"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>--%>
 
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="2" idsubseccion="1">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>Event</p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" permission="deletepermission" value="3"><label class="check"></label><span>Cancelled</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" value="3"><label class="check"></label><span>Cancelled</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permevent" value="4"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>
 
-                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="2" idsubseccion="2">
+                                                                                <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                   <p>Add Services/Product</p><br>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" permission="deletepermission" value="3"><label class="check"></label><span>Cancelled</span></div>
-                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" value="1"><label class="check"></label><span>New</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" value="3"><label class="check"></label><span>Cancelled</span></div>
+                                                                                  <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproducts" value="4"><label class="check"></label><span>Consult</span></div>
                                                                                 </div>
 
                                                                          <%--       <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -404,13 +313,13 @@
 
                                                                              
 
-                                                                              <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="3" idsubseccion="1">
+                                                                              <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                                 <p>Payments </p><br>
-                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" permission="deletepermission" value="3"><label class="check"></label><span>Cancelled</span></div>
-                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
-                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" permission="validatepermission" value="6"><label class="check"></label><span>Validate</span></div>
+                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" value="1"><label class="check"></label><span>New</span></div>
+                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" value="3"><label class="check"></label><span>Cancelled</span></div>
+                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                                <div class="" style="display:inline-block;"><input type="checkbox" name="permpayments" value="6"><label class="check"></label><span>Validate</span></div>
                                                                               </div>
 
                                                                              <%-- <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -431,20 +340,20 @@
 
                                                                           
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="1">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Users</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permusers" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="2">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Profiles</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permprofiles" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
                                                                            <%-- <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -455,92 +364,92 @@
                                                                               <div class="" style="display:inline-block;"><input type="checkbox" name="consult" value="Bike"><label class="check"></label><span>Consult</span></div>
                                                                             </div>--%>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="3">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Markets</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permmarkets" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="4">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Group Types</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permgrouptypes" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="5">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Promotions</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permpromotions" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="6">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Companies</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcompanies" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="7">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Contacts</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permcontacts" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="8">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Products/Services</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permservicesandproductscat" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="9">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Channels</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permchannels" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="10">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Agency Types</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permagencytypes" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="11">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Suppliers</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permsuppliers" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="12">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Distribution Groups</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permdistribution" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
-                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4" idseccion="4" idsubseccion="13">
+                                                                            <div class="box-prm-xtrs col-xs-12 col-sm-6 col-md-4 col-lg-4">
                                                                               <p>Units Measure</p><br>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" permission="newpermission" value="1"><label class="check"></label><span>New</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" permission="editpermission" value="2"><label class="check"></label><span>Edit</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" permission="deletepermission" value="3"><label class="check"></label><span>Delete</span></div>
-                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" permission="consultpermission" value="4"><label class="check"></label><span>Consult</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" value="1"><label class="check"></label><span>New</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" value="2"><label class="check"></label><span>Edit</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" value="3"><label class="check"></label><span>Delete</span></div>
+                                                                              <div class="" style="display:inline-block;"><input type="checkbox" name="permunitsmeasure" value="4"><label class="check"></label><span>Consult</span></div>
                                                                             </div>
 
                                                                           
@@ -559,9 +468,7 @@
 
                                                       <div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                                         <br>
-                                                        <button type="button" id="InsertProfile" class="btn btn-success" onclick="CheckPermissions(false);">Save New Profile</button>
-                                                        <button style="display:none;" id="InsertProfileEnd" value="Insert_Profile" name="ProfileButtons" class="btn btn-success">Save New Profile</button>
-                                                        <!--button id="InsertProfile" value="Insert_Profile" name="ProfileButtons" class="btn btn-success">Save New Profile</button-->
+                                                        <button id="InsertProfile" value="Insert_Profile" name="ProfileButtons" class="btn btn-success">Save New Profile</button>
                                                       </div>
 
                                                    <div class="clear"></div>

@@ -141,9 +141,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -178,15 +175,8 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new Agency list-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion10new_permission") IsNot Nothing And ViewData("idseccion4subseccion10new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newagency_head""><a href=""#newagency"" aria-controls=""newagency"" role=""tab"" data-toggle=""tab"">Add New Agency Type</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion10consult_permission") IsNot Nothing And ViewData("idseccion4subseccion10consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""agencyList_head"" ><a href=""#agencyList"" aria-controls=""agencyList"" role=""tab"" data-toggle=""tab"">Agency List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newagency_head" class="active"><a href="#newagency" aria-controls="newagency" role="tab" data-toggle="tab">Add New Agency Type</a></li>
+                                      <li role="presentation" id="agencyList_head" ><a href="#agencyList" aria-controls="agencyList" role="tab" data-toggle="tab">Agency List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add Agency list sections-->
@@ -197,7 +187,7 @@
                                                 <!--Notification success alert-->
 
 
-                                            <div role="tabpanel" class="tab-pane" id="newagency"><!--Star tab form agency-->
+                                            <div role="tabpanel" class="tab-pane active" id="newagency"><!--Star tab form agency-->
 
                                             <% Using Ajax.BeginForm("CatalogAgencyType", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>   
 

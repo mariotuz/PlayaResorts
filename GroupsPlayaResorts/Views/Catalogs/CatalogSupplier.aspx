@@ -145,9 +145,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -181,20 +178,13 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new supplier list-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion11new_permission") IsNot Nothing And ViewData("idseccion4subseccion11new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newsupp_head""><a href=""#newsupp"" aria-controls=""newsupp"" role=""tab"" data-toggle=""tab"">Add New Supplier</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion11consult_permission") IsNot Nothing And ViewData("idseccion4subseccion11consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""suppList_head"" ><a href=""#suppList"" aria-controls=""suppList"" role=""tab"" data-toggle=""tab"">Supplier List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newsupp_head" class="active"><a href="#newsupp" aria-controls="newsupp" role="tab" data-toggle="tab">Add New Supplier</a></li>
+                                      <li role="presentation" id="suppList_head" ><a href="#suppList" aria-controls="suppList" role="tab" data-toggle="tab">Supplier List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add Supplier list sections-->
 
-                                            <div role="tabpanel" class="tab-pane" id="newsupp"><!--Star tab form supplier-->
+                                            <div role="tabpanel" class="tab-pane active" id="newsupp"><!--Star tab form supplier-->
 
                                                  <% Using Ajax.BeginForm("CatalogSupplier", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>
 

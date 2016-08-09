@@ -32,7 +32,7 @@
             }
 
             $('#buscarGrupo').val('');
-            window.open('<%: Url.Content("~/Groups/GroupDetail")%>?id=' + valor);
+            window.open('/Groups/GroupDetail?id=' + valor);
         }
     }
 
@@ -44,7 +44,7 @@
         }
 
         $('#buscarGrupo').val('');
-        window.open('<%: Url.Content("~/Groups/GroupDetail")%>?id=' + valor);
+        window.open('/Groups/GroupDetail?id=' + valor);
     }
 
     $(document).ready(function () {
@@ -57,11 +57,7 @@
 
 
                     <div id="toolbar">  
-                        <%
-                            If (ViewData("idseccion1subseccion1new_permission") isNot Nothing and ViewData("idseccion1subseccion1new_permission") > 0) Then
-                                Response.Write("<a id=""new"" target=""_blank"" class=""btn btn-default"" href=""" & Url.Content("~/Groups/GroupDetail") & """ >Add New Group  </a>")
-                            End If
-                        %>
+                        <a id="new" target="_blank" class="btn btn-default" href="/Groups/GroupDetail" >Add New Group  </a>
                         <div class="pull-right btnSearch"><span class="btn btn-default fa fa-search" onclick="MuestraGrupo();"></span></div>
                         <div class="pull-right findGroup"><input class="form-control findGroupTxt" type="text" placeholder="Find group" id="buscarGrupo" onkeypress="ValidaTecla({e:event, valor:value});"></div>
                         <%--<a id="donepay" class="btn btn-default" data-toggle="modal" data-target="#deploy">Filters</a>--%>
@@ -143,19 +139,19 @@
                                        
                                        Date1 = Model.ListGroupDatain.Item(i).Colum2
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Date1.ToString("yyyy-MM-dd"))
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Response.Write("<td   >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum1)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                                        
                                        Response.Write("<td >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
                                        Response.Write("<span style=""display:block;width:150px;height:24px;overflow:hidden;""    >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum20.ToUpper)
                                        Response.Write("</span>")
@@ -166,7 +162,7 @@
                                      
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write("<span style=""display:block;width:150px;height:24px;overflow:hidden;""   >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum3.ToUpper)
                                        Response.Write("</span>")
@@ -174,39 +170,39 @@
                                        Response.Write("</td>")
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum4.ToUpper)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum5.ToUpper)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum6.ToUpper)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Date2 = Model.ListGroupDatain.Item(i).Colum7
                                        Response.Write("<td  >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
                                        Response.Write(Date2.ToString("yyyy-MM-dd"))
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Date3 = Model.ListGroupDatain.Item(i).Colum8
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Date3.ToString("yyyy-MM-dd"))
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum9.ToUpper)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
@@ -214,31 +210,31 @@
                                        Select Case Model.ListGroupDatain.Item(i).Colum10
                                            Case 1
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("PROSPECT")
                                            Case 2
                                                Response.Write("<td    >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("TENTATIVE")
                                            Case 3
                                                Response.Write("<td    >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled"" target=""_blank""  >")
                                                Response.Write("CANCELED")
                                            Case 4
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
                                                Response.Write("TURNED DOWN")
                                            Case 5
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("LOST")
                                            Case 6
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed"" target=""_blank""  >")
                                                Response.Write("DEFINITIVE")
                                            Case 7
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled""  target=""_blank"" >")
                                                Response.Write("EXPIRED")
                                          
                                        End Select
@@ -249,27 +245,27 @@
                                        Select Case Model.ListGroupDatain.Item(i).Colum11
                                            Case 1
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("UNPAID")
                                            Case 2
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
                                                Response.Write("PARTIAL")
                                            Case 3
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled"" target=""_blank""  >")
                                                Response.Write("CANCELED")
                                            Case 4
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("OVER PAID")
                                            Case 5
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("CONCILIATE")
                                            Case 6
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed""  target=""_blank"" >")
                                                Response.Write("PAID")
                                          
                                        End Select
@@ -279,19 +275,19 @@
                                        Select Case Model.ListGroupDatain.Item(i).Colum21
                                            Case 1
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm""  target=""_blank"" >")
                                                Response.Write("NO CONFIRM")
                                            Case 2
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos no-confirm"" target=""_blank""  >")
                                                Response.Write("SEND")
                                            Case 3
                                                Response.Write("<td   >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled""  target=""_blank"" >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos canceled""  target=""_blank"" >")
                                                Response.Write("CANCELED")
                                            Case 4
                                                Response.Write("<td  >")
-                                               Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed"" target=""_blank""  >")
+                                               Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list_dos confirmed"" target=""_blank""  >")
                                                Response.Write("CONFIRMED")
                                          
                                        End Select
@@ -300,21 +296,21 @@
                     
                                        
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum12)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        
                                        Response.Write("<td   > ")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >$ ")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >$ ")
                                        Response.Write(FormatNumber(Model.ListGroupDatain.Item(i).Colum13, 0, , , TriState.True))
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        
                                        If Model.ListGroupDatain.Item(i).Colum14 = 5 Then
                                            Response.Write("MICE")
@@ -341,35 +337,36 @@
                                        End If
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
+                    
                                        
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum15)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum16)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >$ ")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list""  target=""_blank"" >$ ")
                                        Response.Write(FormatNumber(Model.ListGroupDatain.Item(i).Colum18, 0, , , TriState.True))
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                                        
                                        Response.Write("<td    >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >$ ")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >$ ")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum17)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")
                     
                                        
                                        Response.Write("<td   >")
-                                       Response.Write(" <a  href=""" & Url.Content("~/Groups/GroupDetail") & "?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >$ ")
+                                       Response.Write(" <a  href=""/Groups/GroupDetail?id=" + Model.ListGroupDatain.Item(i).Colum19 + """ class=""link_list"" target=""_blank""  >$ ")
                                        Response.Write(Model.ListGroupDatain.Item(i).Colum17)
                                        Response.Write(" </a>")
                                        Response.Write("</td>")

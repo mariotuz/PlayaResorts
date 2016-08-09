@@ -18,177 +18,68 @@ Imports Microsoft.Reporting.WebForms
 
 
 Namespace GroupsPlayaResorts
+
+
     Public Class GroupsController
-        'Inherits System.Web.Mvc.Controller
-        Inherits ApplicationController
-        'Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
-        'Public conn = New SqlConnection(coonString)
+        Inherits System.Web.Mvc.Controller
+        Public classQuery As New Querys.Qrys
+        Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
+        Public conn = New SqlConnection(coonString)
+        'Variable para Reutilizar
+        Public R_Calc As Char = "S"
+        Public R_Show As Char = "C"
+        Public ListGroupType_Global = New List(Of SelectListItem)
+        Public ListMarkets_Global = New List(Of SelectListItem)
+        Public ListGroupCordinator_Global = New List(Of SelectListItem)
+        Public ListAgencyType_Global = New List(Of SelectListItem)
+        Public ListOnsiteCordinator_Global = New List(Of SelectListItem)
+        Public ListEventCordinator_Global = New List(Of SelectListItem)
+        Public ListEventSeller_Global = New List(Of SelectListItem)
+        Public CountryLis_Global = New List(Of SelectListItem)
+        Public EstadoLis_GLobal = New List(Of SelectListItem)
+        Public ListHotels_Global = New List(Of SelectListItem)
+        Public Array_Clv_Hotel_Tip(1, 1) As String
+        Public values As New List(Of Dictionary(Of String, String))()
 
-
-        '
         ' GET: /Groups
-
         Function Index() As ActionResult
             Return View()
         End Function
 
-        '
-        ' GET: /Group/GroupsList
+        ' GET: /Group/GroupsList Construye la vista Principal de Grupos
         <Authorize()> _
         Function GroupsList() As ActionResult
-            UserPermissions("1,2,3,4")
-            'Dim a As String
             Dim model = New GroupsList
-
+            'Abre conexion
             conn.Open()
+            Obtiene_Hoteles_Permisos()
+            'Construye Vista grupod
+            Dim DataUser As New Dictionary(Of String, String)
+            DataUser.Add("TotalRevenue", "")
+            DataUser.Add("User", Session.Item("UserName"))
 
-            Dim QueryDos As String
+            model.ListGroupDatain = Construye_Vista_Grupo(DataUser)
 
-            '= " select a.*, b.Market_Key , c.Type_Name ,d.Group_Status as PaymentStatus, e.Group_Status as BookStatus, f.Group_Status as HotelStatus,g.User_Name + ' ' + g.Last_Name as CordinatorGroup from groups a left join Cat_Markets b on a.Market=b.Id_Market left join Cat_GroupType c on a.GroupType=c.Id_Type left join (Select  Id_Group, Group_Status from Groups_Status where Type_Status=1 and Status_Data=1 )d on a.Id_Group=d.Id_Group left join (Select  Id_Group, Group_Status from Groups_Status where Type_Status=2 and Status_Data=1 )e on a.Id_Group=e.Id_Group left join (Select  Id_Group, Group_Status from Groups_Status where Type_Status=3 and Status_Data=1 )f on a.Id_Group=f.Id_Group left join Cat_Users g on a.GroupCordinator=g.Id_User where a.status_data=1 order by a.Date_Register desc  "
+            'Pruebas para armar selects de una sola consulta
+            Dim Valores_Selects As String
+            Valores_Selects = classQuery.GetQuery("GetValoresSelect", "querys.xml")
+            Dim CommandSelects = New SqlCommand(Valores_Selects, conn)
+            Dim ResultsSelects = CommandSelects.ExecuteReader()
 
-            QueryDos = "Exec sp_Groups_List 0  , ''  , 'order by  a.Date_Register desc ' "
+            'Construye Select`s 
+            Construye_Opciones_Select(ResultsSelects)
 
-            Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+            ResultsSelects.Close()
 
-            'Return Content(QueryDos.ToString)
-
-            Dim Results = CommandUserDos.ExecuteReader()
-
-            Dim GroupList = New List(Of GroupsListData)
-
-            Dim hotel As String = ""
-
-            If Results.HasRows Then
-
-                While Results.Read()
-
-                    Select Case Results("Cve_Hotel")
-                        Case "GCR"
-                            hotel = "GCCUN"
-                        Case "GPR"
-                            hotel = "POPDC"
-                        Case "RPR"
-                            hotel = "ROPDC"
-                        Case "TRC"
-                            hotel = "HZLCUN"
-                        Case "ZLJ"
-                            hotel = "HZLJAM"
-                        Case "ZVC"
-                            hotel = "HZVCUN"
-                        Case "ZVJ"
-                            hotel = "HZVJAM"
-                        Case "ZVL"
-                            hotel = "HZLCA"
-                        Case "ZVP"
-                            hotel = "HZVPV"
-                    End Select
-
-                    GroupList.Add(New GroupsListData With {.Colum1 = hotel + "000" + Results("Id_Group").ToString, .Colum20 = Results("GroupName"), .Colum2 = Results("Date_Register"), .Colum3 = Results("Client"), .Colum22 = Results("Wholesale"), .Colum4 = Results("Market_Key"), .Colum5 = Results("Contact"), .Colum6 = Results("CordinatorGroup"), .Colum7 = Results("ArrivalDate"), .Colum8 = Results("DepartureDate"), .Colum9 = Results("Type_Name"), .Colum10 = Results("BookStatus"), .Colum11 = Results("PaymentStatus"), .Colum21 = Results("HotelStatus"), .Colum12 = hotel, .Colum13 = Results("RateProm"), .Colum14 = Results("TypeRate"), .Colum15 = Results("PeakRoom"), .Colum16 = Results("NumberRooms"), .Colum17 = "0.00", .Colum18 = Results("RevenueProm"), .Colum19 = Results("Id_Group"), .Colum23 = Results("CommissionAgent")})
-                End While
-
-                Results.Close()
-            End If
-
-
-            QueryDos = "Exec sp_Groups_List_Totals 0  , ''   "
-            Dim CommandUserTres = New SqlCommand(QueryDos, conn)
-
-            Dim ResultsDos = CommandUserTres.ExecuteReader()
-
-            If ResultsDos.HasRows Then
-
-                While ResultsDos.Read()
-
-                    model.TotalRevenue = ResultsDos("RevenueProm")
-
-                End While
-
-                ResultsDos.Close()
-            End If
-
-
-
-            Dim QueryListuno As String = "Select Id_Type,[TYPE_NAME] as Name from Cat_GroupType where Status_Data=1 "
-            Dim CommandUserListuno = New SqlCommand(QueryListuno, conn)
-            Dim ListGroupType = New List(Of SelectListItem)
-
-            'conn.Open()
-
-            Dim ResultsListuno = CommandUserListuno.ExecuteReader()
-
-            If ResultsListuno.HasRows Then
-                While ResultsListuno.Read()
-                    ListGroupType.Add(New SelectListItem With {.Text = ResultsListuno("Name"), .Value = ResultsListuno("Id_Type"), .Selected = False})
-                End While
-            End If
-            ResultsListuno.Close()
-
-            'conn.close()
-
-
-            Dim QueryListDos As String = "Select Id_Market, Market_Name from Cat_Markets where Status_Data=1 order by Market_Name "
-            Dim CommandUserListDos = New SqlCommand(QueryListDos, conn)
-            Dim ListMarkets = New List(Of SelectListItem)
-
-            'conn.Open()
-
-            Dim ResultsListDos = CommandUserListDos.ExecuteReader()
-
-            If ResultsListDos.HasRows Then
-                While ResultsListDos.Read()
-                    ListMarkets.Add(New SelectListItem With {.Text = ResultsListDos("Market_Name"), .Value = ResultsListDos("Id_Market"), .Selected = False})
-                End While
-            End If
-            ResultsListDos.Close()
-
-            'conn.close()
-
-
-
-            Dim QueryListCuatro As String = "select Id_User , [User_Name] + ' ' + Last_Name as UserName from Cat_Users where Type_User=2 order by [User_Name] "
-            Dim CommandUserListCuatro = New SqlCommand(QueryListCuatro, conn)
-            Dim ListGroupCordinator = New List(Of SelectListItem)
-
-            'conn.Open()
-
-            Dim ResultsListCuatro = CommandUserListCuatro.ExecuteReader()
-
-            If ResultsListCuatro.HasRows Then
-                While ResultsListCuatro.Read()
-                    ListGroupCordinator.Add(New SelectListItem With {.Text = ResultsListCuatro("UserName"), .Value = ResultsListCuatro("Id_User"), .Selected = False})
-                End While
-            End If
-            ResultsListCuatro.Close()
-
-            'conn.close()
-
-            Dim QueryListTres As String = "Select Id_Type, [TYPE_NAME] as Name from Cat_AgencyType where Status_Data=1 order by [TYPE_NAME] "
-            Dim CommandUserListTres = New SqlCommand(QueryListTres, conn)
-            Dim ListAgencyType = New List(Of SelectListItem)
-
-            'conn.Open()
-
-            Dim ResultsListTres = CommandUserListTres.ExecuteReader()
-
-            If ResultsListTres.HasRows Then
-                While ResultsListTres.Read()
-                    ListAgencyType.Add(New SelectListItem With {.Text = ResultsListTres("Name"), .Value = ResultsListTres("Id_Type"), .Selected = False})
-                End While
-            End If
-            ResultsListTres.Close()
-
-            'conn.close()
-
-            model.ListGroupCordinatorin = ListGroupCordinator
-            model.ListaGroupTypein = ListGroupType
-            model.ListaGroupMarketin = ListMarkets
-            model.ListaAgencyTypein = ListAgencyType
-            model.ListGroupDatain = GroupList
-
+            model.ListGroupCordinatorin = ListGroupCordinator_Global
+            model.ListaGroupTypein = ListGroupType_Global
+            model.ListaGroupMarketin = ListMarkets_Global
+            model.ListaAgencyTypein = ListAgencyType_Global
+            model.ListHotelPermissionsin = ListHotels_Global
 
             conn.close()
+          
             Return View(model)
-
 
         End Function
 
@@ -196,441 +87,36 @@ Namespace GroupsPlayaResorts
         ' POST: /Group/GroupsList
         <HttpPost()> _
         Public Function GroupsList(ByVal model As GroupsList, ByVal GroupsListBotons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
+            'Abre conexion
+            conn.Open()
+            Obtiene_Hoteles_Permisos()
             If GroupsListBotons = "Apply_Filters" Then
 
                 Dim GroupList = New List(Of GroupsListData)
-
-                Dim Filters As String = " "
-                Dim Order As String = " "
-                Dim i As Integer
-
-                'HOTEL FILTER
-
-                Dim HotelValues() As String = Split(Request("hotelfilter"), ",")
-                Dim HotelFilters As String = ""
-
-                If HotelValues.Count <> 0 Then
-
-                    HotelFilters = " and a.Cve_Hotel in( "
-
-                    For i = 0 To HotelValues.Count - 1
-
-                        If HotelValues(i) = "0" Then
-
-                            i = HotelValues.Count
-                            HotelFilters = " "
-                        Else
-                            If i = HotelValues.Count - 1 Then
-                                HotelFilters += "  ''" + HotelValues(i) + "''  )  "
-                            Else
-                                HotelFilters += "  ''" + HotelValues(i) + "'' ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + HotelFilters
-
-                End If
-
-
-                'Book Status
-
-                Dim BookStatusValues() As String = Split(Request("BookStatusFilter"), ",")
-                Dim BookStatusFilters As String = ""
-
-                If BookStatusValues.Count <> 0 Then
-
-                    BookStatusFilters = " and e.Group_Status in( "
-
-                    For i = 0 To BookStatusValues.Count - 1
-
-                        If BookStatusValues(i) = "0" Then
-
-                            i = BookStatusValues.Count
-                            BookStatusFilters = " "
-                        Else
-                            If i = BookStatusValues.Count - 1 Then
-                                BookStatusFilters += "  " + BookStatusValues(i) + "  )  "
-                            Else
-                                BookStatusFilters += "  " + BookStatusValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + BookStatusFilters
-
-                End If
-
-
-                'Pay Status
-
-                Dim PayStatusValues() As String = Split(Request("PayStatusFilter"), ",")
-                Dim PayStatusFilters As String = ""
-
-                If PayStatusValues.Count <> 0 Then
-
-                    PayStatusFilters = " and d.Group_Status in( "
-
-                    For i = 0 To PayStatusValues.Count - 1
-
-                        If PayStatusValues(i) = "0" Then
-
-                            i = PayStatusValues.Count
-                            PayStatusFilters = " "
-                        Else
-                            If i = PayStatusValues.Count - 1 Then
-                                PayStatusFilters += "  " + PayStatusValues(i) + "  )  "
-                            Else
-                                PayStatusFilters += "  " + PayStatusValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + PayStatusFilters
-
-                End If
-
-
-                'Hotel Status
-
-                Dim HotelStatusValues() As String = Split(Request("HotelStatusFilter"), ",")
-                Dim HotelStatusFilters As String = ""
-
-                If HotelStatusValues.Count <> 0 Then
-
-                    HotelStatusFilters = " and f.Group_Status in( "
-
-                    For i = 0 To HotelStatusValues.Count - 1
-
-                        If HotelStatusValues(i) = "0" Then
-
-                            i = HotelStatusValues.Count
-                            HotelStatusFilters = " "
-                        Else
-                            If i = HotelStatusValues.Count - 1 Then
-                                HotelStatusFilters += "  " + HotelStatusValues(i) + "  )  "
-                            Else
-                                HotelStatusFilters += "  " + HotelStatusValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + HotelStatusFilters
-
-                End If
-
-
-
-                'Agent
-
-                Dim AgentValues() As String = Split(Request("agentfilter"), ",")
-                Dim AgentFilters As String = ""
-
-                If AgentValues.Count <> 0 Then
-
-                    AgentFilters = " and a.GroupCordinator in( "
-
-                    For i = 0 To AgentValues.Count - 1
-
-                        If AgentValues(i) = "0" Then
-
-                            i = AgentValues.Count
-                            AgentFilters = " "
-                        Else
-                            If i = AgentValues.Count - 1 Then
-                                AgentFilters += "  " + AgentValues(i) + "  )  "
-                            Else
-                                AgentFilters += "  " + AgentValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + AgentFilters
-
-                End If
-
-
-                'Motive
-
-                Dim MotiveValues() As String = Split(Request("motivefilter"), ",")
-                Dim MotiveFilters As String = ""
-
-                If MotiveValues.Count <> 0 Then
-
-                    MotiveFilters = " and a.GroupType in( "
-
-                    For i = 0 To MotiveValues.Count - 1
-
-                        If MotiveValues(i) = "0" Then
-
-                            i = MotiveValues.Count
-                            MotiveFilters = " "
-                        Else
-                            If i = MotiveValues.Count - 1 Then
-                                MotiveFilters += "  " + MotiveValues(i) + "  )  "
-                            Else
-                                MotiveFilters += "  " + MotiveValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + MotiveFilters
-
-                End If
-
-
-                'Market
-
-                Dim MarketValues() As String = Split(Request("marketfilter"), ",")
-                Dim MarketFilters As String = ""
-
-                If MarketValues.Count <> 0 Then
-
-                    MarketFilters = " and a.Market in( "
-
-                    For i = 0 To MarketValues.Count - 1
-
-                        If MarketValues(i) = "0" Then
-
-                            i = MarketValues.Count
-                            MarketFilters = " "
-                        Else
-                            If i = MarketValues.Count - 1 Then
-                                MarketFilters += "  " + MarketValues(i) + "  )  "
-                            Else
-                                MarketFilters += "  " + MarketValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + MarketFilters
-
-                End If
-
-
-                'AgencyType
-
-                Dim AgencyTypeValues() As String = Split(Request("agencytypefilter"), ",")
-                Dim AgencyTypeFilters As String = ""
-
-                If AgencyTypeValues.Count <> 0 Then
-
-                    AgencyTypeFilters = " and a.AgencyType in( "
-
-                    For i = 0 To AgencyTypeValues.Count - 1
-
-                        If AgencyTypeValues(i) = "0" Then
-
-                            i = AgencyTypeValues.Count
-                            AgencyTypeFilters = " "
-                        Else
-                            If i = AgencyTypeValues.Count - 1 Then
-                                AgencyTypeFilters += "  " + AgencyTypeValues(i) + "  )  "
-                            Else
-                                AgencyTypeFilters += "  " + AgencyTypeValues(i) + " ,  "
-                            End If
-
-                        End If
-
-                    Next
-
-                    Filters = Filters + AgencyTypeFilters
-
-                End If
-
-
-                Dim DatesFilters As String = ""
-
-                If Request("datetimepickerdate1text") <> "" And Request("datetimepickerdate2text") <> "" And Request("datefilter") <> 0 And Request("datetimepickerdate1text") <> Request("datetimepickerdate2text") Then
-
-
-                    If Request("datefilter") = 1 Then
-
-                        DatesFilters = " and  (a.ArrivalDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "''   ) "
-                    End If
-
-                    If Request("datefilter") = 2 Then
-
-                        DatesFilters = " and  (a.DepartureDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "''   ) "
-
-                    End If
-
-                    If Request("datefilter") = 3 Then
-
-                        DatesFilters = " and  (Convert(date ,a.Date_Register)  between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "''   ) "
-
-                    End If
-
-                    If Request("datefilter") = 4 Then
-
-                        DatesFilters = " and  (a.ArrivalDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "''  or a.DepartureDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "'' ) "
-
-                    End If
-
-
-                End If
-
-
-                If Request("datetimepickerdate1text") <> "" And Request("datefilter") <> 0 And Request("datefilter") <> 4 And Request("datetimepickerdate2text") = "" Then
-
-
-                    If Request("datefilter") = 1 Then
-
-                        DatesFilters = " and a.ArrivalDate=''" + Request("datetimepickerdate1text") + "''     "
-                    End If
-
-                    If Request("datefilter") = 2 Then
-
-                        DatesFilters = " and  a.DepartureDate=''" + Request("datetimepickerdate1text") + "''    "
-
-                    End If
-
-                    If Request("datefilter") = 3 Then
-
-                        DatesFilters = " and  Convert(date ,a.Date_Register) =''" + Request("datetimepickerdate1text") + "'' "
-
-                    End If
-
-                    'If Request("datefilter") = 4 Then
-
-                    '    DatesFilters = " and  (a.ArrivalDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "''  or a.DepartureDate between ''" + Request("datetimepickerdate1text") + "'' and ''" + Request("datetimepickerdate2text") + "'' ) "
-
-                    'End If
-
-
-                End If
-
-
-
-
-
-                Filters = Filters + DatesFilters
-
-
-                'ORDER BY
-
-                Dim OrderByValues() As String = Split(Request("OrderByList"), ",")
-                Dim OrderTypeValues() As String = Split(Request("OrderTypeList"), ",")
-                Dim OrderByFilters As String = ""
-
-
-
-                If OrderByValues.Count <> 0 Then
-
-                    OrderByFilters = "  order by   "
-
-                    For i = 0 To OrderByValues.Count - 1
-
-                        If OrderByValues(i) <> "0" And OrderTypeValues(i) <> "0" Then
-
-                            If i = OrderByValues.Count - 1 Then
-
-                                OrderByFilters += " , " + OrderByValues(i) + "   " + OrderTypeValues(i) + "  "
-                            Else
-                                OrderByFilters += "  " + OrderByValues(i) + "  " + OrderTypeValues(i) + "    "
-                            End If
-
-
-
-                        End If
-                    Next
-
-                    Order = Order + OrderByFilters
-
-                End If
-
-
-
-
-                Dim Query As String = " Exec sp_Groups_List 0  , '" + Filters + "' , '" + Order + "' "
-
-                Dim CommandUser = New SqlCommand(Query, conn)
-
-                'Return Content(Query.ToString)
-
-                conn.Open()
-
-                Dim Results = CommandUser.ExecuteReader()
-
-                Dim hotel As String = ""
-
-                If Results.HasRows Then
-
-                    While Results.Read()
-
-                        Select Case Results("Cve_Hotel")
-                            Case "GCR"
-                                hotel = "GCCUN"
-                            Case "GPR"
-                                hotel = "POPDC"
-                            Case "RPR"
-                                hotel = "ROPDC"
-                            Case "TRC"
-                                hotel = "HZLCUN"
-                            Case "ZLJ"
-                                hotel = "HZLJAM"
-                            Case "ZVC"
-                                hotel = "HZVCUN"
-                            Case "ZVJ"
-                                hotel = "HZVJAM"
-                            Case "ZVL"
-                                hotel = "HZLCA"
-                            Case "ZVP"
-                                hotel = "HZVPV"
-                        End Select
-
-                        GroupList.Add(New GroupsListData With {.Colum1 = hotel + "000" + Results("Id_Group").ToString, .Colum20 = Results("GroupName"), .Colum2 = Results("Date_Register"), .Colum3 = Results("Client"), .Colum22 = Results("Wholesale"), .Colum4 = Results("Market_Key"), .Colum5 = Results("Contact"), .Colum6 = Results("CordinatorGroup"), .Colum7 = Results("ArrivalDate"), .Colum8 = Results("DepartureDate"), .Colum9 = Results("Type_Name"), .Colum10 = Results("BookStatus"), .Colum11 = Results("PaymentStatus"), .Colum21 = Results("HotelStatus"), .Colum12 = hotel, .Colum13 = Results("RateProm"), .Colum14 = Results("TypeRate"), .Colum15 = Results("PeakRoom"), .Colum16 = Results("NumberRooms"), .Colum17 = "0.00", .Colum18 = Results("RevenueProm"), .Colum19 = Results("Id_Group"), .Colum23 = Results("CommissionAgent")})
-                    End While
-
-
-                End If
-                Results.Close()
-
-
-                Dim QueryDos = "Exec sp_Groups_List_Totals 0  , '" + Filters + "'   "
-                Dim CommandUserTres = New SqlCommand(QueryDos, conn)
-
-                Dim ResultsDos = CommandUserTres.ExecuteReader()
-
-                If ResultsDos.HasRows Then
-
-                    While ResultsDos.Read()
-
-                        model.TotalRevenue = ResultsDos("RevenueProm")
-
-                    End While
-
-
-                End If
-                ResultsDos.Close()
-
-
-                conn.close()
-
-                model.ListGroupDatain = GroupList
-
-
+           
+                Dim DataUser As New Dictionary(Of String, String)
+                DataUser.Add("TotalRevenue", "")
+                DataUser.Add("User", Session.Item("UserName"))
+                DataUser.Add("Hoteles", Request("hotelfilter"))
+                DataUser.Add("BookStatus", Request("BookStatusFilter"))
+                DataUser.Add("HotelStatus", Request("HotelStatusFilter"))
+                DataUser.Add("PayStatus", Request("PayStatusFilter"))
+                DataUser.Add("Coordinators", Request("agentfilter"))
+                DataUser.Add("GroupTypes", Request("motivefilter"))
+                DataUser.Add("Markets", Request("marketfilter"))
+                DataUser.Add("AgencyTypes", Request("agencytypefilter"))
+                DataUser.Add("DateFilter", Request("datefilter"))
+                DataUser.Add("FechaIni", Request("datetimepickerdate1text"))
+                DataUser.Add("FechaFin", Request("datetimepickerdate2text"))
+
+                model.ListGroupDatain = Construye_Vista_Grupo(DataUser)
                 Return PartialView("GroupListTable", model)
 
             End If
+            conn.close()
 
-
-            Return View(model)
+                Return View(model)
         End Function
 
 
@@ -638,337 +124,113 @@ Namespace GroupsPlayaResorts
         ' GET: /Group/GroupDetail
         <Authorize()> _
         Function GroupDetail() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New GroupsDetail
             Dim UsuariosLis = New List(Of GroupsRatesList)
             Dim ID_GROUP As Integer = 0
             Dim ListAvailability = New List(Of SelectListItem)
             Dim DocumentsLis = New List(Of GroupsDocList)
             Dim ListSchemePayments = New List(Of SelectListItem)
-            'Dim ListSuites = New List(Of SuitesList)
+            Dim ListSuites = New List(Of SelectListItem)
             Dim BreakdownList = New List(Of GroupsBreakList)
             Dim BreakdownListGroupBy = New List(Of GroupsBreakList)
-            Dim BreakdownVirtual = New List(Of GroupsBreakList)
             Dim ListPax = New List(Of SelectListItem)
             Dim LogBookList = New List(Of GroupsLogBookList)
             Dim PaymentList = New List(Of GroupsPaymentsList)
             Dim ListSalons = New List(Of SelectListItem)
             Dim EventsList = New List(Of GroupsEventsList)
-
-            Dim ListGroupCordinator = New List(Of SelectListItem)
             Dim ListOnsiteCordinator = New List(Of SelectListItem)
             Dim ListEventCordinator = New List(Of SelectListItem)
             Dim ListEventSeller = New List(Of SelectListItem)
 
+            conn.Open()
+            Obtiene_Hoteles_Permisos()
+            conn.close()
 
             ListAvailability.Add(New SelectListItem With {.Text = "", .Value = "", .Selected = False})
 
             model.Accion = 0
-
             model.GroupId = 0
-
             model.EditGroupData35 = 0
 
-            If Request.QueryString("id") <> "" Then
+            Try
+                ID_GROUP = Request.QueryString("id").ToString()
+            Catch ex As Exception
+                ID_GROUP = 0
+            End Try
 
-                ID_GROUP = Request.QueryString("id")
 
+            If ID_GROUP > 0 Then
 
-                Dim Query As String
-                Dim QueryDos As String
-                Dim CommandUser
-                Dim CommanRate
-                Dim Results
-                Dim ResultsDos
                 Dim RevenueFinal As Double = 0
-                Dim DateInit As Date
                 Dim BanderaRevenue As Integer = 0
                 Dim i As Integer = 0
-                conn.Open()
-
-                Query = "select *from Groups where Status_Data=1 and id_group=" + ID_GROUP.ToString + " "
-                CommandUser = New SqlCommand(Query, conn)
-                Results = CommandUser.ExecuteReader()
-                If Results.HasRows Then
-                    While Results.Read()
-                        model.EditGroupData1 = Results("Cve_Hotel")
-                        model.EditGroupData2 = Results("Wholesale")
-                        model.EditGroupData3 = Results("NumberRooms")
-
-                        Dim thisDate1 As Date = Results("ArrivalDate")
-                        model.EditGroupData4 = thisDate1.ToString("yyyy-MM-dd")
-
-                        Dim thisDate2 As Date = Results("DepartureDate")
-                        model.EditGroupData5 = thisDate2.ToString("yyyy-MM-dd")
-
-                        model.EditGroupData6 = Results("TypeRate")
-                        model.EditGroupData7 = Results("Discount")
-                        model.EditGroupData8 = Results("GroupName")
-                        model.EditGroupData9 = Results("Market")
-                        model.EditGroupData10 = Results("GroupType")
-                        model.EditGroupData11 = Results("Allotment")
-                        model.EditGroupData12 = Results("PeakRoom")
-                        model.EditGroupData34 = Results("CommissionAgent")
-                        model.EditGroupData13 = Results("AgencyType")
-                        model.EditGroupData14 = Results("Company")
-                        model.EditGroupData35 = Results("NumberNights")
-                        model.EditGroupData15 = Results("Contact")
-                        model.EditGroupData16 = Results("GroupCordinator")
-                        model.EditGroupData17 = Results("OnsiteCordinator")
-                        model.EditGroupData18 = Results("Channel")
-
-                        Dim thisDate3 As Date = Results("TentativeArrivalDate")
-                        model.EditGroupData19 = thisDate3.ToString("yyyy-MM-dd")
-
-                        Dim thisDate4 As Date = Results("TentativeDepartureDate")
-                        model.EditGroupData20 = thisDate4.ToString("yyyy-MM-dd")
-
-                        model.GroupTypeRate = Results("TypeRate")
-                        model.EditGroupData51 = IIf(Results("Package"), 1, 0)
-
-                    End While
-                End If
-                Results.close()
-
-
-                conn.close()
-
-
-
+                'aqui
+                'Construye detalle del grupo, enviamos  el ID_GROUP , y el model como REFERENCIA
+                Construye_Detalle_Grupo(ID_GROUP, model)
 
                 conn.Open()
-
-                QueryDos = "select *from Groups_Rates where Status_Data=1 and id_group=" + ID_GROUP.ToString + " order by Id_GroupRate "
-                CommanRate = New SqlCommand(QueryDos, conn)
-                ResultsDos = CommanRate.ExecuteReader()
-                If ResultsDos.HasRows Then
-                    While ResultsDos.Read()
-
-                        If DateInit <> ResultsDos("Init_Date") Or i = 0 Then
-                            DateInit = ResultsDos("Init_Date")
-                            If i <> 0 Then
-                                BanderaRevenue = 1
-                            End If
-                        End If
-
-                        UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = ResultsDos("Init_Date"), .EndDateRate = ResultsDos("End_Date"), .SuiteName = ResultsDos("Code_Room"), .SuiteCode = ResultsDos("Code_Room"), .RateSingle = ResultsDos("Rate_1"), .RateDouble = ResultsDos("Rate_2"), .RateTripleandFour = ResultsDos("Rate_Extra"), .RateFiveandSix = ResultsDos("Rate_ExtraX"), .RateChildrens = ResultsDos("Rate_C"), .RateTeensValue = ResultsDos("Rate_T"), .Availability = ResultsDos("Status"), .RateRevenue = ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue")), .RatePax = ResultsDos("Num_Rooms"), .CommissionRate = ResultsDos("Commission"), .DiscountRate = ResultsDos("Promo"), .RateRevenuePerRoom = ResultsDos("Revenue"), .RateRevenueRoomNigth = ResultsDos("Rate_2") * 2})
-
-
-                        If BanderaRevenue = 0 Then
-                            RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue"))
-                        End If
-
-
-                        i = i + 1
-
-                    End While
-                End If
-                ResultsDos.close()
-
-
+                'Construye UsuariosLis
+                Construye_UsuariosLis(UsuariosLis, model)
                 conn.close()
-
-
-                Dim QueryDoc As String = " SELECT *FROM Documents WHERE Id_Group=" + ID_GROUP.ToString + " order by Id_Document desc "
-                Dim CommandUserDoc = New SqlCommand(QueryDoc, conn)
-
 
                 conn.Open()
-
-                Dim ResultsDoc = CommandUserDoc.ExecuteReader()
-
-                If ResultsDoc.HasRows Then
-                    While ResultsDoc.Read()
-                        DocumentsLis.Add(New GroupsDocList With {.TypeDocument = ResultsDoc("Type_Document"), .Actions = ResultsDoc("Actions"), .User = ResultsDoc("User_Action"), .DateRegister = ResultsDoc("Date_Register"), .URL = ResultsDoc("URL")})
-                    End While
-                End If
-                ResultsDoc.Close()
-
+                Construye_DocumentsList(DocumentsLis, ID_GROUP.ToString())
                 conn.close()
-
-
-                Dim QueryDocSC As String = " select top 1 *from Documents where Id_Group=" + ID_GROUP.ToString + " order by Date_Register desc "
-                Dim CommandUserDocSC = New SqlCommand(QueryDocSC, conn)
-
 
                 conn.Open()
-
-                Dim ResultsDocSC = CommandUserDocSC.ExecuteReader()
-
-                If ResultsDocSC.HasRows Then
-                    While ResultsDocSC.Read()
-                        model.EditGroupData50 = "" & ResultsDocSC("Additionanl_SC")
-                    End While
-                End If
-                ResultsDocSC.Close()
-
+                Obtiene_Top1_Documents(model, ID_GROUP.ToString())
                 conn.close()
-
-
-
-                Dim QueryScheme As String = " Select * from Groups_SchemePayments where Id_Group=" + ID_GROUP.ToString + " and Status_Data=1 order by NumberPayment   "
-                Dim CommandUserScheme = New SqlCommand(QueryScheme, conn)
-                Dim SchemeDate As Date
 
                 conn.Open()
-
-                Dim ResultsScheme = CommandUserScheme.ExecuteReader()
-
-                If ResultsScheme.HasRows Then
-                    While ResultsScheme.Read()
-                        SchemeDate = ResultsScheme("DatePayment")
-                        ListSchemePayments.Add(New SelectListItem With {.Text = SchemeDate.ToString("yyyy-MM-dd"), .Value = ResultsScheme("Amount")})
-                    End While
-                End If
-                ResultsScheme.Close()
-
+                Construye_Groups_SchemePayments(ListSchemePayments, ID_GROUP.ToString())
                 conn.close()
-
-
-                'Dim QuerySuites As String = " select distinct a.Clave_TC,a.Nomb_TC_Act,a.SuiteOrden from vw_Tipo_Cuarto a left join Groups_Rates b on a.Clave_TC=b.Code_Room where a.Clav_Hotel='" + model.EditGroupData1 + "' and b.Id_Group=" + ID_GROUP.ToString + " order by a.SuiteOrden  "
-                'Dim CommandUserSuites = New SqlCommand(QuerySuites, conn)
-
-
-                'conn.Open()
-
-                'Dim ResultsSuites = CommandUserSuites.ExecuteReader()
-
-                'If ResultsSuites.HasRows Then
-                '    While ResultsSuites.Read()
-
-                '        ListSuites.Add(New SuitesList With {.Text = ResultsSuites("Nomb_TC_Act"), .Value = ResultsSuites("Clave_TC")})
-                '    End While
-                'End If
-                'ResultsSuites.Close()
-                'conn.close()
-
-                'ByVal model As Object, ByVal DatosObjeto As Object, ByVal IdGroup As String, ByVal GroupBy As String
-
-                'BEGIN: llena el modelo con los datos del break down
-                Dim DatosObjeto As New Dictionary(Of String, String)
-                DatosObjeto.Add("Id_Group", ID_GROUP.ToString)
-
-                GetDataBreakDown(model, DatosObjeto, ID_GROUP.ToString, 0)
-                'END: llena el modelo con los datos del break down
 
                 conn.Open()
-
-                Dim QueryLogBook = "Select *from LogBook where Id_group=" + ID_GROUP.ToString + " and Status_Data=1 order by Date_Register desc "
-                Dim CommandLogBook = New SqlCommand(QueryLogBook, conn)
-
-                Dim ResultsLogBook = CommandLogBook.ExecuteReader()
-
-                If ResultsLogBook.HasRows Then
-                    While ResultsLogBook.Read()
-
-                        LogBookList.Add(New GroupsLogBookList With {.LogBookID = ResultsLogBook("Id_LoogBook"), .InputType = ResultsLogBook("Input_Type"), .NotesLogBook = ResultsLogBook("Notes"), .UserLogBook = ResultsLogBook("User_LogBook"), .DateLogBook = ResultsLogBook("Date_Register")})
-
-                    End While
-                End If
-                ResultsLogBook.Close()
-
-
-
-                Dim QueryPayments = "Select *from Payments where Id_group=" + ID_GROUP.ToString + " and Status_Data=1 order by Date_Register desc "
-                Dim CommandPayment = New SqlCommand(QueryPayments, conn)
-                Dim DateValidated As String
-                Dim ResultsPayment = CommandPayment.ExecuteReader()
-
-                If ResultsPayment.HasRows Then
-                    While ResultsPayment.Read()
-                        If IsDBNull(ResultsPayment("Date_Validated")) Then
-                            DateValidated = ""
-                        Else
-                            DateValidated = ResultsPayment("Date_Validated")
-                        End If
-                        PaymentList.Add(New GroupsPaymentsList With {.RoomID = ResultsPayment("Id_Breakdown"), .EventID = ResultsPayment("Id_Event"), .FolioPayment = ResultsPayment("Folio_Code_PMS"), .DateValidatedPayment = DateValidated, .AppliedPayment = ResultsPayment("AppliedPayment"), .StatusPayment = ResultsPayment("Status_Payment"), .UserValidatedPayment = ResultsPayment("User_Validated"), .DateRegisterPayment = ResultsPayment("Date_Register"), .UserResgisterPayment = ResultsPayment("User_Register"), .ValidatedPayment = ResultsPayment("Status_Validated"), .AmountPayment = ResultsPayment("Quantity"), .DescriptionPayment = ResultsPayment("Special_Notes"), .TypeCurrencyPayment = ResultsPayment("Type_Currency"), .TypePayment = ResultsPayment("Type_Payment"), .PaymentID = ResultsPayment("Id_Payment")})
-
-                    End While
-                End If
-                ResultsPayment.Close()
-
-
-                Dim QuerySalon As String = " Select id_Salon , Nombre from vw_Locations where Clav_Hotel='" + model.EditGroupData1 + "' order by Nombre  "
-                Dim CommandSalon = New SqlCommand(QuerySalon, conn)
-
-                Dim ResultsSalon = CommandSalon.ExecuteReader()
-
-                If ResultsSalon.HasRows Then
-                    While ResultsSalon.Read()
-
-                        ListSalons.Add(New SelectListItem With {.Text = ResultsSalon("Nombre"), .Value = ResultsSalon("id_Salon")})
-                    End While
-                End If
-                ResultsSalon.Close()
-
-
-
-                Dim QueryEvetns = "Select *from Events where Id_group=" + ID_GROUP.ToString + " and Status_Data=1 order by Date_Register desc "
-                Dim CommandEvents = New SqlCommand(QueryEvetns, conn)
-
-                Dim ResultsEvents = CommandEvents.ExecuteReader()
-
-                If ResultsEvents.HasRows Then
-                    While ResultsEvents.Read()
-
-                        EventsList.Add(New GroupsEventsList With {.EventID = ResultsEvents("Id_Event"), .EventName = ResultsEvents("Event_Name"), .EventDate = ResultsEvents("Event_Date"), .EventStartTime = ResultsEvents("Event_StartTime"), .EventEndTime = ResultsEvents("Event_EndTime"), .EventSalonName = ResultsEvents("SalonName"), .EventStatus = ResultsEvents("Status_Event"), .EventPax = ResultsEvents("Num_Pax"), .EventSellerName = ResultsEvents("Event_Seller"), .EventCordinatorName = ResultsEvents("Event_Cordinator"), .EventDeposits = ResultsEvents("Deposits"), .EventBalance = ResultsEvents("Balance"), .EventRevenue = ResultsEvents("Revenue"), .EventUserRegister = ResultsEvents("User_Register"), .EventDateRegister = ResultsEvents("Date_Register")})
-
-                    End While
-                End If
-                ResultsEvents.Close()
-
-
-                Dim QueryStatus = "select a.PaymentStatus, B.BookStatus, c.HotelStatus from(select Group_Status as PaymentStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP.ToString + " and Type_Status=1 and Status_Data=1)a left join (select Group_Status as BookStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP.ToString + " and Type_Status=2 and Status_Data=1)b on a.Id_Group=b.Id_Group left join (select Group_Status as HotelStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP.ToString + " and Type_Status=3 and Status_Data=1)c on a.Id_Group=c.Id_Group "
-                Dim CommandStatus = New SqlCommand(QueryStatus, conn)
-
-                Dim ResultsStatus = CommandStatus.ExecuteReader()
-
-                If ResultsStatus.HasRows Then
-                    While ResultsStatus.Read()
-
-                        model.GroupStatusPayment = ResultsStatus("PaymentStatus")
-                        model.GroupStatusBook = ResultsStatus("BookStatus")
-                        model.GroupStatusHotel = ResultsStatus("HotelStatus")
-
-                    End While
-                End If
-                ResultsStatus.Close()
-
-
+                Construye_ListSuites(ListSuites, model.EditGroupData1, ID_GROUP.ToString())
                 conn.close()
 
+                conn.Open()
+                Construye_BreakdownList(BreakdownList, ID_GROUP.ToString())
+                conn.close()
 
-                model.RevenueFinal = RevenueFinal
+                conn.Open()
+                Construye_BreakdownListGroupBy(BreakdownListGroupBy, ID_GROUP.ToString())
+                conn.close()
+
+                conn.Open()
+                Construye_ResultsBreakTotal(model, ID_GROUP.ToString())
+                conn.close()
+
+                conn.Open()
+                Construye_LogBookList(LogBookList, ID_GROUP.ToString())
+                conn.close()
+
+                conn.Open()
+                Construye_PaymentList(PaymentList, ID_GROUP.ToString())
+                conn.close()
+
+                conn.Open()
+                Construye_ListSalons(ListSalons, model.EditGroupData1)
+                conn.close()
+
+                conn.Open()
+                Construye_EventsList(EventsList, ID_GROUP.ToString())
+                conn.close()
+
+                conn.Open()
+                Obtiene_Status(model, ID_GROUP.ToString())
+                conn.close()
+
                 model.GroupId = Request.QueryString("id")
                 model.GroupIdLabel = model.EditGroupData1
-
-                Select Case model.EditGroupData1
-                    Case "GCR"
-                        model.GroupHotelNew = "GCCUN"
-                    Case "GPR"
-                        model.GroupHotelNew = "POPDC"
-                    Case "RPR"
-                        model.GroupHotelNew = "ROPDC"
-                    Case "TRC"
-                        model.GroupHotelNew = "HZLCUN"
-                    Case "ZLJ"
-                        model.GroupHotelNew = "HZLJAM"
-                    Case "ZVC"
-                        model.GroupHotelNew = "HZVCUN"
-                    Case "ZVJ"
-                        model.GroupHotelNew = "HZVJAM"
-                    Case "ZVL"
-                        model.GroupHotelNew = "HZLCA"
-                    Case "ZVP"
-                        model.GroupHotelNew = "HZVPV"
-                End Select
-
-
+                model.GroupHotelNew = ObtieneHotel(model.EditGroupData1)
                 model.Accion = 3
+                model.ListHotelPermissionsin = ListHotels_Global
 
             Else
 
-                UsuariosLis.Add(New GroupsRatesList With {.SuiteName = "N/A", .SuiteCode = "N/A", .RateSingle = 0, .RateDouble = 0, .RateTripleandFour = 0, .RateChildrens = 0, .RateTeensValue = 0, .Availability = "Available"})
+                UsuariosLis.Add(New GroupsRatesList With {.SuiteName = "N/A", .SuiteCode = "N/A", .RateSingle = 0, .RateDouble = 0, .RateTripleandFour = 0, .RateChildrens = 0, .RateTeensValue = 0, .Availability = "Available", .Formato = R_Show})
 
                 model.TotalNumRooms = 0
                 model.TotalDeployRooms = 0
@@ -984,156 +246,61 @@ Namespace GroupsPlayaResorts
 
             End If
 
-            Dim QueryListuno As String = "Select Id_Type,[TYPE_NAME] as Name from Cat_GroupType where Status_Data=1 "
-            Dim CommandUserListuno = New SqlCommand(QueryListuno, conn)
+            'model.ListGroupCordinatorin = ListGroupCordinator_Global
+            'model.ListaGroupTypein = ListGroupType_Global
+            'model.ListaGroupMarketin = ListMarkets_Global
+            'model.ListaAgencyTypein = ListAgencyType_Global
+
+            'Asignando filtros de catalogos construidos desde el inicio
+            'Pruebas para armar selects de una sola consulta
+            conn.Open()
+            Dim Valores_Selects As String
+            Valores_Selects = classQuery.GetQuery("GetValoresSelect", "querys.xml")
+            Dim CommandSelects = New SqlCommand(Valores_Selects, conn)
+            Dim ResultsSelects = CommandSelects.ExecuteReader()
+
+            'Construye Select`s 
+            Construye_Opciones_Select(ResultsSelects)
+
+            ResultsSelects.Close()
+            conn.close()
+
             Dim ListGroupType = New List(Of SelectListItem)
+            ListGroupType = ListGroupType_Global
 
-            conn.Open()
-
-            Dim ResultsListuno = CommandUserListuno.ExecuteReader()
-
-            If ResultsListuno.HasRows Then
-                While ResultsListuno.Read()
-                    ListGroupType.Add(New SelectListItem With {.Text = ResultsListuno("Name"), .Value = ResultsListuno("Id_Type"), .Selected = False})
-                End While
-            End If
-            ResultsListuno.Close()
-
-            conn.close()
-
-
-            Dim QueryListDos As String = "Select Id_Market, Market_Name from Cat_Markets where Status_Data=1 order by Market_Name "
-            Dim CommandUserListDos = New SqlCommand(QueryListDos, conn)
             Dim ListMarkets = New List(Of SelectListItem)
+            ListMarkets = ListMarkets_Global
 
-            conn.Open()
-
-            Dim ResultsListDos = CommandUserListDos.ExecuteReader()
-
-            If ResultsListDos.HasRows Then
-                While ResultsListDos.Read()
-                    ListMarkets.Add(New SelectListItem With {.Text = ResultsListDos("Market_Name"), .Value = ResultsListDos("Id_Market"), .Selected = False})
-                End While
-            End If
-            ResultsListDos.Close()
-
-            conn.close()
-
-
-            Dim QueryListTres As String = "Select Id_Type, [TYPE_NAME] as Name from Cat_AgencyType where Status_Data=1 order by [TYPE_NAME] "
-            Dim CommandUserListTres = New SqlCommand(QueryListTres, conn)
             Dim ListAgencyType = New List(Of SelectListItem)
+            ListAgencyType = ListAgencyType_Global
 
+            Dim ListGroupCordinator = New List(Of SelectListItem)
+            ListGroupCordinator = ListGroupCordinator_Global
+
+            ListOnsiteCordinator = ListOnsiteCordinator_Global
+            ListEventCordinator = ListEventCordinator_Global
+            ListEventSeller = ListEventCordinator_Global
+
+            'Pendiente para eliminar querys
             conn.Open()
-
-            Dim ResultsListTres = CommandUserListTres.ExecuteReader()
-
-            If ResultsListTres.HasRows Then
-                While ResultsListTres.Read()
-                    ListAgencyType.Add(New SelectListItem With {.Text = ResultsListTres("Name"), .Value = ResultsListTres("Id_Type"), .Selected = False})
-                End While
-            End If
-            ResultsListTres.Close()
-
-            conn.close()
-
-
-            Dim QueryListCuatro As String = "select Id_User , [User_Name] + ' ' + Last_Name as UserName from Cat_Users where Type_User=2 order by [User_Name] "
-            Dim CommandUserListCuatro = New SqlCommand(QueryListCuatro, conn)
-
-            conn.Open()
-
-            Dim ResultsListCuatro = CommandUserListCuatro.ExecuteReader()
-
-            If ResultsListCuatro.HasRows Then
-                While ResultsListCuatro.Read()
-                    ListGroupCordinator.Add(New SelectListItem With {.Text = ResultsListCuatro("UserName"), .Value = ResultsListCuatro("Id_User"), .Selected = False})
-                End While
-            End If
-            ResultsListCuatro.Close()
-
-            conn.close()
-
-
-            Dim QueryListCinco As String = "select Id_User , [User_Name] + ' ' + Last_Name as UserName from Cat_Users where Type_User=3 order by [User_Name] "
-            Dim CommandUserListCinco = New SqlCommand(QueryListCinco, conn)
-
-            conn.Open()
-
-            Dim ResultsListCinco = CommandUserListCinco.ExecuteReader()
-
-            If ResultsListCinco.HasRows Then
-                While ResultsListCinco.Read()
-                    ListOnsiteCordinator.Add(New SelectListItem With {.Text = ResultsListCinco("UserName"), .Value = ResultsListCinco("Id_User"), .Selected = False})
-                End While
-            End If
-            ResultsListCinco.Close()
-
-            conn.close()
-
-
-            Dim QueryListSeis As String = "select Id_User , [User_Name] + ' ' + Last_Name as UserName from Cat_Users where Type_User=5 order by [User_Name] "
-            Dim CommandUserListSeis = New SqlCommand(QueryListSeis, conn)
-
-            conn.Open()
-
-            Dim ResultsListSeis = CommandUserListSeis.ExecuteReader()
-
-            If ResultsListSeis.HasRows Then
-                While ResultsListSeis.Read()
-                    ListEventCordinator.Add(New SelectListItem With {.Text = ResultsListSeis("UserName"), .Value = ResultsListSeis("Id_User"), .Selected = False})
-                End While
-            End If
-            ResultsListSeis.Close()
-
-            conn.close()
-
-
-            Dim QueryListSiete As String = "select Id_User , [User_Name] + ' ' + Last_Name as UserName from Cat_Users where Type_User=4 order by [User_Name] "
-            Dim CommandUserListSiete = New SqlCommand(QueryListSiete, conn)
-
-            conn.Open()
-
-            Dim ResultsListSiete = CommandUserListSiete.ExecuteReader()
-
-            If ResultsListSiete.HasRows Then
-                While ResultsListSiete.Read()
-                    ListEventSeller.Add(New SelectListItem With {.Text = ResultsListSiete("UserName"), .Value = ResultsListSiete("Id_User"), .Selected = False})
-                End While
-            End If
-            ResultsListSiete.Close()
-
-
             Dim QueryCountry As String = "select distinct ISO_2CAR,ISO_PAIS_ES from ISO_3166 where ISO_PAIS_ES is not null and ISO_2CAR in('MX','US') order by ISO_PAIS_ES  "
-
             Dim CommandCountry = New SqlCommand(QueryCountry, conn)
             Dim ResultCountry = CommandCountry.ExecuteReader()
             Dim CountryLis = New List(Of SelectListItem)
-
             If ResultCountry.HasRows Then
                 While ResultCountry.Read()
-
                     CountryLis.Add(New SelectListItem With {.Text = ResultCountry("ISO_PAIS_ES"), .Value = ResultCountry("ISO_2CAR")})
-
                 End While
-
             End If
             ResultCountry.Close()
-
             Dim QueryState As String = "select Iso_pais_region,region from ISO_3166 where region<>'' and ISO_2CAR in('MX','US')  order by REGION  "
-
-
             Dim CommandState = New SqlCommand(QueryState, conn)
             Dim ResultState = CommandState.ExecuteReader()
             Dim EstadoLis = New List(Of SelectListItem)
-
             If ResultState.HasRows Then
                 While ResultState.Read()
-
                     EstadoLis.Add(New SelectListItem With {.Text = ResultState("region"), .Value = ResultState("Iso_pais_region")})
-
                 End While
-
             End If
             ResultState.Close()
 
@@ -1154,13 +321,15 @@ Namespace GroupsPlayaResorts
             model.ListaGroupTypein = ListGroupType
             model.ListaGroupMarketin = ListMarkets
             model.ListaAgencyTypein = ListAgencyType
-            'model.ListaSuitein = ListSuites
+            model.ListaSuitein = ListSuites
+            model.ListGroupBreakdownin = BreakdownList
+            model.ListGroupBreakdownGroupByin = BreakdownListGroupBy
             model.ListaBreakdownPaxin = ListPax
             model.ListaSchemePaymentsin = ListSchemePayments
             model.ListGroupDocumentsin = DocumentsLis
             model.ListaAvailabilityin = ListAvailability
             model.ListGroupRatesin = UsuariosLis
-
+            model.ListHotelPermissionsin = ListHotels_Global
             Return View(model)
         End Function
 
@@ -1168,32 +337,26 @@ Namespace GroupsPlayaResorts
         ' POST: /Group/GroupDetail
         <HttpPost()> _
         Public Function GroupDetail(ByVal model As GroupsDetail, ByVal GroupDetailBotons As String, Doc_File As HttpPostedFileBase) As ActionResult
-            UserPermissions("1,2,3,4")
+
+            Dim UsuariosLis_Tipo1 = New List(Of GroupsRatesList)
+
+            Dim Informacion_Suites As String = ""
 
             If GroupDetailBotons = "ConsultRateForm" Or GroupDetailBotons = "Consult_Revenue" Or GroupDetailBotons = "ConsultRateFormChosen" Or GroupDetailBotons = "ConsultRateFormMICE" Then
 
                 Dim BanderaMICE As Integer = 0
-
-
                 If (Request("numberpax") > 38 And Request("selectyperatecotizar") <> 5 And GroupDetailBotons = "ConsultRateForm" And Request("selectgrouptype") <> 1) Then
                     BanderaMICE = 1
                 End If
-
-
                 If (Request("numberpax") > 75 And Request("selectyperatecotizar") <> 5 And GroupDetailBotons = "ConsultRateForm" And Request("selectgrouptype") <> 6) Then
                     BanderaMICE = 2
                 End If
-
-
                 If (Request("numberpax") > 40 And GroupDetailBotons = "ConsultRateForm" And Request("selectgrouptype") = 6) Then
                     BanderaMICE = 3
                 End If
-
-
                 If BanderaMICE <> 0 Then
 
                     Dim UsuariosLis = New List(Of GroupsRatesList)
-
                     model.ListGroupRatesin = UsuariosLis
                     model.RevenueFinal = 0
 
@@ -1237,11 +400,20 @@ Namespace GroupsPlayaResorts
                         Dim ListaPaxRevenue() As String
                         Dim PercentajeDiscount As Double
 
-                        If GroupDetailBotons = "Consult_Revenue" Then
+                        If GroupDetailBotons = "Consult_Revenue" Or GroupDetailBotons = "ConsultRateForm" Then
 
                             Dim ListaPax As String
 
-                            ListaPax = Request("List_Pax").ToArray()
+                            Try
+                                ListaPax = Request("List_Pax").ToArray()
+                            Catch ex As Exception
+                                Try
+                                    ListaPax = Request("List_Pax1").ToArray()
+                                Catch ex2 As Exception
+                                    ListaPax = ""
+                                End Try
+
+                            End Try
 
                             ListaPaxRevenue = Split(ListaPax, ",")
 
@@ -1284,6 +456,7 @@ Namespace GroupsPlayaResorts
                           "<Llegada>" + Request("datetimepicker6text") + "</Llegada>" & _
                            "<Salida>" + Request("datetimepicker7text") + "</Salida>" & _
                            "<SoloDisponibilidad>0</SoloDisponibilidad>" & _
+                           "<Paquete>" & Request("selectquotetype") & "</Paquete>" & _
                         " </WS_Request2>" & _
                         "</soap:Body></soap:Envelope>"
 
@@ -1332,9 +505,24 @@ Namespace GroupsPlayaResorts
                         Dim i As Integer = 0
                         Dim NumberPaxAuxDos As String = "0"
 
+                        Dim Date1 As Date
+                        Dim Date2 As Date
+                        Dim dias_dif As Integer
+
+                        'Variable r_show esta manual por el momento en esta parte
+                        Dim R_Show_Aux As String = "C"
+
+                        If WhosaleValue(0) = "WESTJET" Then
+                            R_Show_Aux = "S"
+                        End If
+
                         If GroupDetailBotons = "Consult_Revenue" Then
 
                             For Each node As XmlElement In nodelist
+
+                                Date1 = node.Attributes("Start").Value
+                                Date2 = node.Attributes("End").Value
+                                dias_dif = DateDiff("d", Date1, Date2)
 
                                 If node.Attributes("Status").Value = "Available" Then
 
@@ -1344,33 +532,94 @@ Namespace GroupsPlayaResorts
                                     Else
                                         NumberPaxAuxDos = "0"
                                     End If
+                                   
+                                    dias_dif = DateDiff("d", Date1, Date2)
+                                    '01
+                                    UsuariosLis.Add(New GroupsRatesList With {
+                                                    .InitDateRate = Date1,
+                                                    .EndDateRate = Date2,
+                                                    .RateCveValue = node.Attributes("RatePlan").Value,
+                                                    .SuiteName = node.Attributes("Suite").Value,
+                                                    .SuiteCode = node.Attributes("Suite").Value,
+                                                    .RateSingle = node.Attributes("Rate_1").Value,
+                                                    .RateDouble = (node.Attributes("Rate_2").Value * PercentajeDiscount),
+                                                    .RateTripleandFour = node.Attributes("Rate_Extra").Value,
+                                                    .RateChildrens = node.Attributes("Rate_C").Value,
+                                                    .RateTeensValue = node.Attributes("Rate_T").Value,
+                                                    .Availability = node.Attributes("Status").Value,
+                                                    .RateRevenuePerRoom = ((node.Attributes("Rate_2").Value * 2) * dias_dif),
+                                                    .RateRevenue = (((node.Attributes("Rate_2").Value * 2) * dias_dif) * NumberPaxAuxDos),
+                                                    .RatePax = NumberPaxAuxDos,
+                                                    .Tip = node.Attributes("SuiteName").Value,
+                                                    .Formato = R_Show_Aux})
 
-                                    UsuariosLis.Add(New GroupsRatesList With {.SuiteName = node.Attributes("Suite").Value, .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = (node.Attributes("Rate_2").Value * PercentajeDiscount), .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = NumberPaxAuxDos * (((node.Attributes("Rate_2").Value * PercentajeDiscount) * 2)), .RatePax = NumberPaxAuxDos})
-
-                                    RevenueFinal = RevenueFinal + NumberPaxAuxDos * ((node.Attributes("Rate_2").Value * PercentajeDiscount) * 2)
+                                    RevenueFinal = RevenueFinal + (((node.Attributes("Rate_2").Value * 2) * dias_dif) * NumberPaxAuxDos)
 
                                     i = i + 1
 
                                 Else
-                                    UsuariosLis.Add(New GroupsRatesList With {.SuiteName = node.Attributes("Suite").Value, .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = node.Attributes("Rate_2").Value, .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = 0, .RatePax = 0})
+                                    UsuariosLis.Add(New GroupsRatesList With {
+                                                    .InitDateRate = Date1,
+                                                    .EndDateRate = Date2,
+                                                    .RateCveValue = node.Attributes("RatePlan").Value,
+                                                    .SuiteName = node.Attributes("Suite").Value,
+                                                    .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = node.Attributes("Rate_2").Value, .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = 0, .RatePax = 0, .Tip = node.Attributes("SuiteName").Value, .Formato = R_Show_Aux})
 
                                 End If
 
                             Next
 
-
+                            RevenueFinal = Round(RevenueFinal, R_Show)
 
                         Else
 
                             For Each node As XmlElement In nodelist
 
+
+                                Date1 = node.Attributes("Start").Value
+                                Date2 = node.Attributes("End").Value
+                                dias_dif = DateDiff("d", Date1, Date2)
+
+                                Try
+                                    If IsNumeric(ListaPaxRevenue(i)) Then
+                                        NumberPaxAuxDos = ListaPaxRevenue(i)
+                                        NumberPaxAuxDos.Replace(" ", "")
+                                    Else
+                                        NumberPaxAuxDos = "0"
+                                    End If
+                                Catch ex As Exception
+                                    NumberPaxAuxDos = "0"
+                                End Try
+
                                 If i = 0 And Request("numberpax") <> "" And node.Attributes("Status").Value = "Available" Then
 
-                                    UsuariosLis.Add(New GroupsRatesList With {.SuiteName = node.Attributes("Suite").Value, .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = node.Attributes("Rate_2").Value, .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = Request("numberpax") * (node.Attributes("Rate_2").Value * 2), .RatePax = Request("numberpax")})
-                                    RevenueFinal = RevenueFinal + Request("numberpax") * (node.Attributes("Rate_2").Value * 2)
+                                    UsuariosLis.Add(New GroupsRatesList With {
+                                                    .InitDateRate = Date1,
+                                                    .EndDateRate = Date2,
+                                                    .RateCveValue = node.Attributes("RatePlan").Value,
+                                                    .SuiteName = node.Attributes("Suite").Value,
+                                                    .SuiteCode = node.Attributes("Suite").Value,
+                                                    .RateSingle = node.Attributes("Rate_1").Value,
+                                                    .RateDouble = (node.Attributes("Rate_2").Value * PercentajeDiscount),
+                                                    .RateTripleandFour = node.Attributes("Rate_Extra").Value,
+                                                    .RateChildrens = node.Attributes("Rate_C").Value,
+                                                    .RateTeensValue = node.Attributes("Rate_T").Value,
+                                                    .Availability = node.Attributes("Status").Value,
+                                                    .RateRevenuePerRoom = ((node.Attributes("Rate_2").Value * 2) * dias_dif),
+                                                    .RateRevenue = (((node.Attributes("Rate_2").Value * 2) * dias_dif) * NumberPaxAuxDos),
+                                                    .RatePax = NumberPaxAuxDos,
+                                                    .Tip = node.Attributes("SuiteName").Value,
+                                                    .Formato = R_Show_Aux})
+
+                                    RevenueFinal = RevenueFinal + (((node.Attributes("Rate_2").Value * 2) * dias_dif) * NumberPaxAuxDos)
+
                                 Else
 
-                                    UsuariosLis.Add(New GroupsRatesList With {.SuiteName = node.Attributes("Suite").Value, .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = node.Attributes("Rate_2").Value, .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = 0, .RatePax = 0})
+                                    UsuariosLis.Add(New GroupsRatesList With {
+                                                    .InitDateRate = Date1,
+                                                    .EndDateRate = Date2,
+                                                    .RateCveValue = node.Attributes("RatePlan").Value,
+                                                    .SuiteName = node.Attributes("Suite").Value, .SuiteCode = node.Attributes("Suite").Value, .RateSingle = node.Attributes("Rate_1").Value, .RateDouble = node.Attributes("Rate_2").Value, .RateTripleandFour = node.Attributes("Rate_Extra").Value, .RateChildrens = node.Attributes("Rate_C").Value, .RateTeensValue = node.Attributes("Rate_T").Value, .Availability = node.Attributes("Status").Value, .RateRevenue = 0, .RatePax = 0, .Tip = node.Attributes("SuiteName").Value, .Formato = R_Show_Aux})
                                     RevenueFinal = RevenueFinal + 0
                                 End If
 
@@ -1382,9 +631,10 @@ Namespace GroupsPlayaResorts
 
                             Next
 
+                            RevenueFinal = Round(RevenueFinal, R_Show)
                         End If
 
-
+                        UsuariosLis_Tipo1 = UsuariosLis
                         model.ListGroupRatesin = UsuariosLis
 
                         model.RevenueFinal = RevenueFinal
@@ -1398,13 +648,12 @@ Namespace GroupsPlayaResorts
 
                         Else
                             model.GroupTypeRate = TypeRateValue
-                            model.EditGroupData7 = 0
+                            'Aqui le pone cero por default, consultar despues
+                            '  model.EditGroupData7 = 0
                         End If
 
                         Return PartialView("RatesConsult", model)
                     End If
-
-
 
 
                     If TypeRateValue = "2" Or TypeRateValue = "3" Then
@@ -1421,7 +670,16 @@ Namespace GroupsPlayaResorts
                             Dim ListaPax As String
                             Dim Listasuites As String
 
-                            ListaPax = Request("List_Pax1").ToArray()
+                            Try
+                                ListaPax = Request("List_Pax1").ToArray()
+                            Catch ex As Exception
+                                Try
+                                    ListaPax = Request("List_Pax").ToArray()
+                                Catch ex2 As Exception
+                                    ListaPax = ""
+                                End Try
+
+                            End Try
 
                             ListaPaxRevenue = Split(ListaPax, ",")
 
@@ -1480,8 +738,7 @@ Namespace GroupsPlayaResorts
 
                         Try
 
-
-                            QueryDos = " Select a.*, '" + Request("datetimepicker6text") + "' as VigenciaI , '" + Request("datetimepicker7text") + "' as VigenciaF , DATEDIFF(day,'" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "') as Nights from vw_Tipo_Cuarto a where a.Clav_Hotel='" + Request("HotelSelect") + "' order by a.SuiteOrden  "
+                            QueryDos = " Select a.*, '" + Request("datetimepicker6text") + "' as VigenciaI , '" + Request("datetimepicker7text") + "' as VigenciaF , DATEDIFF(day,'" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "') as Nights, AG.R_CALC, AG.R_SHOW from vw_Tipo_Cuarto a, vw_Agencies AG where a.Clav_Hotel='" + Request("HotelSelect") + "' AND AG.Clav_Ag='" + WhosaleValue(0) + "' order by a.SuiteOrden  "
                             Dim CommandUserTres = New SqlCommand(QueryDos, conn)
                             CommandUserTres.CommandTimeout = 0
                             Dim Results = CommandUserTres.ExecuteReader()
@@ -1503,12 +760,27 @@ Namespace GroupsPlayaResorts
                             Dim nodelist As XmlNodeList
                             nodelist = GetAvailability()
 
+                            Dim contador As Integer = 1
+
                             If Results.HasRows Then
                                 While Results.Read()
+
+                                    R_Calc = Results("R_Calc")
+                                    R_Show = Results("R_Show")
 
                                     If GroupDetailBotons = "Consult_Revenue" Then
 
                                         'AvailabilityAux = Availability(Results("Clave_TC"), nodelist)
+                                        Dim tip As String = ""
+                                        AvailabilityAux = Availability(Results("Clave_TC"), nodelist, tip)
+                                        'AvailabilityAux = "Available"
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                                  {"Clave_TC", Results("Clave_TC")} _
+                                       })
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                            {"SuiteName", tip} _
+                                        })
+
                                         AvailabilityAux = "Available"
 
                                         j = 0
@@ -1525,34 +797,38 @@ Namespace GroupsPlayaResorts
                                             NumberPaxAuxDos = "0"
                                         End If
 
+                                        Dim tip_hotel = Obtiene_Tip_Hotel(Results("Clave_TC"))
+
                                         If TypeRateValue = "2" Then
 
                                             If Request("List_DoubleRate") <> "" Then
                                                 RateDobleBase = ListaRate(i)
                                             End If
+                                            'Calculo tarifario manual 
+                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .Formato = R_Show, .Tip = tip_hotel})
 
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase})
-
-                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights"))
+                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc)
 
                                         Else
                                             RateDobleBase = RateDobleBase + Results("ITA")
 
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase})
+                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .Formato = R_Show, .Tip = tip_hotel})
 
-                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights"))
+                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc)
                                         End If
 
 
 
                                     Else
-
-
-
-                                        AvailabilityAuxConsultRate = AvailabilityConsultRate(Results("Clave_TC"), nodelist)
-                                        AvailabilityAuxConsultRate(0) = "Available"
-
-
+                                        '27
+                                        Dim tip As String = ""
+                                        AvailabilityAuxConsultRate = AvailabilityConsultRate(Results("Clave_TC"), nodelist, tip)
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                                  {"Clave_TC", Results("Clave_TC")} _
+                                       })
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                            {"SuiteName", tip} _
+                                        })
 
                                         If (DateInit <> Results("VigenciaI") Or i = 0 Or i = 1) And AvailabilityAuxConsultRate(0) = "Available" Then
 
@@ -1621,17 +897,9 @@ Namespace GroupsPlayaResorts
 
                                         End If
 
+                                        Dim tip_hotel = Obtiene_Tip_Hotel(Results("Clave_TC"))
 
-
-                                        'If i = 0 And AvailabilityAux = "Available" Then
-                                        '    NumberPaxAux = NumberPax
-                                        'Else
-                                        '    NumberPaxAux = 0
-                                        'End If
-
-                                        'UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = 0, .RateDouble = 0, .RateTripleandFour = 0, .RateFiveandSix = 0, .RateChildrens = 0, .RateTeensValue = 0, .Availability = AvailabilityAux, .RateRevenue = 0, .RatePax = NumberPaxAux, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = 0, .RateRevenueRoomNigth = 0})
-
-                                        UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = 0, .RateDouble = 0, .RateTripleandFour = 0, .RateFiveandSix = 0, .RateChildrens = 0, .RateTeensValue = 0, .Availability = AvailabilityAuxConsultRate(0), .RateRevenue = 0, .RatePax = NumberPaxAux, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = 0, .RateRevenueRoomNigth = 0})
+                                        UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = 0, .RateDouble = 0, .RateTripleandFour = 0, .RateFiveandSix = 0, .RateChildrens = 0, .RateTeensValue = 0, .Availability = AvailabilityAuxConsultRate(0), .RateRevenue = 0, .RatePax = NumberPaxAux, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = 0, .RateRevenueRoomNigth = 0, .Formato = R_Show, .Tip = tip_hotel})
 
                                     End If
 
@@ -1660,29 +928,7 @@ Namespace GroupsPlayaResorts
                         model.RevenueFinal = RevenueFinal
                         model.Accion = 2
                         model.GroupId = Request("grupoidlabeltext")
-
-
-                        Select Case Request("HotelSelect")
-                            Case "GCR"
-                                model.GroupHotelNew = "GCCUN"
-                            Case "GPR"
-                                model.GroupHotelNew = "POPDC"
-                            Case "RPR"
-                                model.GroupHotelNew = "ROPDC"
-                            Case "TRC"
-                                model.GroupHotelNew = "HZLCUN"
-                            Case "ZLJ"
-                                model.GroupHotelNew = "HZLJAM"
-                            Case "ZVC"
-                                model.GroupHotelNew = "HZVCUN"
-                            Case "ZVJ"
-                                model.GroupHotelNew = "HZVJAM"
-                            Case "ZVL"
-                                model.GroupHotelNew = "HZLCA"
-                            Case "ZVP"
-                                model.GroupHotelNew = "HZVPV"
-                        End Select
-
+                        model.GroupHotelNew = ObtieneHotel(Request("HotelSelect"))
 
                         If GroupDetailBotons = "Consult_Revenue" Then
                             model.GroupTypeRate = Request("selectratetype")
@@ -1697,7 +943,7 @@ Namespace GroupsPlayaResorts
 
 
 
-
+                    'Modelo de compensacion y MICE
                     If TypeRateValue = "4" Or TypeRateValue = "5" Then
 
 
@@ -1709,12 +955,23 @@ Namespace GroupsPlayaResorts
                             Dim ListaPax As String
                             Dim Listasuites As String
 
-                            ListaPax = Request("List_Pax1").ToArray()
+                            Try
+                                ListaPax = Request("List_Pax1").ToArray()
+                            Catch ex As Exception
+                                Try
+                                    ListaPax = Request("List_Pax").ToArray()
+                                Catch ex2 As Exception
+                                    ListaPax = ""
+                                End Try
+                             End Try
 
                             ListaPaxRevenue = Split(ListaPax, ",")
 
-                            Listasuites = Request("List_Suites").ToArray()
-
+                            Try
+                                Listasuites = Request("List_Suites").ToArray()
+                            Catch ex3 As Exception
+                                Listasuites = ""
+                            End Try
                             ListaSuitesPax = Split(Listasuites, ",")
 
                             Dim PercentajeDiscount As Double
@@ -1732,6 +989,8 @@ Namespace GroupsPlayaResorts
 
                             End If
 
+                            'Commision 
+                            model.EditGroupData34 = Request("ComissionAgency")
 
                         End If
 
@@ -1748,32 +1007,31 @@ Namespace GroupsPlayaResorts
                         Dim RevenueFinal As Double = 0
                         Dim i As Integer = 0
                         Dim j As Integer = 0
-                        Dim QueryDos As String
+                        Dim QueryDos As String = ""
 
 
                         conn.Open()
-
                         Try
-
                             If GroupDetailBotons = "Consult_Revenue" Then
                                 If TypeRateValue = "4" Then
-                                    QueryDos = " Exec sp_Rates_Compensacion '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "', @Package = " + Request("selectquotetype")
+                                    QueryDos = " Exec sp_Rates_Compensacion_test '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'" + ", @Package = " + Request("selectquotetype")
                                 Else
                                     QueryDos = " Exec sp_Rates_MICE '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'"
                                 End If
                             Else
                                 If TypeRateValue = "4" Then
-                                    QueryDos = " Exec sp_Rates_Compensacion '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "', @Package = " + Request("selectquotetype")
+                                    QueryDos = " Exec sp_Rates_Compensacion_test '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'" + ", @Package = " + Request("selectquotetype")
                                 Else
                                     QueryDos = " Exec sp_Rates_MICE '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'"
                                 End If
 
                             End If
 
-
                             Dim CommandUserTres = New SqlCommand(QueryDos, conn)
                             CommandUserTres.CommandTimeout = 0
                             Dim Results = CommandUserTres.ExecuteReader()
+
+
                             Dim NumberPax As Integer = 0
                             Dim NumberPaxAux As Integer = 0
                             Dim DateInit As Date
@@ -1792,14 +1050,24 @@ Namespace GroupsPlayaResorts
 
                             Dim nodelist As XmlNodeList
                             nodelist = GetAvailability()
-
+                            Dim contador2 As Integer = 1
                             If Results.HasRows Then
                                 While Results.Read()
+                                    R_Calc = Results("R_Calc")
+                                    R_Show = Results("R_Show")
 
                                     If GroupDetailBotons = "Consult_Revenue" Then
 
-                                        AvailabilityAux = Availability(Results("Clave_TC"), nodelist)
+                                        Dim tip As String = ""
+                                        AvailabilityAux = Availability(Results("Clave_TC"), nodelist, tip)
+                                        '277
                                         'AvailabilityAux = "Available"
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                                  {"Clave_TC", Results("Clave_TC")} _
+                                       })
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                            {"SuiteName", tip} _
+                                        })
 
                                         j = 0
 
@@ -1823,25 +1091,32 @@ Namespace GroupsPlayaResorts
                                             End If
                                         End If
 
+                                        Dim tip_hotel = Obtiene_Tip_Hotel(Results("Clave_TC"))
+
                                         If TypeRateValue = "4" Then
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Base"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAuxDos, .CommissionRate = Results("Comision"), .DiscountRate = Results("Descuento"), .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2")})
+                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Base"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = Results("Comision"), .DiscountRate = Results("Descuento"), .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .Formato = R_Show, .Tip = tip_hotel})
                                         Else
                                             If Results("Rate") = 0 Then
                                                 AvailabilityAux = "Close"
                                             End If
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2")})
+                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .Formato = R_Show, .Tip = tip_hotel})
                                         End If
 
 
                                         If BanderaRevenue = 0 Then
-                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue"))
+                                            RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc)
                                         End If
 
                                     Else
+                                        Dim tip2 As String = ""
+                                        AvailabilityAuxConsultRate = AvailabilityConsultRate(Results("Clave_TC"), nodelist, tip2)
 
-                                        'AvailabilityAux = Availability(Results("Clave_TC"), nodelist)
-                                        AvailabilityAuxConsultRate = AvailabilityConsultRate(Results("Clave_TC"), nodelist)
-                                        'AvailabilityAuxConsultRate(0) = "Available"
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                                   {"Clave_TC", Results("Clave_TC")} _
+                                        })
+                                        values.Add(New Dictionary(Of String, String)() From { _
+                                            {"SuiteName", tip2} _
+                                        })
 
 
 
@@ -1900,15 +1175,16 @@ Namespace GroupsPlayaResorts
 
                                                 End If
 
-
+                                                'Aqui es donde esta el TOTAL DE REVENUE DE LA TABLA
                                                 If BanderaRevenue = 0 Then
-                                                    RevenueFinal = RevenueFinal + (NumberPaxAux * Math.Ceiling(Results("TotalRevenue")))
+                                                    RevenueFinal = RevenueFinal + (NumberPaxAux * Round(Results("TotalRevenue"), R_Calc))
 
                                                 End If
 
 
                                             End If
 
+                                            RevenueFinal = Round(RevenueFinal, R_Show)
 
                                         Else
                                             NumberPaxAux = 0
@@ -1918,24 +1194,45 @@ Namespace GroupsPlayaResorts
 
                                         End If
 
+                                        Dim tip_hotel = Obtiene_Tip_Hotel(Results("Clave_TC"))
+
+                                        'Modelo Compensasion
                                         If TypeRateValue = "4" Then
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Base"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAuxConsultRate(0), .RateRevenue = NumberPaxAux * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAux, .CommissionRate = Results("Comision"), .DiscountRate = Results("Descuento"), .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2")})
+                                            UsuariosLis.Add(New GroupsRatesList With {
+                                                            .InitDateRate = Results("VigenciaI"),
+                                                            .EndDateRate = Results("VigenciaF"),
+                                                            .SuiteName = Results("Clave_TC"),
+                                                            .SuiteCode = Results("Clave_TC"),
+                                                            .RateSingle = Round(Results("Tar_1"), R_Show),
+                                                            .RateDouble = Round(Results("Base"), R_Show),
+                                                            .RateTripleandFour = Round(Results("Extra"), R_Show),
+                                                            .RateFiveandSix = Round(Results("ExtraX"), R_Show),
+                                                            .RateChildrens = Round(Results("Tar_N"), R_Show),
+                                                            .RateTeensValue = Round(Results("Tar_A"), R_Show),
+                                                            .Availability = AvailabilityAuxConsultRate(0),
+                                                            .RateRevenue = Round((NumberPaxAux * Round(Results("TotalRevenue"), R_Calc)), R_Show),
+                                                            .RatePax = NumberPaxAux,
+                                                            .CommissionRate = Results("Comision"),
+                                                            .DiscountRate = Results("Descuento"),
+                                                            .RateRevenuePerRoom = Round(Results("TotalRevenue"), R_Show),
+                                                            .RateRevenueRoomNigth = Round(Results("Tar_2"), R_Show),
+                                                            .Formato = R_Show,
+                                                            .Tip = tip_hotel
+                                                        })
                                         Else
+                                            'Desde boton Calculate Rate de pantalla principal
                                             If Results("Rate") = 0 Then
                                                 AvailabilityAux = "Close"
                                             End If
-                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAuxConsultRate(0), .RateRevenue = NumberPaxAux * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAux, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2")})
+                                            'Modelo MICE
+                                            UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Results("VigenciaI"), .EndDateRate = Results("VigenciaF"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Round(Results("Tar_1"), R_Show), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAuxConsultRate(0), .RateRevenue = NumberPaxAux * Round(Results("TotalRevenue"), R_Calc), .RatePax = NumberPaxAux, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .Formato = R_Show, .Tip = tip_hotel})
                                         End If
-
-
-
                                     End If
-
-
                                     'i = i + 1
 
                                 End While
                             End If
+
 
                         Catch ex As Exception
 
@@ -1951,27 +1248,7 @@ Namespace GroupsPlayaResorts
                         model.RevenueFinal = RevenueFinal
                         model.Accion = 2
                         model.GroupId = Request("grupoidlabeltext")
-
-                        Select Case Request("HotelSelect")
-                            Case "GCR"
-                                model.GroupHotelNew = "GCCUN"
-                            Case "GPR"
-                                model.GroupHotelNew = "POPDC"
-                            Case "RPR"
-                                model.GroupHotelNew = "ROPDC"
-                            Case "TRC"
-                                model.GroupHotelNew = "HZLCUN"
-                            Case "ZLJ"
-                                model.GroupHotelNew = "HZLJAM"
-                            Case "ZVC"
-                                model.GroupHotelNew = "HZVCUN"
-                            Case "ZVJ"
-                                model.GroupHotelNew = "HZVJAM"
-                            Case "ZVL"
-                                model.GroupHotelNew = "HZLCA"
-                            Case "ZVP"
-                                model.GroupHotelNew = "HZVPV"
-                        End Select
+                        model.GroupHotelNew = ObtieneHotel(Request("HotelSelect"))
 
                         If GroupDetailBotons = "Consult_Revenue" Then
                             model.GroupTypeRate = Request("selectratetype")
@@ -2020,41 +1297,16 @@ Namespace GroupsPlayaResorts
 
                     ID_group = Update_Group_Data()
 
-                    model = Group_Rates(Request("grupoidlabeltext"), 1)
+                    model = Group_Rates(ID_group, 1)
                     model.Accion = 1
-
-
-
                 End If
 
                 model.GroupId = ID_group
                 model.GroupIdLabel = Request("HotelSelect")
-
-                Select Case Request("HotelSelect")
-                    Case "GCR"
-                        model.GroupHotelNew = "GCCUN"
-                    Case "GPR"
-                        model.GroupHotelNew = "POPDC"
-                    Case "RPR"
-                        model.GroupHotelNew = "ROPDC"
-                    Case "TRC"
-                        model.GroupHotelNew = "HZLCUN"
-                    Case "ZLJ"
-                        model.GroupHotelNew = "HZLJAM"
-                    Case "ZVC"
-                        model.GroupHotelNew = "HZVCUN"
-                    Case "ZVJ"
-                        model.GroupHotelNew = "HZVJAM"
-                    Case "ZVL"
-                        model.GroupHotelNew = "HZLCA"
-                    Case "ZVP"
-                        model.GroupHotelNew = "HZVPV"
-                End Select
-
+                model.GroupHotelNew = ObtieneHotel(Request("HotelSelect"))
                 Return View("RatesConsult", model)
 
             End If
-
             If GroupDetailBotons = "GenerateFile" Then
 
 
@@ -2083,7 +1335,6 @@ Namespace GroupsPlayaResorts
                         Dim CommandUserUno = New SqlCommand(QueryDos, conn)
                         Dim ResultsUno = CommandUserUno.ExecuteReader()
 
-
                         If ResultsUno.HasRows Then
                             While ResultsUno.Read()
                                 ClavHotel = ResultsUno("Cve_Hotel")
@@ -2099,26 +1350,20 @@ Namespace GroupsPlayaResorts
                         Dim QueryTres = "Exec sp_Report_Groups " + Request("grupoiddoc") + " "
                         Dim CommandDos = New SqlCommand(QueryTres, conn)
                         Dim ResultsDos = CommandDos.ExecuteReader()
-                        'Dim QueryTres = "Exec sp_Report_Groups_testII " + Request("grupoiddoc") + " "
-                        'Dim CommandDos = New SqlCommand(QueryTres, conn)
-                        'Dim ResultsDos = CommandDos.ExecuteReader()
 
 
                         If ResultsDos.HasRows Then
                             While ResultsDos.Read()
-                                'ClavHotel = ResultsDos("Cve_Hotel")
-                                'AgencyType = ResultsDos("AgencyType")
-                                'Wholesale = ResultsDos("TO")
-                                'NumRooms = ResultsDos("NumberRooms")
 
                                 GroupsData.Add(New GroupsReportDataList With {.DateDeposit = ResultsDos("DateDeposit"), .ComplementaryRoom = ResultsDos("ComplementaryRoom"), .Contact_Email = ResultsDos("Contact_Email"), .Phones = ResultsDos("Phones"), .ArrivalDate = ResultsDos("ArrivalDate"), .DepartureDate = ResultsDos("DepartureDate"), .Contact = ResultsDos("Contact"), .GroupCordinator = ResultsDos("GroupCordinator"), .GroupName = ResultsDos("GroupName"), .Wholesale = ResultsDos("Wholesale"), .NumberRooms = ResultsDos("NumberRooms"), .Special_Notes = ResultsDos("Special_Notes"), .HotelLogo = ResultsDos("HotelLogo"), .HotelName = ResultsDos("HotelName"), .User_Email = ResultsDos("User_Email"), .GroupType = ResultsDos("GroupType"), .Cve_Hotel = ResultsDos("Cve_Hotel"), .Beneficiary_Bank = ResultsDos("Beneficiary_Bank"), .ABA_Routing = ResultsDos("ABA_Routing"), .ABA_WireTransfers = ResultsDos("ABA_WireTransfers"), .SWIFT_CODE = ResultsDos("SWIFT_CODE"), .Bank_Address = ResultsDos("Bank_Address"), .Beneficiary_Name = ResultsDos("Beneficiary_Name"), .Memo = ResultsDos("Memo"), .Beneficiary_Account = ResultsDos("Beneficiary_Account"), .Hotel_Address = ResultsDos("Hotel_Address"), .IdGroupCode = ResultsDos("IdGroupCode"), .QuotedDate = ResultsDos("QuotedDate"), .VersionDoc = ResultsDos("VersionDoc"), .AgencyTypeText = ResultsDos("AgencyTypeText"), .DateMICEPayments = ResultsDos("DateMICEPayments"), .Additional_SC = Request("enrollmentconcessions"), .IncludeEvents = Request("selectincludeevents"), .RevenueGeneral = ResultsDos("RevenueGeneral")})
+
 
                             End While
                         End If
                         ResultsDos.Close()
 
 
-                        Dim QueryCuatro = "Exec sp_Report_GroupsRoomRates " + Request("grupoiddoc") + " "
+                        Dim QueryCuatro = "Exec sp_Report_GroupsRoomRates_test " + Request("grupoiddoc") + " "
                         Dim CommandTres = New SqlCommand(QueryCuatro, conn)
                         Dim ResultsTres = CommandTres.ExecuteReader()
 
@@ -2126,14 +1371,27 @@ Namespace GroupsPlayaResorts
                         If ResultsTres.HasRows Then
                             While ResultsTres.Read()
 
-                                GroupsDataRoomRates.Add(New GroupsReportRoomRatesList With {.Init_Date = ResultsTres("Init_Date"), .End_Date = ResultsTres("End_Date"), .Nomb_TC_Act = ResultsTres("Nomb_TC_Act"), .Rate_1 = Math.Ceiling(ResultsTres("Rate_1")), .Rate_2 = Math.Ceiling(ResultsTres("Rate_2")), .Rate_Extra = Math.Ceiling(ResultsTres("Rate_Extra")), .Rate_T = Math.Ceiling(ResultsTres("Rate_T")), .Rate_C = Math.Ceiling(ResultsTres("Rate_C")), .Code_Room = ResultsTres("Code_Room"), .Description_Promo = ResultsTres("Description_Promo"), .Availability = ResultsTres("Availability")})
+                                GroupsDataRoomRates.Add(New GroupsReportRoomRatesList With {
+                                                        .Init_Date = ResultsTres("Init_Date"),
+                                                        .End_Date = ResultsTres("End_Date"),
+                                                        .Nomb_TC_Act = ResultsTres("Nomb_TC_Act"),
+                                                        .Rate_1 = ResultsTres("Rate_1"),
+                                                        .Rate_2 = ResultsTres("Rate_2"),
+                                                        .Rate_Extra = ResultsTres("Rate_Extra"),
+                                                        .Rate_T = ResultsTres("Rate_T"),
+                                                        .Rate_C = ResultsTres("Rate_C"),
+                                                        .Code_Room = ResultsTres("Code_Room"),
+                                                        .Description_Promo = ResultsTres("Description_Promo"),
+                                                        .Availability = ResultsTres("Availability"),
+                                                        .R_Show = ResultsTres("R_Show")
+                                                    })
 
                             End While
                         End If
                         ResultsTres.Close()
 
 
-                        Dim QueryCinco = "Exec sp_Report_GroupsRevenue " + Request("grupoiddoc") + " "
+                        Dim QueryCinco = "Exec sp_Report_GroupsRevenue_New_Test " + Request("grupoiddoc") + " "
                         Dim CommandCuatro = New SqlCommand(QueryCinco, conn)
                         Dim Resultscuatro = CommandCuatro.ExecuteReader()
 
@@ -2141,7 +1399,15 @@ Namespace GroupsPlayaResorts
                         If Resultscuatro.HasRows Then
                             While Resultscuatro.Read()
 
-                                GroupsDataRoomRevenue.Add(New GroupsReportRevenueList With {.Nomb_TC_Act = Resultscuatro("Nomb_TC_Act"), .Num_Rooms = Resultscuatro("Num_Rooms"), .Revenue = Math.Ceiling(Resultscuatro("Revenue")), .People = Resultscuatro("People"), .Total = Math.Ceiling(Resultscuatro("Total"))})
+                                GroupsDataRoomRevenue.Add(New GroupsReportRevenueList With {
+                                                          .Nomb_TC_Act = Resultscuatro("Nomb_TC_Act"),
+                                                          .Num_Rooms = Resultscuatro("Num_Rooms"),
+                                                          .Revenue = Resultscuatro("Revenue"),
+                                                          .People = Resultscuatro("People"),
+                                                          .Total = Resultscuatro("Total"),
+                                                          .R_Show = Resultscuatro("R_Show")
+                                                        })
+
 
                             End While
                         End If
@@ -2215,13 +1481,16 @@ Namespace GroupsPlayaResorts
 
                                 GroupDataRoomNights.Add(New GroupsReportRoomNigthsList With {.Code_Room = Resultscinco("Code_Room"), .NumberRooms = Resultscinco("NumberRooms"), .Col1 = Col1, .Col2 = Col2, .Col3 = Col3, .Col4 = Col4, .Col5 = Col5, .Col6 = Col6, .Col7 = Col7})
 
-
                             End While
                         End If
                         Resultscinco.Close()
 
 
                         Dim QuerySiete
+                        'tIPO DE DOCUEMNTO
+                        ' <option value="2">Enrollment Form</option>
+                        '<option value="3">Lock Rooms</option>
+                        '<option value="5">Rooming List</option>
 
                         If Request("selectypedocument") = 3 Or Request("selectypedocument") = 5 Then
                             QuerySiete = "Exec sp_Report_GroupsRoomNights_Estimated_test " + Request("grupoiddoc") + " , 0 "
@@ -2233,13 +1502,6 @@ Namespace GroupsPlayaResorts
                         Dim CommandSeis = New SqlCommand(QuerySiete, conn)
                         Dim Resultsseis = CommandSeis.ExecuteReader()
 
-                        If Resultsseis.HasRows Then
-                            While Resultsseis.Read()
-
-                                GroupsReportRoomNightsEstimated.Add(New GroupsReportRoomNightsEstimatedList With {.ArrivalDatePeriod = Resultsseis("ArrivalDatePeriod"), .DepartureDatePeriod = Resultsseis("DepartureDatePeriod"), .Name_Room = Resultsseis("Name_Room"), .Code_Room = Resultsseis("Code_Room"), .NumberRooms = Resultsseis("NumberRooms"), .DepartureDateFinal = Resultsseis("DepartureDateFinal")})
-
-                            End While
-                        End If
                         Resultsseis.Close()
 
 
@@ -2257,7 +1519,35 @@ Namespace GroupsPlayaResorts
                         If Resultssiete.HasRows Then
                             While Resultssiete.Read()
 
-                                GroupsReportRoomingList.Add(New GroupsReportRoomingList With {.NumberNigths = Resultssiete("NumberNigths"), .DateNight = Resultssiete("DateNight"), .Flag = Resultssiete("Flag"), .PaxName4 = Resultssiete("PaxName4"), .PaxLastname4 = Resultssiete("PaxLastname4"), .PaxName3 = Resultssiete("PaxName3"), .PaxLastname3 = Resultssiete("PaxLastname3"), .PaxName2 = Resultssiete("PaxName2"), .PaxLastname2 = Resultssiete("PaxLastname2"), .PaxName1 = Resultssiete("PaxName1"), .PaxLastname1 = Resultssiete("PaxLastname1"), .Nights = Resultssiete("Nights"), .Rate = Resultssiete("Rate"), .FolioPMS = Resultssiete("FolioPMS"), .Special_Notes = Resultssiete("Special_Notes"), .Revenue = Resultssiete("Revenue"), .Checkout = Resultssiete("Checkout"), .Checkin = Resultssiete("Checkin"), .Infants = Resultssiete("Infants"), .Teens = Resultssiete("Teens"), .Childs = Resultssiete("Childs"), .Adults = Resultssiete("Adults"), .GuestName = Resultssiete("GuestName"), .GuestLastName = Resultssiete("GuestLastName"), .Code_Room = Resultssiete("Code_Room"), .Id_BreakDown = Resultssiete("Id_BreakDown")})
+                                GroupsReportRoomingList.Add(New GroupsReportRoomingList With {
+                                                            .NumberNigths = Resultssiete("NumberNigths"),
+                                                            .DateNight = Resultssiete("DateNight"),
+                                                            .Flag = Resultssiete("Flag"),
+                                                            .PaxName4 = Resultssiete("PaxName4"),
+                                                            .PaxLastname4 = Resultssiete("PaxLastname4"),
+                                                            .PaxName3 = Resultssiete("PaxName3"),
+                                                            .PaxLastname3 = Resultssiete("PaxLastname3"),
+                                                            .PaxName2 = Resultssiete("PaxName2"),
+                                                            .PaxLastname2 = Resultssiete("PaxLastname2"),
+                                                            .PaxName1 = Resultssiete("PaxName1"),
+                                                            .PaxLastname1 = Resultssiete("PaxLastname1"),
+                                                            .Nights = Resultssiete("Nights"),
+                                                            .Rate = Resultssiete("Rate"),
+                                                            .FolioPMS = Resultssiete("FolioPMS"),
+                                                            .Special_Notes = Resultssiete("Special_Notes"),
+                                                            .Revenue = Resultssiete("Revenue"),
+                                                            .Checkout = Resultssiete("Checkout"),
+                                                            .Checkin = Resultssiete("Checkin"),
+                                                            .Infants = Resultssiete("Infants"),
+                                                            .Teens = Resultssiete("Teens"),
+                                                            .Childs = Resultssiete("Childs"),
+                                                            .Adults = Resultssiete("Adults"),
+                                                            .GuestName = Resultssiete("GuestName"),
+                                                            .GuestLastName = Resultssiete("GuestLastName"),
+                                                            .Code_Room = Resultssiete("Code_Room"),
+                                                            .Id_BreakDown = Resultssiete("Id_BreakDown"),
+                                                            .R_Show = Resultssiete("R_Show")
+                                                            })
 
                             End While
                         End If
@@ -2275,42 +1565,53 @@ Namespace GroupsPlayaResorts
 
                     conn.close()
 
-
+                    'aGENCYS
+                    '<option value="2">Direct Consumer</option>
+                    '<option value="4" selected="selected">Tour Operator</option>
+                    '<option value="5">Travel Agency</option>
 
                     If GroupType <> 4 And GroupType <> 6 Then
 
                         If Request("selectypedocument") = 2 Then
                             If NumRooms >= 75 Then
                                 If AgencyType = 2 Then
+                                    'Formato Ok
                                     Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormDirectClientMICEV2.rdlc")
                                 Else
+                                    'Formato Ok
                                     Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormMICEV2.rdlc")
                                 End If
                             ElseIf NumRooms >= 39 Then
                                 If AgencyType = 2 Then
+                                    'Formato Ok
                                     Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormDirectClient39.rdlc")
                                 Else
                                     Select Case Wholesale
                                         Case "LIBGOTRS", "LIBGOGRP", "GOGOW"
                                             '' Mismas politicas 39++ y 39---
+                                            'Formato Ok
                                             Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormTOSpecialV2.rdlc")
                                         Case Else
+                                            'Formato Ok
                                             Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentForm39.rdlc")
                                     End Select
                                 End If
                             Else
 
                                 If AgencyType = 2 Then
+                                    'Formato Ok
                                     Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormDirectClientV2.rdlc")
                                 Else
 
                                     Select Case Wholesale
                                         Case "LIBGOTRS", "LIBGOGRP", "GOGOW"
-                                            '' Mismas politicas 39++ y 39---
+                                            '' Mismas politicas 39++ y 39--- Formato Ok
                                             Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormTOSpecialV2.rdlc")
                                         Case "EXGROTVL"
-                                            Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormTOSpecial2v2.rdlc")
+                                            'Formato Ok 
+                                            Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormTOSpecial2V2.rdlc")
                                         Case Else
+                                            'Formato Ok
                                             Ubicacion = Server.MapPath("~/bin/Content/Reports/EnrollmentFormV2.rdlc")
                                     End Select
                                 End If
@@ -2319,14 +1620,21 @@ Namespace GroupsPlayaResorts
 
                         End If
 
-
                         If Request("selectypedocument") = 3 Then
+
+
                             Ubicacion = Server.MapPath("~/bin/Content/Reports/LookRoomEstimate.rdlc")
+
+
                         End If
 
 
                         If Request("selectypedocument") = 5 Then
+
+
                             Ubicacion = Server.MapPath("~/bin/Content/Reports/RoomingList.rdlc")
+
+
                         End If
 
 
@@ -2451,18 +1759,8 @@ Namespace GroupsPlayaResorts
                         If Request("selectypedocument") = 5 Then
                             Return File(renderedBytes, mimeType, "RoomingList_" + ClavHotel + "000" + Request("grupoiddoc") + "." + fileNameExtension)
                         End If
-
-
                     Else
-
-
-
-
-
                     End If
-
-
-
                 Else
 
                     Dim UsuariosLis = New List(Of GroupsRatesList)
@@ -2479,33 +1777,11 @@ Namespace GroupsPlayaResorts
                     model.Accion = 4
                     model.GroupId = Request("grupoiddoc")
                     model.GroupIdLabel = Request("HotelSelect")
-                    Select Case Request("HotelSelect")
-                        Case "GCR"
-                            model.GroupHotelNew = "GCCUN"
-                        Case "GPR"
-                            model.GroupHotelNew = "POPDC"
-                        Case "RPR"
-                            model.GroupHotelNew = "ROPDC"
-                        Case "TRC"
-                            model.GroupHotelNew = "HZLCUN"
-                        Case "ZLJ"
-                            model.GroupHotelNew = "HZLJAM"
-                        Case "ZVC"
-                            model.GroupHotelNew = "HZVCUN"
-                        Case "ZVJ"
-                            model.GroupHotelNew = "HZVJAM"
-                        Case "ZVL"
-                            model.GroupHotelNew = "HZLCA"
-                        Case "ZVP"
-                            model.GroupHotelNew = "HZVPV"
-
-                    End Select
-
+                    model.GroupHotelNew = ObtieneHotel(Request("HotelSelect"))
+                    
                     Return PartialView(model)
 
                 End If
-
-
             End If
 
 
@@ -2525,6 +1801,7 @@ Namespace GroupsPlayaResorts
                     End While
                 End If
                 Results.Close()
+
                 conn.close()
 
                 model.ListGroupDocumentsin = DocumentsLis
@@ -2621,11 +1898,11 @@ Namespace GroupsPlayaResorts
                             End If
                         End If
 
-                        UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = ResultsDos("Init_Date"), .EndDateRate = ResultsDos("End_Date"), .SuiteName = ResultsDos("Code_Room"), .SuiteCode = ResultsDos("Code_Room"), .RateSingle = ResultsDos("Rate_1"), .RateDouble = ResultsDos("Rate_2"), .RateTripleandFour = ResultsDos("Rate_Extra"), .RateFiveandSix = ResultsDos("Rate_ExtraX"), .RateChildrens = ResultsDos("Rate_C"), .RateTeensValue = ResultsDos("Rate_T"), .Availability = ResultsDos("Status"), .RateRevenue = ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue")), .RatePax = ResultsDos("Num_Rooms"), .CommissionRate = ResultsDos("Commission"), .DiscountRate = ResultsDos("Promo"), .RateRevenuePerRoom = ResultsDos("Revenue"), .RateRevenueRoomNigth = ResultsDos("Rate_2") * 2})
+                        UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = ResultsDos("Init_Date"), .EndDateRate = ResultsDos("End_Date"), .SuiteName = ResultsDos("Code_Room"), .SuiteCode = ResultsDos("Code_Room"), .RateSingle = ResultsDos("Rate_1"), .RateDouble = ResultsDos("Rate_2"), .RateTripleandFour = ResultsDos("Rate_Extra"), .RateFiveandSix = ResultsDos("Rate_ExtraX"), .RateChildrens = ResultsDos("Rate_C"), .RateTeensValue = ResultsDos("Rate_T"), .Availability = ResultsDos("Status"), .RateRevenue = ResultsDos("Num_Rooms") * Round(ResultsDos("Revenue"), R_Calc), .RatePax = ResultsDos("Num_Rooms"), .CommissionRate = ResultsDos("Commission"), .DiscountRate = ResultsDos("Promo"), .RateRevenuePerRoom = ResultsDos("Revenue"), .RateRevenueRoomNigth = ResultsDos("Rate_2") * 2, .Formato = R_Show})
 
 
                         If BanderaRevenue = 0 Then
-                            RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue"))
+                            RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * Round(ResultsDos("Revenue"), R_Calc)
                         End If
 
 
@@ -3198,11 +2475,11 @@ Namespace GroupsPlayaResorts
                                     End If
                                 End If
 
-                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = ResultsDos("Init_Date"), .EndDateRate = ResultsDos("End_Date"), .SuiteName = ResultsDos("Code_Room"), .SuiteCode = ResultsDos("Code_Room"), .RateSingle = ResultsDos("Rate_1"), .RateDouble = ResultsDos("Rate_2"), .RateTripleandFour = ResultsDos("Rate_Extra"), .RateFiveandSix = ResultsDos("Rate_ExtraX"), .RateChildrens = ResultsDos("Rate_C"), .RateTeensValue = ResultsDos("Rate_T"), .Availability = ResultsDos("Status"), .RateRevenue = ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue")), .RatePax = ResultsDos("Num_Rooms"), .CommissionRate = ResultsDos("Commission"), .DiscountRate = ResultsDos("Promo"), .RateRevenuePerRoom = ResultsDos("Revenue"), .RateRevenueRoomNigth = ResultsDos("Rate_2") * 2})
+                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = ResultsDos("Init_Date"), .EndDateRate = ResultsDos("End_Date"), .SuiteName = ResultsDos("Code_Room"), .SuiteCode = ResultsDos("Code_Room"), .RateSingle = ResultsDos("Rate_1"), .RateDouble = ResultsDos("Rate_2"), .RateTripleandFour = ResultsDos("Rate_Extra"), .RateFiveandSix = ResultsDos("Rate_ExtraX"), .RateChildrens = ResultsDos("Rate_C"), .RateTeensValue = ResultsDos("Rate_T"), .Availability = ResultsDos("Status"), .RateRevenue = ResultsDos("Num_Rooms") * Round(ResultsDos("Revenue"), R_Calc), .RatePax = ResultsDos("Num_Rooms"), .CommissionRate = ResultsDos("Commission"), .DiscountRate = ResultsDos("Promo"), .RateRevenuePerRoom = ResultsDos("Revenue"), .RateRevenueRoomNigth = ResultsDos("Rate_2") * 2, .Formato = R_Show})
 
 
                                 If BanderaRevenue = 0 Then
-                                    RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * Math.Ceiling(ResultsDos("Revenue"))
+                                    RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * Round(ResultsDos("Revenue"), R_Calc)
                                 End If
 
 
@@ -3220,27 +2497,8 @@ Namespace GroupsPlayaResorts
                         model.Accion = 5
                         model.GroupId = Request("grupoidlabeltext")
                         model.GroupIdLabel = Request("HotelSelect")
-                        Select Case Request("HotelSelect")
-                            Case "GCR"
-                                model.GroupHotelNew = "GCCUN"
-                            Case "GPR"
-                                model.GroupHotelNew = "POPDC"
-                            Case "RPR"
-                                model.GroupHotelNew = "ROPDC"
-                            Case "TRC"
-                                model.GroupHotelNew = "HZLCUN"
-                            Case "ZLJ"
-                                model.GroupHotelNew = "HZLJAM"
-                            Case "ZVC"
-                                model.GroupHotelNew = "HZVCUN"
-                            Case "ZVJ"
-                                model.GroupHotelNew = "HZVJAM"
-                            Case "ZVL"
-                                model.GroupHotelNew = "HZLCA"
-                            Case "ZVP"
-                                model.GroupHotelNew = "HZVPV"
-
-                        End Select
+                        model.GroupHotelNew = ObtieneHotel(Request("HotelSelect"))
+                        
                         model.GroupTypeRate = Request("selectratetype")
 
                         conn.close()
@@ -3264,17 +2522,92 @@ Namespace GroupsPlayaResorts
 
             If GroupDetailBotons = "GroupBy_Breakdown" Then
 
-                'BEGIN: Preparación y llamada a base de datos que ejecuta un procedimiento
+                Dim GroupBy As Integer = Request("selectgroupbytext")
+                Dim BreakdownList = New List(Of GroupsBreakList)
+                Dim BreakdownListGroupBy = New List(Of GroupsBreakList)
+                Dim QueryDos As String
+                Dim QueryBreakGroupBy As String
+
+
+                If GroupBy = 1 Then
+
+                    QueryDos = "Select COUNT(*) NumGroup , a.Code_Room , a.Checkin , a.Checkout from BreakDown a where a.Id_Group=" + Request("grupoidbreakdowngroupby") + " and a.status_data=1 group by Code_Room , Checkin , Checkout order by Checkin, Code_Room "
+
+                    QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + Request("grupoidbreakdowngroupby") + " and a.status_data=1  order by Checkin , Code_Room "
+
+                Else
+
+                    QueryDos = "Select COUNT(*) NumGroup , a.Code_Room , 'N/A' as Checkin ,'N/A' as Checkout from BreakDown a  where a.Id_Group=" + Request("grupoidbreakdowngroupby") + " and a.status_data=1 group by a.Code_Room  order by  a.Code_Room"
+
+                    QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + Request("grupoidbreakdowngroupby") + " and a.status_data=1  order by Code_Room"
+
+
+                End If
+
+                Dim CommandBreak = New SqlCommand(QueryDos, conn)
+                Dim CommandBreakGroupBy = New SqlCommand(QueryBreakGroupBy, conn)
+                conn.Open()
+
                 Try
-                    'BEGIN: llena el modelo con los datos del break down
-                    Dim DatosObjeto As New Dictionary(Of String, String)
-                    DatosObjeto.Add("Id_Group", Request("grupoidbreakdowngroupby").ToString)
-                    DatosObjeto.Add("Group_By", Request("selectgroupbytext").ToString)
+
+                    Dim ResultsBreak = CommandBreak.ExecuteReader()
+
+                    If ResultsBreak.HasRows Then
+                        While ResultsBreak.Read()
+
+
+                            BreakdownList.Add(New GroupsBreakList With {.RoomID = ResultsBreak("NumGroup"), .RoomCode = ResultsBreak("Code_Room"), .Checkin = ResultsBreak("Checkin"), .Checkout = ResultsBreak("Checkout")})
+
+
+                        End While
+                    End If
+                    ResultsBreak.Close()
+
+
+                    Dim ResultsBreakGroupBy = CommandBreakGroupBy.ExecuteReader()
+
+                    If ResultsBreakGroupBy.HasRows Then
+                        While ResultsBreakGroupBy.Read()
+
+
+                            BreakdownListGroupBy.Add(New GroupsBreakList With {.RoomID = ResultsBreakGroupBy("Id_BreakDown"), .GuestName = ResultsBreakGroupBy("GuestName") + " " + ResultsBreakGroupBy("GuestLastname"), .RoomCode = ResultsBreakGroupBy("Code_Room"), .Adults = ResultsBreakGroupBy("Adults"), .Teens = ResultsBreakGroupBy("Teens"), .Childrens = ResultsBreakGroupBy("Childs"), .Infants = ResultsBreakGroupBy("Infants"), .Checkin = ResultsBreakGroupBy("Checkin"), .Checkout = ResultsBreakGroupBy("Checkout"), .RoomNighs = ResultsBreakGroupBy("Nights"), .StatusPayment = ResultsBreakGroupBy("Status_P"), .StatusBooking = ResultsBreakGroupBy("Status_B"), .Deposit = 0, .Balance = 0, .Revenue = ResultsBreakGroupBy("Revenue"), .TentativeRooms = ResultsBreakGroupBy("TentativeRoom"), .ComplementaryRooms = ResultsBreakGroupBy("ComplementaryRoom")})
+
+
+                        End While
+                    End If
+                    ResultsBreakGroupBy.Close()
 
 
 
-                    GetDataBreakDown(model, DatosObjeto, Request("grupoidbreakdowngroupby").ToString, Request("selectgroupbytext").ToString)
-                    'END: llena el modelo con los datos del break down
+                    Dim QueryBreakTotals = "Select a.NumberRooms,COUNT(*)as TotalBreakdown,SUM(b.TentativeRoom) as TotalTentativeRooms ,SUM(b.Adults) as TotalAdults,SUM(b.Teens) as TotalTeens , SUM(b.Childs) as TotalChilds, SUM(b.Infants) as TotalInfants ,SUM(b.Revenue) as TotalRevenue from Groups a left join BreakDown b on a.Id_Group=b.Id_Group where a.Id_Group=" + Request("grupoidbreakdowngroupby") + " and b.Status_B<>3 Group By a.NumberRooms"
+                    Dim CommandBreakTotals = New SqlCommand(QueryBreakTotals, conn)
+
+                    Dim ResultsBreakTotal = CommandBreakTotals.ExecuteReader()
+
+                    If ResultsBreakTotal.HasRows Then
+                        While ResultsBreakTotal.Read()
+
+                            model.TotalNumRooms = ResultsBreakTotal("NumberRooms")
+                            model.TotalDeployRooms = ResultsBreakTotal("TotalBreakdown")
+                            model.TotalTentativeRooms = ResultsBreakTotal("TotalTentativeRooms")
+                            model.TotalAdults = ResultsBreakTotal("TotalAdults")
+                            model.TotalTeens = ResultsBreakTotal("TotalTeens")
+                            model.TotalChildrens = ResultsBreakTotal("TotalChilds")
+                            model.TotalInfants = ResultsBreakTotal("TotalInfants")
+                            model.TotalBalance = 0
+                            model.TotalDeposit = 0
+                            model.TotalRevenue = ResultsBreakTotal("TotalRevenue")
+
+                        End While
+                    End If
+                    ResultsBreakTotal.Close()
+
+
+                    model.ListGroupBreakdownin = BreakdownList
+                    model.ListGroupBreakdownGroupByin = BreakdownListGroupBy
+                    model.GroupBy = GroupBy
+
+                    conn.close()
 
                     Return View("BreakDownConsultDos", model)
 
@@ -3291,11 +2624,205 @@ Namespace GroupsPlayaResorts
 
 
             If GroupDetailBotons = "Deploy_Breakdown" Then
+
+
                 If Request("grupoidbreakdown") <> "0" Then
+
+                    Dim CommandUser
+                    Dim CommandPax
+                    Dim numdeploy_breakdown
+                    Dim numadults As Integer
+                    Dim numteens As Integer
+                    Dim numchilds As Integer
+                    Dim numinfants As Integer
+                    Dim tentativerooms As Integer = 0
+                    Dim complementaryrooms As Integer = 0
+
+                    If Request("grupoidbreakdown") <> "0" Then
+                        numdeploy_breakdown = Request("breaknumroom")
+                    Else
+                        numdeploy_breakdown = 0
+                    End If
+
+                    If Request("breaknumroomtentative") <> "" Then
+                        tentativerooms = Request("breaknumroomtentative")
+                    Else
+                        tentativerooms = 0
+                    End If
+
+                    If Request("breakcomplementaryrooms") <> "" Then
+                        complementaryrooms = Request("breakcomplementaryrooms")
+                    Else
+                        complementaryrooms = 0
+                    End If
+
+                    If Request("breakadults") <> "" Then
+                        numadults = Request("breakadults")
+                    Else
+                        numadults = 0
+                    End If
+
+                    If Request("breakteens") <> "" Then
+                        numteens = Request("breakteens")
+                    Else
+                        numteens = 0
+                    End If
+
+                    If Request("breakchilds") <> "" Then
+                        numchilds = Request("breakchilds")
+                    Else
+                        numchilds = 0
+                    End If
+
+                    If Request("breakinfants") <> "" Then
+                        numinfants = Request("breakinfants")
+                    Else
+                        numinfants = 0
+                    End If
+
+
+                    Dim i As Integer = 0
+                    Dim j As Integer = 0
+                    Dim RateFinal As Double
+                    Dim ID_Breakdown As Integer
+
+                    Dim Query As String
+                    Dim QueryPax As String = ""
+                    Dim PaxList() As String = Split(Request("PaxList"), ",")
+
+                    Dim PaxLastNameList() As String = Split(Request("PaxListLastName"), ",")
+
+
+                    For i = 0 To numdeploy_breakdown - 1
+
+                        Query = "Insert into BreakDown(Id_BreakDown , Id_Group , Code_Room , GuestName , GuestLastName , TentativeRoom , ComplementaryRoom , Adults , Teens , Childs , Infants , Checkin , Checkout , Status_P , Status_B , Revenue , Special_Notes , FolioPMS , Status_Data , Date_Register , CancelType, CancelNotes  ) VALUES  "
+
+                        'If i <= numdeploytentative_breakdown - 1 Then
+                        '    tentativerooms = 1
+                        'Else
+                        '    tentativerooms = 0
+                        'End If
+
+                        If complementaryrooms = 1 Then
+                            RateFinal = 0
+                        Else
+                            RateFinal = GetRate(Request("grupoidbreakdown"), Request("datetimepickerdate1text"), Request("datetimepickerdate2text"), Request("selectypesuitebreak"), numadults, numteens, numchilds)
+                        End If
+
+                        ID_Breakdown = ConsecutiveValue("Id_BreakDown", "BreakDown")
+
+                        Query += "  ( " + ID_Breakdown.ToString + ", " + Request("grupoidbreakdown") + " , '" + Request("selectypesuitebreak") + "'  ,  '" + Request("breakname") + "', '" + Request("breaklastname") + "'  ,  " + tentativerooms.ToString + ",  " + complementaryrooms.ToString + "   , " + numadults.ToString + " , " + numteens.ToString + " , " + numchilds.ToString + " , " + numinfants.ToString + " , '" + Request("datetimepickerdate1text") + "' , '" + Request("datetimepickerdate2text") + "' , 1 , 1 , " + RateFinal.ToString + " , '" + Request("groupspecialnotesbreak") + "',  '" + Request("breakfolio") + "' , 1 , Getdate() , 0 , '' ) "
+
+
+                        If PaxList(0) <> "" Then
+
+                            QueryPax = "Insert into BreakDown_Guests(Id_BreakDown , Id_Group, GuestName, GuestLastname , Status_Data, Date_Register  ) VALUES  "
+
+                            For j = 0 To PaxList.Count - 1
+
+                                If j = PaxList.Count - 1 Then
+                                    QueryPax += " (  " + ID_Breakdown.ToString + " , " + Request("grupoidbreakdown") + " ,  '" + PaxList(j) + "' , '" + PaxLastNameList(j) + "' , 1 , getdate() )  "
+                                Else
+                                    QueryPax += " (  " + ID_Breakdown.ToString + " , " + Request("grupoidbreakdown") + " ,  '" + PaxList(j) + "' , '" + PaxLastNameList(j) + "' , 1 , getdate() ) ,"
+                                End If
+
+                            Next
+
+                        End If
+
+
+                        CommandUser = New SqlCommand(Query, conn)
+
+                        conn.Open()
+
+                        CommandUser.ExecuteNonQuery()
+
+                        If PaxList(0) <> "" Then
+
+                            CommandPax = New SqlCommand(QueryPax, conn)
+                            CommandPax.ExecuteNonQuery()
+
+                        End If
+
+                        conn.close()
+
+                        Query = ""
+
+                    Next
+
+
+                    Dim BreakdownList = New List(Of GroupsBreakList)
+                    Dim QueryDos = "Select COUNT(*) NumGroup , a.Code_Room , a.Checkin , a.Checkout from BreakDown a where a.Id_Group=" + Request("grupoidbreakdown") + " and a.status_data=1 group by Code_Room , Checkin , Checkout order by Checkin, Code_Room "
+                    Dim CommandBreak = New SqlCommand(QueryDos, conn)
+
+
+                    Dim BreakdownListGroupBy = New List(Of GroupsBreakList)
+                    Dim QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + Request("grupoidbreakdown") + " and a.status_data=1  order by Checkin , Code_Room "
+                    Dim CommandBreakGroupBy = New SqlCommand(QueryBreakGroupBy, conn)
+
+
+                    conn.Open()
+
                     Try
-                        'BEGIN: llena el modelo con los datos del break down
-                        GetDataBreakDown(model, Request, Request("grupoidbreakdown").ToString, Request("selectgroupby").ToString, "InsertBreak")
-                        'END: llena el modelo con los datos del break down
+
+                        Dim ResultsBreak = CommandBreak.ExecuteReader()
+
+                        If ResultsBreak.HasRows Then
+                            While ResultsBreak.Read()
+
+
+                                BreakdownList.Add(New GroupsBreakList With {.RoomID = ResultsBreak("NumGroup"), .RoomCode = ResultsBreak("Code_Room"), .Checkin = ResultsBreak("Checkin"), .Checkout = ResultsBreak("Checkout")})
+
+
+                            End While
+                        End If
+                        ResultsBreak.Close()
+
+
+                        Dim ResultsBreakGroupBy = CommandBreakGroupBy.ExecuteReader()
+
+                        If ResultsBreakGroupBy.HasRows Then
+                            While ResultsBreakGroupBy.Read()
+
+
+                                BreakdownListGroupBy.Add(New GroupsBreakList With {.RoomID = ResultsBreakGroupBy("Id_BreakDown"), .GuestName = ResultsBreakGroupBy("GuestName") + " " + ResultsBreakGroupBy("GuestLastname"), .RoomCode = ResultsBreakGroupBy("Code_Room"), .Adults = ResultsBreakGroupBy("Adults"), .Teens = ResultsBreakGroupBy("Teens"), .Childrens = ResultsBreakGroupBy("Childs"), .Infants = ResultsBreakGroupBy("Infants"), .Checkin = ResultsBreakGroupBy("Checkin"), .Checkout = ResultsBreakGroupBy("Checkout"), .RoomNighs = ResultsBreakGroupBy("Nights"), .StatusPayment = ResultsBreakGroupBy("Status_P"), .StatusBooking = ResultsBreakGroupBy("Status_B"), .Deposit = 0, .Balance = 0, .Revenue = ResultsBreakGroupBy("Revenue"), .TentativeRooms = ResultsBreakGroupBy("TentativeRoom"), .ComplementaryRooms = ResultsBreakGroupBy("ComplementaryRoom")})
+
+
+                            End While
+                        End If
+                        ResultsBreakGroupBy.Close()
+
+
+
+                        Dim QueryBreakTotals = "Select a.NumberRooms,COUNT(*)as TotalBreakdown,SUM(b.TentativeRoom) as TotalTentativeRooms ,SUM(b.Adults) as TotalAdults,SUM(b.Teens) as TotalTeens , SUM(b.Childs) as TotalChilds, SUM(b.Infants) as TotalInfants ,SUM(b.Revenue) as TotalRevenue from Groups a left join BreakDown b on a.Id_Group=b.Id_Group where a.Id_Group=" + Request("grupoidbreakdown") + " and b.Status_B<>3 Group By a.NumberRooms"
+                        Dim CommandBreakTotals = New SqlCommand(QueryBreakTotals, conn)
+
+                        Dim ResultsBreakTotal = CommandBreakTotals.ExecuteReader()
+
+                        If ResultsBreakTotal.HasRows Then
+                            While ResultsBreakTotal.Read()
+
+                                model.TotalNumRooms = ResultsBreakTotal("NumberRooms")
+                                model.TotalDeployRooms = ResultsBreakTotal("TotalBreakdown")
+                                model.TotalTentativeRooms = ResultsBreakTotal("TotalTentativeRooms")
+                                model.TotalAdults = ResultsBreakTotal("TotalAdults")
+                                model.TotalTeens = ResultsBreakTotal("TotalTeens")
+                                model.TotalChildrens = ResultsBreakTotal("TotalChilds")
+                                model.TotalInfants = ResultsBreakTotal("TotalInfants")
+                                model.TotalBalance = 0
+                                model.TotalDeposit = 0
+                                model.TotalRevenue = ResultsBreakTotal("TotalRevenue")
+
+                            End While
+                        End If
+                        ResultsBreakTotal.Close()
+
+
+                        model.ListGroupBreakdownin = BreakdownList
+                        model.ListGroupBreakdownGroupByin = BreakdownListGroupBy
+                        model.GroupBy = Request("selectgroupby")
+
+                        conn.close()
 
                         Return View("BreakDownConsultDos", model)
 
@@ -3303,12 +2830,14 @@ Namespace GroupsPlayaResorts
 
                         conn.close()
 
-                        Return Content(ex.ToString)
+                        Return Content("Error")
 
                     End Try
 
 
                 Else
+
+
                     Return Content("Error")
                 End If
 
@@ -3418,14 +2947,14 @@ Namespace GroupsPlayaResorts
 
                         Dim QuerySuites As String = " select distinct a.Clave_TC,a.Nomb_TC_Act,a.SuiteOrden from vw_Tipo_Cuarto a left join Groups_Rates b on a.Clave_TC=b.Code_Room where a.Clav_Hotel='" + Request("editbreakdownhotel") + "' and b.Id_Group=" + ID_GROUP.ToString + " order by a.SuiteOrden  "
                         Dim CommandUserSuites = New SqlCommand(QuerySuites, conn)
-                        Dim ListSuites = New List(Of SuitesList)
+                        Dim ListSuites = New List(Of SelectListItem)
 
                         Dim ResultsSuites = CommandUserSuites.ExecuteReader()
 
                         If ResultsSuites.HasRows Then
                             While ResultsSuites.Read()
 
-                                ListSuites.Add(New SuitesList With {.Text = ResultsSuites("Nomb_TC_Act"), .Value = ResultsSuites("Clave_TC")})
+                                ListSuites.Add(New SelectListItem With {.Text = ResultsSuites("Nomb_TC_Act"), .Value = ResultsSuites("Clave_TC")})
                             End While
                         End If
                         ResultsSuites.Close()
@@ -3545,24 +3074,84 @@ Namespace GroupsPlayaResorts
 
                     End If
 
+                    Dim BreakdownList = New List(Of GroupsBreakList)
+                    Dim QueryDos = "Select COUNT(*) NumGroup , a.Code_Room , a.Checkin , a.Checkout from BreakDown a where a.Id_Group=" + Request("grupoidbreakdown") + " and a.status_data=1 group by Code_Room , Checkin , Checkout order by Checkin, Code_Room "
+                    Dim CommandBreak = New SqlCommand(QueryDos, conn)
+
+                    Dim ResultsBreak = CommandBreak.ExecuteReader()
+
+                    If ResultsBreak.HasRows Then
+                        While ResultsBreak.Read()
+
+                            BreakdownList.Add(New GroupsBreakList With {.RoomID = ResultsBreak("NumGroup"), .RoomCode = ResultsBreak("Code_Room"), .Checkin = ResultsBreak("Checkin"), .Checkout = ResultsBreak("Checkout")})
+
+                        End While
+                    End If
+                    ResultsBreak.Close()
+
+
+                    Dim BreakdownListGroupBy = New List(Of GroupsBreakList)
+                    Dim QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + Request("grupoidbreakdown") + " and a.status_data=1  order by Checkin , Code_Room "
+                    Dim CommandBreakGroupBy = New SqlCommand(QueryBreakGroupBy, conn)
+
+                    Dim ResultsBreakGroupBy = CommandBreakGroupBy.ExecuteReader()
+
+                    If ResultsBreakGroupBy.HasRows Then
+                        While ResultsBreakGroupBy.Read()
+
+
+                            BreakdownListGroupBy.Add(New GroupsBreakList With {.RoomID = ResultsBreakGroupBy("Id_BreakDown"), .GuestName = ResultsBreakGroupBy("GuestName") + " " + ResultsBreakGroupBy("GuestLastname"), .RoomCode = ResultsBreakGroupBy("Code_Room"), .Adults = ResultsBreakGroupBy("Adults"), .Teens = ResultsBreakGroupBy("Teens"), .Childrens = ResultsBreakGroupBy("Childs"), .Infants = ResultsBreakGroupBy("Infants"), .Checkin = ResultsBreakGroupBy("Checkin"), .Checkout = ResultsBreakGroupBy("Checkout"), .RoomNighs = ResultsBreakGroupBy("Nights"), .StatusPayment = ResultsBreakGroupBy("Status_P"), .StatusBooking = ResultsBreakGroupBy("Status_B"), .Deposit = 0, .Balance = 0, .Revenue = ResultsBreakGroupBy("Revenue"), .TentativeRooms = ResultsBreakGroupBy("TentativeRoom"), .ComplementaryRooms = ResultsBreakGroupBy("ComplementaryRoom")})
+
+
+                        End While
+                    End If
+                    ResultsBreakGroupBy.Close()
+
+
+
+
+                    Dim QueryBreakTotals = "Select a.NumberRooms,COUNT(*) as TotalBreakdown,SUM(b.TentativeRoom) as TotalTentativeRooms ,SUM(b.Adults) as TotalAdults,SUM(b.Teens) as TotalTeens , SUM(b.Childs) as TotalChilds, SUM(b.Infants) as TotalInfants ,SUM(b.Revenue) as TotalRevenue from Groups a left join BreakDown b on a.Id_Group=b.Id_Group where a.Id_Group=" + Request("grupoidbreakdown") + " and b.Status_B<>3 Group By a.NumberRooms"
+                    Dim CommandBreakTotals = New SqlCommand(QueryBreakTotals, conn)
+
+                    Dim ResultsBreakTotal = CommandBreakTotals.ExecuteReader()
+
+                    If ResultsBreakTotal.HasRows Then
+                        While ResultsBreakTotal.Read()
+
+                            model.TotalNumRooms = ResultsBreakTotal("NumberRooms")
+                            model.TotalDeployRooms = ResultsBreakTotal("TotalBreakdown")
+                            model.TotalTentativeRooms = ResultsBreakTotal("TotalTentativeRooms")
+                            model.TotalAdults = ResultsBreakTotal("TotalAdults")
+                            model.TotalTeens = ResultsBreakTotal("TotalTeens")
+                            model.TotalChildrens = ResultsBreakTotal("TotalChilds")
+                            model.TotalInfants = ResultsBreakTotal("TotalInfants")
+                            model.TotalBalance = 0
+                            model.TotalDeposit = 0
+                            model.TotalRevenue = ResultsBreakTotal("TotalRevenue")
+
+                        End While
+                    End If
+                    ResultsBreakTotal.Close()
+
+                    model.ListGroupBreakdownin = BreakdownList
+                    model.ListGroupBreakdownGroupByin = BreakdownListGroupBy
+                    model.GroupBy = Request("groupbytextedit")
+
                     conn.close()
-                    
-                    Dim DatosObjeto As New Dictionary(Of String, String)
-                    DatosObjeto.Add("Id_Group", Request("grupoidbreakdown").ToString)
-                    DatosObjeto.Add("Group_By", Request("groupbytextedit").ToString)
-
-                    'BEGIN: llena el modelo con los datos del break down
-                    GetDataBreakDown(model, DatosObjeto, Request("grupoidbreakdown").ToString, Request("groupbytextedit").ToString)
-                    'END: llena el modelo con los datos del break down
-
                     Return View("BreakDownConsultDos", model)
 
                 Catch ex As Exception
+
                     conn.close()
                     'Return Content("Error")
                     Return Content(ex.ToString)
+
                 End Try
+
+
             End If
+
+
 
             If GroupDetailBotons = "DeleteDeploy_Breakdown" Then
 
@@ -4480,11 +4069,14 @@ Namespace GroupsPlayaResorts
 
             End If
 
+
         End Function
 
         '
         ' GET: /Group/GroupsBreak
         Function GroupsBreak() As ActionResult
+
+
             Return View()
         End Function
 
@@ -4493,7 +4085,6 @@ Namespace GroupsPlayaResorts
         ' GET: /Groups/Dashboard
 
         Function Dashboard() As ActionResult
-            UserPermissions("1,2,3,4")
             Return View()
         End Function
 
@@ -4533,7 +4124,35 @@ Namespace GroupsPlayaResorts
         End Function
 
 
-        Function Contacts(ByVal search As String) As JsonResult
+        Function Valida_Contacts(ByVal search As String, ByVal cia As String, ByVal [to] As String, ByVal valor_Usuario As String) As Boolean
+            conn.Open()
+            Dim Query As String
+            Dim CommandUser
+            Dim Resultados
+            Dim result As Boolean = False
+
+
+            Query = "EXEC sp_Search_Contacts @Name = '" & search & "', @CompanyName = '" & cia & "', @Wholesale = '" & [to] & "'"
+            CommandUser = New SqlCommand(Query, conn)
+            Resultados = CommandUser.ExecuteReader()
+
+            If Resultados.HasRows Then
+                While Resultados.Read()
+                    If Resultados("Contact_Name") = valor_Usuario Then
+                        result = True
+                        Exit While
+                    End If
+                End While
+                Resultados.Close()
+            End If
+
+            conn.close()
+
+
+            Return result
+        End Function
+
+        Function Contacts(ByVal search As String, ByVal cia As String, ByVal [to] As String) As JsonResult
 
             ' Dim data = New String() {"ActionScript", "AppleScript", "Asp", "BASIC", "C", "C++", "Clojure", "COBOL", "ColdFusion","Erlang","Fortran","Groovy","Haskell","instinctcoder.com", "Java", "JavaScript","Lisp","Perl", "PHP", "Python", "edgar","Ruby","Scala", "Scheme"}
 
@@ -4543,7 +4162,7 @@ Namespace GroupsPlayaResorts
             Dim Resultados
             Dim Activo = New List(Of String)
 
-            Query = "select Contact_Name from Cat_Contacts where Status_Data=1 and Contact_Name  like '%" + search + "%'  order by Contact_Name "
+            Query = "EXEC sp_Search_Contacts @Name = '" & search & "', @CompanyName = '" & cia & "', @Wholesale = '" & [to] & "'"
             CommandUser = New SqlCommand(Query, conn)
             Resultados = CommandUser.ExecuteReader()
 
@@ -4685,7 +4304,16 @@ Namespace GroupsPlayaResorts
             Dim ipax As Integer
             Dim NumPax As Integer = 0
 
-            ListaPax = Request("List_Pax1").ToArray()
+
+            Try
+                ListaPax = Request("List_Pax1").ToArray()
+            Catch ex As Exception
+                Try
+                    ListaPax = Request("List_Pax").ToArray()
+                Catch ex2 As Exception
+                    ListaPax = ""
+                End Try
+            End Try
 
             ListaPaxRevenue = Split(ListaPax, ",")
 
@@ -4834,7 +4462,7 @@ Namespace GroupsPlayaResorts
             Dim CommandUser
             Dim ID_group As Double
 
-            Dim Query As String = " Update Groups Set Cve_Hotel=@Cve_Hotel , Wholesale=@Wholesale , NumberRooms=@NumberRooms , ArrivalDate=@ArrivalDate , DepartureDate=@DepartureDate , Discount=@Discount , GroupName=@GroupName , Market=@Market , GroupType=@GroupType , AgencyType=@AgencyType , Company=@Company , Contact=@Contact , GroupCordinator=@GroupCordinator , OnsiteCordinator=@OnsiteCordinator , Channel=@Channel , TentativeArrivalDate=@TentativeArrivalDate , TentativeDepartureDate=@TentativeDepartureDate , TypeRate=@TypeRate , Allotment=@Allotment, ComplementaryRoom=@ComplementaryRoom , NumberNights=@NumberNights, Commission=@Commission , Promo=@Promo , Special_Notes=@Special_Notes , CommissionAgent=@CommissionAgent , PeakRoom=@PeakRoom   , Package=@Package     where Id_Group= @Id_Group "
+            Dim Query As String = " Update Groups Set Cve_Hotel=@Cve_Hotel , Wholesale=@Wholesale , NumberRooms=@NumberRooms , ArrivalDate=@ArrivalDate , DepartureDate=@DepartureDate , Discount=@Discount , GroupName=@GroupName , Market=@Market , GroupType=@GroupType , AgencyType=@AgencyType , Company=@Company , Contact=@Contact , GroupCordinator=@GroupCordinator , OnsiteCordinator=@OnsiteCordinator , Channel=@Channel , TentativeArrivalDate=@TentativeArrivalDate , TentativeDepartureDate=@TentativeDepartureDate , TypeRate=@TypeRate , Allotment=@Allotment, ComplementaryRoom=@ComplementaryRoom , NumberNights=@NumberNights, Commission=@Commission , Promo=@Promo , Special_Notes=@Special_Notes , CommissionAgent=@CommissionAgent , PeakRoom=@PeakRoom , Package = @Package    where Id_Group= @Id_Group "
 
 
             Dim WhosaleValue() As String = Split(Request("WhosaleDetail"), ":")
@@ -4847,6 +4475,22 @@ Namespace GroupsPlayaResorts
             CommandUser.Parameters.AddWithValue("@ArrivalDate", Request("datetimepicker6text"))
             CommandUser.Parameters.AddWithValue("@DepartureDate", Request("datetimepicker7text"))
             CommandUser.Parameters.AddWithValue("@Package", Request("selectquotetype"))
+
+            'Pruebas
+
+            Try
+                If Not Valida_Contacts(Request("selectcontact"), Request("selectcompany"), WhosaleValue(0), Request("selectcontact")) Then
+                    Query = 8.0 + "hola"
+                Else
+                    ID_group = Request("grupoidlabeltext")
+                End If
+
+            Catch ex As Exception
+                Return ex.ToString
+
+            End Try
+
+
 
             If Request("NumberNights") <> "" Then
                 CommandUser.Parameters.AddWithValue("@NumberNights", Request("NumberNights"))
@@ -4935,37 +4579,24 @@ Namespace GroupsPlayaResorts
             Dim UsuariosLis = New List(Of GroupsRatesList)
             Dim WhosaleValue() As String
 
-            'Select Case Request("selectratetype")
-
-            '    Case 1
-            '        'Tarifario
-
-            '    Case 2
-            '        'Tarifario Manual
-
-            '    Case 3
-            '        'Tarifario Semiautomatico
-
-            '    Case 4
-            '        'Modelo de Compensacion
-
-            '    Case 5
-            '        'MICE
-
-            'End Select
-
             If Request("selectratetype") = 2 Or Request("selectratetype") = 3 Then
 
                 Dim ListaPaxRevenue() As String
                 Dim ListaSuitesPax() As String
                 Dim ListaRate() As String
-
                 Dim RateDobleBase = 0
-
                 Dim ListaPax As String
                 Dim Listasuites As String
 
-                ListaPax = Request("List_Pax1").ToArray()
+                Try
+                    ListaPax = Request("List_Pax1").ToArray()
+                Catch ex As Exception
+                    Try
+                        ListaPax = Request("List_Pax").ToArray()
+                    Catch ex2 As Exception
+                        ListaPax = ""
+                    End Try
+                End Try
 
                 ListaPaxRevenue = Split(ListaPax, ",")
 
@@ -4976,13 +4607,9 @@ Namespace GroupsPlayaResorts
                 Dim ListaRateDoble As String
 
                 If Request("List_DoubleRate") <> "" Then
-
                     ListaRateDoble = Request("List_DoubleRate").ToArray()
-
                     ListaRate = Split(ListaRateDoble, ",")
-
                     RateDobleBase = ListaRate(0)
-
                 End If
 
                 Dim PercentajeDiscount As Double
@@ -5019,9 +4646,9 @@ Namespace GroupsPlayaResorts
                 conn.Open()
 
                 Try
+                    '288
 
-
-                    QueryDos = " Select a.*, '" + Request("datetimepicker6text") + "' as VigenciaI , '" + Request("datetimepicker7text") + "' as VigenciaF , DATEDIFF(day,'" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "') as Nights from vw_Tipo_Cuarto a where a.Clav_Hotel='" + Request("HotelSelect") + "' order by a.SuiteOrden  "
+                    QueryDos = " Select a.*, '" + Request("datetimepicker6text") + "' as VigenciaI , '" + Request("datetimepicker7text") + "' as VigenciaF , DATEDIFF(day,'" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "') as Nights, AG.R_CALC, AG.R_SHOW from vw_Tipo_Cuarto a, vw_Agencies AG where a.Clav_Hotel='" + Request("HotelSelect") + "' AND AG.Clav_Ag='" + WhosaleValue(0) + "' order by a.SuiteOrden  "
                     Dim CommandUserTres = New SqlCommand(QueryDos, conn)
                     CommandUserTres.CommandTimeout = 0
                     Dim Results = CommandUserTres.ExecuteReader()
@@ -5042,11 +4669,20 @@ Namespace GroupsPlayaResorts
 
                     Dim nodelist As XmlNodeList
                     nodelist = GetAvailability()
-
+    
                     If Results.HasRows Then
                         While Results.Read()
+                            R_Calc = Results("R_Calc")
+                            R_Show = Results("R_Show")
 
-                            'AvailabilityAux = Availability(Results("Clave_TC"), nodelist)
+                            Dim tip As String = ""
+                            AvailabilityAux = Availability(Results("Clave_TC"), nodelist, tip)
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                      {"Clave_TC", Results("Clave_TC")} _
+                           })
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                {"SuiteName", tip} _
+                            })
                             AvailabilityAux = "Available"
 
                             j = 0
@@ -5066,22 +4702,24 @@ Namespace GroupsPlayaResorts
                             Date1 = Results("VigenciaI")
                             Date2 = Results("VigenciaF")
 
+                            Dim tip_hotel As String = Obtiene_Tip_Hotel(Results("Clave_TC"))
+
                             If Request("selectratetype") = 2 Then
 
                                 If Request("List_DoubleRate") <> "" Then
                                     RateDobleBase = ListaRate(i)
                                 End If
 
-                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .RateCve = "MANUAL", .RateRack = 0, .RateMICE = 0, .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = ""})
+                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .RateCve = "MANUAL", .RateRack = 0, .RateMICE = 0, .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = "", .Formato = R_Show, .Tip = tip_hotel})
 
-                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights"))
+                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc)
 
                             Else
                                 RateDobleBase = RateDobleBase + Results("ITA")
 
-                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .RateCve = "SEMIAUTO", .RateRack = 0, .RateMICE = 0, .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = ""})
+                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = RateDobleBase * 1.6, .RateDouble = RateDobleBase, .RateTripleandFour = RateDobleBase * 0.8, .RateFiveandSix = RateDobleBase * 0.8, .RateChildrens = RateDobleBase * 0.4, .RateTeensValue = RateDobleBase * 0.7, .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = (RateDobleBase * 2) * Results("Nights"), .RateRevenueRoomNigth = RateDobleBase, .RateCve = "SEMIAUTO", .RateRack = 0, .RateMICE = 0, .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = "", .Formato = R_Show, .Tip = tip_hotel})
 
-                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling((RateDobleBase * 2) * Results("Nights"))
+                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round((RateDobleBase * 2) * Results("Nights"), R_Calc)
                             End If
 
                             i = i + 1
@@ -5105,10 +4743,7 @@ Namespace GroupsPlayaResorts
                 model.GroupId = Request("grupoidlabeltext")
                 model.GroupTypeRate = Request("selectratetype")
 
-
-
             End If
-
 
             If Request("selectratetype") = 4 Or Request("selectratetype") = 5 Then
 
@@ -5118,7 +4753,15 @@ Namespace GroupsPlayaResorts
                 Dim ListaPax As String
                 Dim Listasuites As String
 
-                ListaPax = Request("List_Pax1").ToArray()
+                Try
+                    ListaPax = Request("List_Pax1").ToArray()
+                Catch ex As Exception
+                    Try
+                        ListaPax = Request("List_Pax").ToArray()
+                    Catch ex2 As Exception
+                        ListaPax = ""
+                    End Try
+                End Try
 
                 ListaPaxRevenue = Split(ListaPax, ",")
 
@@ -5159,12 +4802,13 @@ Namespace GroupsPlayaResorts
                 conn.Open()
 
                 Try
-
+                    '288
                     If Request("selectratetype") = 4 Then
-                        QueryDos = " Exec sp_Rates_Compensacion '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "', @Package = " + Request("selectquotetype")
+                        QueryDos = " Exec sp_Rates_Compensacion_test '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'" + ", @Package = " + Request("selectquotetype")
                     Else
                         QueryDos = " Exec sp_Rates_MICE '" + Request("datetimepicker6text") + "' , '" + Request("datetimepicker7text") + "', '" + Request("HotelSelect") + "' , '" + WhosaleValue(0) + "'"
 
+                        'Pasar a procedure la descripcion de la promocion
 
                         'Tour Operator
                         If Request("selectagencytype") = 4 Then
@@ -5207,8 +4851,19 @@ Namespace GroupsPlayaResorts
                     If Results.HasRows Then
                         While Results.Read()
 
-                            AvailabilityAux = Availability(Results("Clave_TC"), nodelist)
+                            R_Calc = Results("R_Calc")
+                            R_Show = Results("R_Show")
+
+                            Dim tip As String = ""
+                            AvailabilityAux = Availability(Results("Clave_TC"), nodelist, tip)
+                            '277
                             'AvailabilityAux = "Available"
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                {"Clave_TC", Results("Clave_TC")} _
+                           })
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                {"SuiteName", tip} _
+                            })
 
                             j = 0
 
@@ -5234,20 +4889,22 @@ Namespace GroupsPlayaResorts
                             Date1 = Results("VigenciaI")
                             Date2 = Results("VigenciaF")
 
+                            Dim tip_hotel = Obtiene_Tip_Hotel(Results("Clave_TC"))
+
                             If Request("selectratetype") = 4 Then
-                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Base"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAuxDos, .CommissionRate = Results("Comision"), .DiscountRate = Results("Descuento"), .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .RateCve = Results("Clav_Rate"), .RateRack = Results("Rack"), .RateMICE = 0, .NochesG = Results("NochesG"), .NinosGxAdu = Results("NinosGxAdu"), .NinosGMax = Results("NinosGMax"), .Alias_Promo = Results("AliasPromo"), .Description_Promo = Results("Descripcion")})
+                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Base"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = Results("Comision"), .DiscountRate = Results("Descuento"), .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .RateCve = Results("Clav_Rate"), .RateRack = Results("Rack"), .RateMICE = 0, .NochesG = Results("NochesG"), .NinosGxAdu = Results("NinosGxAdu"), .NinosGMax = Results("NinosGMax"), .Alias_Promo = Results("AliasPromo"), .Description_Promo = Results("Descripcion"), .Formato = R_Show, .Tip = tip_hotel})
                             Else
                                 If Results("Rate") = 0 Then
                                     AvailabilityAux = "Close"
                                 End If
 
-                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue")), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .RateCve = "MICE", .RateRack = 0, .RateMICE = Results("Rate"), .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = PromoDescriptionMice})
+                                UsuariosLis.Add(New GroupsRatesList With {.InitDateRate = Date1.ToString("yyyy-MM-dd"), .EndDateRate = Date2.ToString("yyyy-MM-dd"), .SuiteName = Results("Clave_TC"), .SuiteCode = Results("Clave_TC"), .RateSingle = Results("Tar_1"), .RateDouble = Results("Tar_2"), .RateTripleandFour = Results("Extra"), .RateFiveandSix = Results("ExtraX"), .RateChildrens = Results("Tar_N"), .RateTeensValue = Results("Tar_A"), .Availability = AvailabilityAux, .RateRevenue = NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc), .RatePax = NumberPaxAuxDos, .CommissionRate = 0, .DiscountRate = 0, .RateRevenuePerRoom = Results("TotalRevenue"), .RateRevenueRoomNigth = Results("Tar_2"), .RateCve = "MICE", .RateRack = 0, .RateMICE = Results("Rate"), .NochesG = "0", .NinosGxAdu = "0", .NinosGMax = "0", .Alias_Promo = "", .Description_Promo = PromoDescriptionMice, .Formato = R_Show, .Tip = tip_hotel})
                             End If
 
 
 
                             If BanderaRevenue = 0 Then
-                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Math.Ceiling(Results("TotalRevenue"))
+                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round(Results("TotalRevenue"), R_Calc)
                             End If
 
 
@@ -5274,12 +4931,201 @@ Namespace GroupsPlayaResorts
 
             End If
 
+            If Request("selectratetype") = 1 Then
 
+                'Inserta 
+
+                WhosaleValue = Split(Request("WhosaleDetail"), ":")
+
+                If WhosaleValue(0) = "" Then
+                    WhosaleValue(0) = "BAR"
+                End If
+
+                Dim QueryDos As String
+                Dim DataUser As New Dictionary(Of String, String)
+                Dim CommanRate
+                Dim Results
+
+                conn.Open()
+                DataUser.Add("ID_GROUP", Request("grupoidlabeltext"))
+                DataUser.Add("NUMBER_ROOMS", Request("NUMBER_ROOMS"))
+                DataUser.Add("DISPONIBILIDAD", Request("DISPONIBILIDAD"))
+                DataUser.Add("FECHA_INI", Request("datetimepicker6text"))
+                DataUser.Add("FECHA_FIN", Request("datetimepicker7text"))
+                DataUser.Add("HOTEL", Request("HotelSelect"))
+                DataUser.Add("AGENCY", WhosaleValue(0))
+
+                QueryDos = classQuery.GetQueryString("SP_INSERT_ROWS_GROUPS_RATE", "querys.xml", DataUser)
+                Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+
+                CommanRate = New SqlCommand(QueryDos, conn)
+                Results = CommanRate.ExecuteReader()
+
+                Dim GroupList = New List(Of GroupsListData)
+                Dim hotel As String = ""
+                Dim totalRevenue As Integer = 0
+
+
+                Dim ListaPaxRevenue() As String
+                Dim ListaSuitesPax() As String
+                Dim ListaPax As String
+                Dim Listasuites As String
+                Dim PercentajeDiscount As Double
+                Dim AuxDiscount As Double
+
+                ListaPax = Request("List_Pax").ToArray()
+                ListaPaxRevenue = Split(ListaPax, ",")
+                Listasuites = Request("List_Suites").ToArray()
+                ListaSuitesPax = Split(Listasuites, ",")
+
+
+                If Not IsNumeric(Request("DiscountRate")) Then
+                    PercentajeDiscount = 1
+                    model.EditGroupData7 = 0
+                Else
+                    AuxDiscount = Request("DiscountRate")
+                    PercentajeDiscount = (100 - AuxDiscount) / 100
+                    model.EditGroupData7 = AuxDiscount
+
+                End If
+
+                Dim RevenueFinal As Double = 0
+                Dim i As Integer = 0
+                Dim j As Integer = 0
+                Dim PromoDescriptionMice As String = ""
+
+                Try
+
+
+                    Dim NumberPax As Integer = 0
+                    Dim NumberPaxAux As Integer = 0
+                    Dim DateInit As Date
+                    Dim NumberPaxAuxDos As String = "0"
+                    Dim BanderaRevenue As Integer = 0
+                    Dim BanderaPax As Integer = 0
+
+                    Dim Date1 As Date
+                    Dim Date2 As Date
+
+                    Dim AvailabilityAux As String = ""
+
+                    If Request("numberpax") <> "" Then
+                        NumberPax = Request("numberpax")
+                    End If
+
+                    Dim nodelist As XmlNodeList
+                    nodelist = GetAvailability()
+
+                    If Results.HasRows Then
+                        While Results.Read()
+
+                            R_Calc = Results("R_Calc")
+                            R_Show = Results("R_Show")
+
+                            Dim tip As String = ""
+                            AvailabilityAux = Availability(Results("Code_Room"), nodelist, tip)
+                            '277
+                            'AvailabilityAux = "Available"
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                {"Clave_TC", Results("Code_Room")} _
+                           })
+                            values.Add(New Dictionary(Of String, String)() From { _
+                                {"SuiteName", tip} _
+                            })
+
+                            j = 0
+
+                            While ListaSuitesPax(j) <> Results("Code_Room") And ListaSuitesPax.Count - 1 > j
+
+                                j = j + 1
+                            End While
+
+                            If ListaSuitesPax(j) = Results("Code_Room") And IsNumeric(ListaPaxRevenue(j)) Then
+                                NumberPaxAuxDos = ListaPaxRevenue(j)
+                                NumberPaxAuxDos.Replace(" ", "")
+                            Else
+                                NumberPaxAuxDos = "0"
+                            End If
+
+                            If DateInit <> Results("Init_Date") Or i = 0 Then
+                                DateInit = Results("End_Date")
+                                If i <> 0 Then
+                                    BanderaRevenue = 1
+                                End If
+                            End If
+
+                            Date1 = Results("Init_Date")
+                            Date2 = Results("End_Date")
+
+                            Dim tip_hotel = Obtiene_Tip_Hotel(Results("Code_Room"))
+
+                            UsuariosLis.Add(New GroupsRatesList With {
+                                .InitDateRate = Date1.ToString("yyyy-MM-dd"),
+                                .EndDateRate = Date2.ToString("yyyy-MM-dd"),
+                                .SuiteName = Results("Code_Room"),
+                                .SuiteCode = Results("Code_Room"),
+                                .RateSingle = Results("Rate_1"),
+                                .RateDouble = Results("Rate_2"),
+                                .RateTripleandFour = Results("Rate_Extra"),
+                                .RateFiveandSix = Results("Rate_ExtraX"),
+                                .RateChildrens = Results("Rate_C"),
+                                .RateTeensValue = Results("Rate_T"),
+                                .Availability = AvailabilityAux,
+                                .RateRevenue = NumberPaxAuxDos * Round(Results("Revenue"), R_Calc),
+                                .RatePax = NumberPaxAuxDos,
+                                .CommissionRate = Results("Commission"),
+                                .DiscountRate = Results("Discount"),
+                                .RateRevenuePerRoom = Results("Revenue"),
+                                .RateRevenueRoomNigth = Results("Rate_2"),
+                                .RateCve = Results("Cve_Rate"),
+                                .RateRack = Results("Rate_Rack"),
+                                .RateMICE = 0,
+                                .NochesG = Results("NochesG"),
+                                .NinosGxAdu = Results("NinosGxAdu"),
+                                .NinosGMax = Results("NinosGMax"),
+                                .Alias_Promo = Results("Alias_Promo"),
+                                .Description_Promo = Results("Description_Promo"),
+                                .Formato = R_Show,
+                                .Tip = tip_hotel
+                            })
+
+                            If BanderaRevenue = 0 Then
+                                RevenueFinal = RevenueFinal + NumberPaxAuxDos * Round(Results("Revenue"), R_Calc)
+                            End If
+
+
+                            i = i + 1
+
+                        End While
+                        Results.Close()
+                    End If
+
+                Catch ex As Exception
+
+                    'Return Content("Error")
+
+                    Return ex.ToString
+
+                End Try
+
+                conn.close()
+
+                model.ListGroupRatesin = UsuariosLis
+                model.RevenueFinal = RevenueFinal
+                model.Accion = 1
+                model.GroupId = Request("grupoidlabeltext")
+                model.GroupTypeRate = Request("selectratetype")
+
+            End If
+
+
+            ''''''
+            conn.Open()
             If Accion = 1 Then
 
                 Dim Query As String = "Insert into Groups_Rates(Id_Group, Cve_Hotel , Code_Room , Cve_Rate , Cve_Ag , Cve_Cp , TypeRate , Rate_Rack , Rate_MICE , Discount, Commission, Promo, Init_Date, End_Date, Num_Rooms, Rate_1,  Rate_2 , Rate_3, Rate_4, Rate_5, Rate_6, Rate_T, Rate_C, Rate_Extra, Rate_ExtraX, Status, Revenue, Status_Data, Date_Register , NochesG , NinosGxAdu , NinosGMax , Alias_Promo , Description_Promo ) VALUES "
 
-
+                'UsuariosLis = usu
                 For z = 0 To UsuariosLis.Count - 1
 
                     If z + 1 = UsuariosLis.Count Then
@@ -5292,57 +5138,36 @@ Namespace GroupsPlayaResorts
 
                 CommandRates = New SqlCommand(Query, conn)
 
-                conn.Open()
             End If
-
-
-
             Try
-
-                If Accion = 1 Then
+                If Accion = 1 And Request("selectratetype") <> 1 Then
                     CommandRates.ExecuteNonQuery()
-
                     conn.close()
                 End If
-
-
                 Return model
-
             Catch ex As Exception
-
                 conn.close()
 
                 Return ex.ToString
 
             End Try
-
-
         End Function
 
-
-        Function Availability(ByVal SuiteRoom As String, ByVal nodelist As XmlNodeList)
+        Function Availability(ByVal SuiteRoom As String, ByVal nodelist As XmlNodeList, ByRef tip As String)
 
             Dim StatusAvailability As String = ""
 
             For Each node As XmlElement In nodelist
 
                 If node.Attributes("Suite").Value = SuiteRoom Then
-
+                    tip = node.Attributes(4).Value
                     StatusAvailability = node.Attributes("Status").Value
-
                 End If
 
             Next
-
-            'model.EditGroupData20 = Request("HotelAvailability") + "/" + WhosaleValue(0) + "/" + Request("CheckinAvailability") + "/" + Request("CheckoutAvailability") + "/" + SuiteRoom
-
             Return StatusAvailability
-
-
         End Function
-
-
-        Function AvailabilityConsultRate(ByVal SuiteRoom As String, ByVal nodelist As XmlNodeList)
+        Function AvailabilityConsultRate(ByVal SuiteRoom As String, ByVal nodelist As XmlNodeList, ByRef tip As String)
 
             Dim StatusAvailability(2) As String
             Dim nodelistDos As XmlNodeList
@@ -5352,7 +5177,7 @@ Namespace GroupsPlayaResorts
             For Each node As XmlElement In nodelist
 
                 If node.Attributes("Suite").Value = SuiteRoom Then
-
+                    tip = node.Attributes(4).Value
                     nodelistDos = node.GetElementsByTagName("Date")
 
                     StatusAvailability(0) = node.Attributes("Status").Value
@@ -5557,98 +5382,660 @@ Namespace GroupsPlayaResorts
             Return Ratefinal
         End Function
 
-        Sub GetDataBreakDown(ByVal model As Object, ByVal DatosObjeto As Object, ByVal IdGroup As String, ByVal GroupBy As String, Optional ByVal QueryID As String = "BreakData")
-            conn.Open()
+        Function Round(ByVal Valor As Double, ByVal tipo As Char) As Double
+            Dim result As Double = 0.0
 
-            Dim BreakdownList = New List(Of GroupsBreakList)
-            Dim BreakdownListGroupBy = New List(Of GroupsBreakList)
-            Dim BreakdownVirtual = New List(Of GroupsBreakList)
-            Dim ListSuites = New List(Of SuitesList)
+            Select Case tipo
+                Case "S"
+                    result = Math.Round(Valor, 2)
+                Case "C"
+                    result = Math.Ceiling(Valor)
+                Case "N"
+                    result = Math.Round(Valor)
+            End Select
 
-            Dim sqlParameters() As Object
-            Dim queryTest = classQuery.GetQueryString(QueryID, "querys.xml", DatosObjeto, sqlParameters)
-            Dim CommandTest = New SqlCommand(queryTest, conn)
+            Return result
 
-            CommandTest.CommandType = CommandType.StoredProcedure
+        End Function
 
-            Dim param As System.Data.SqlClient.SqlParameter
+        Function ObtieneHotel(ByVal clave As String) As String
+            Dim hotel As String = "Ninguno"
 
-            For Each param In sqlParameters
-                CommandTest.Parameters.Add(param)
-            Next
+            Select Case clave
+                Case "GCR"
+                    hotel = "GCCUN"
+                Case "GPR"
+                    hotel = "POPDC"
+                Case "RPR"
+                    hotel = "ROPDC"
+                Case "TRC"
+                    hotel = "HZLCUN"
+                Case "ZLJ"
+                    hotel = "HZLJAM"
+                Case "ZVC"
+                    hotel = "HZVCUN"
+                Case "ZVJ"
+                    hotel = "HZVJAM"
+                Case "ZVL"
+                    hotel = "HZLCA"
+                Case "ZVP"
+                    hotel = "HZVPV"
+            End Select
 
-            Dim xmlr As System.Xml.XmlReader
-            xmlr = CommandTest.ExecuteXmlReader()
-            'END: Preparación y llamada a base de datos que ejecuta un procedimiento
+            Return hotel
+        End Function
+        ''' <summary>
+        ''' Construye un modelo de GroupListData
+        ''' </summary>
+        ''' <param name="Results">Results son los datos de la BD</param>
+        ''' <param name="referencia">referencia se refiere de donde obtiene los datos</param>
+        ''' <param name="valor1">valor1 es una variable auxiliar cuando esta no este contenida en la variable Results</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function Arma_GroupsListData(ByVal Results As SqlDataReader, ByVal referencia As String, ByVal valor1 As String) As GroupsListData
+            Dim GroupList As GroupsListData
 
-            'BEGIN: Lectura del xml devuelto por la base de datos y llenado de los modelos del breakdown
-            Dim xmlDoc As New XmlDocument
-            xmlDoc.Load(xmlr)
+            Select Case referencia
+                Case "GROUPLIST"
+                    GroupList = New GroupsListData With {
+                                  .Colum1 = valor1 + "000" + Results("Id_Group").ToString,
+                                  .Colum20 = Results("GroupName"),
+                                  .Colum2 = Results("Date_Register"),
+                                  .Colum3 = Results("Client"),
+                                  .Colum22 = Results("Wholesale"),
+                                  .Colum4 = Results("Market_Key"),
+                                  .Colum5 = Results("Contact"),
+                                  .Colum6 = Results("CordinatorGroup"),
+                                  .Colum7 = Results("ArrivalDate"),
+                                  .Colum8 = Results("DepartureDate"),
+                                  .Colum9 = Results("Type_Name"),
+                                  .Colum10 = Results("BookStatus"),
+                                  .Colum11 = Results("PaymentStatus"),
+                                  .Colum21 = Results("HotelStatus"),
+                                  .Colum12 = valor1,
+                                  .Colum13 = Results("RateProm"),
+                                  .Colum14 = Results("TypeRate"),
+                                  .Colum15 = Results("PeakRoom"),
+                                  .Colum16 = Results("NumberRooms"),
+                                  .Colum17 = "0.00",
+                                  .Colum18 = Results("RevenueProm"),
+                                  .Colum19 = Results("Id_Group"),
+                                  .Colum23 = Results("CommissionAgent")
+                              }
+            End Select
 
-            Dim breakDown As XmlNodeList
-            breakDown = xmlDoc.SelectNodes("/BREAKDOWN/BREAKDEFAULT/DEFAULT") 'BREAKDOWN default
+            Return GroupList
 
-            Dim break As XmlNode
+        End Function
+        ''' <summary>
+        ''' Metodo para contruir catologos de filtros de pantalla GROUPS
+        ''' </summary>
+        ''' <param name="Results">Variable que contiene los registros de los catalogos</param>
+        ''' <remarks></remarks>
+        Sub Construye_Opciones_Select(ByVal Results As SqlDataReader)
+            Dim Opcion As Object
 
-            For Each break In breakDown
-                Dim nodeDefault = break.Attributes
-                BreakdownList.Add(New GroupsBreakList With {.RoomID = nodeDefault.GetNamedItem("NumGroup").Value, .RoomCode = nodeDefault.GetNamedItem("Code_Room").Value, .Checkin = nodeDefault.GetNamedItem("Checkin").Value, .Checkout = nodeDefault.GetNamedItem("Checkout").Value})
-            Next
+            If Results.HasRows Then
+                While Results.Read()
+                    Opcion = (New SelectListItem With {
+                             .Text = Results("NAME"),
+                             .Value = Results("ID"),
+                             .Selected = False}
+                            )
 
-            breakDown = xmlDoc.SelectNodes("/BREAKDOWN/BREAKDETAIL/DETAIL") 'BREAKDOWN detalle
+                    Select Case Results("TIPO")
+                        Case 1
+                            ListGroupType_Global.add(Opcion)
+                        Case 2
+                            ListMarkets_Global.add(Opcion)
+                        Case 3
+                            ListGroupCordinator_Global.add(Opcion)
+                        Case 4
+                            ListAgencyType_Global.add(Opcion)
+                        Case 5
+                            ListOnsiteCordinator_Global.add(Opcion)
+                        Case 6
+                            ListEventCordinator_Global.add(Opcion)
+                        Case 7
+                            ListEventSeller_Global.add(Opcion)
+                    End Select
 
-            For Each break In breakDown
-                Dim nodeDetail = break.Attributes
-                BreakdownListGroupBy.Add(New GroupsBreakList With {.RoomID = nodeDetail.GetNamedItem("Id_BreakDown").Value, .GuestName = nodeDetail.GetNamedItem("GuestName").Value + " " + nodeDetail.GetNamedItem("GuestLastName").Value, .RoomCode = nodeDetail.GetNamedItem("Code_Room").Value, .Adults = nodeDetail.GetNamedItem("Adults").Value, .Teens = nodeDetail.GetNamedItem("Teens").Value, .Childrens = nodeDetail.GetNamedItem("Childs").Value, .Infants = nodeDetail.GetNamedItem("Infants").Value, .Checkin = nodeDetail.GetNamedItem("Checkin").Value, .Checkout = nodeDetail.GetNamedItem("Checkout").Value, .RoomNighs = nodeDetail.GetNamedItem("Nights").Value, .StatusPayment = nodeDetail.GetNamedItem("Status_P").Value, .StatusBooking = nodeDetail.GetNamedItem("Status_B").Value, .Deposit = 0, .Balance = 0, .Revenue = nodeDetail.GetNamedItem("Revenue").Value, .TentativeRooms = nodeDetail.GetNamedItem("TentativeRoom").Value, .ComplementaryRooms = nodeDetail.GetNamedItem("ComplementaryRoom").Value})
-            Next
-            'END: Lectura del xml devuelto por la base de datos y llenado de los modelos del breakdown
-
-            breakDown = xmlDoc.SelectNodes("/BREAKDOWN/BREAKTOTALS/TOTALS") 'BREAKDOWN Total
-
-            For Each break In breakDown
-                Dim nodeTotals = break.Attributes
-
-                model.TotalNumRooms = nodeTotals.GetNamedItem("NumberRooms").Value
-                model.TotalDeployRooms = nodeTotals.GetNamedItem("TotalBreakdown").Value
-                model.TotalTentativeRooms = nodeTotals.GetNamedItem("TotalTentativeRooms").Value
-                model.TotalAdults = nodeTotals.GetNamedItem("TotalAdults").Value
-                model.TotalTeens = nodeTotals.GetNamedItem("TotalTeens").Value
-                model.TotalChildrens = nodeTotals.GetNamedItem("TotalChilds").Value
-                model.TotalInfants = nodeTotals.GetNamedItem("TotalInfants").Value
-                model.TotalBalance = 0
-                model.TotalDeposit = 0
-                model.TotalRevenue = nodeTotals.GetNamedItem("TotalRevenue").Value
-            Next
-
-            breakDown = xmlDoc.SelectNodes("/BREAKDOWN/BREAKVIRTUAL/VIRTUAL")
-
-            For Each break In breakDown
-                Dim nodeVirtual = break.Attributes
-                BreakdownVirtual.Add(New GroupsBreakList With {.RoomID = nodeVirtual.GetNamedItem("NUM_ROOMS").Value, .RoomCode = nodeVirtual.GetNamedItem("CODE_ROOM").Value, .Checkin = nodeVirtual.GetNamedItem("INIT_DATE").Value, .Checkout = nodeVirtual.GetNamedItem("END_DATE").Value, .Adults = nodeVirtual.GetNamedItem("NUM_ADULTS").Value, .Teens = nodeVirtual.GetNamedItem("NUM_TEENS").Value, .Childrens = nodeVirtual.GetNamedItem("NUM_CHILDS").Value, .Infants = nodeVirtual.GetNamedItem("NUM_INFANTS").Value})
-            Next
-
-            breakDown = xmlDoc.SelectNodes("/BREAKDOWN/LISTROOMS/ROOMS")
-
-            For Each break In breakDown
-                Dim nodeSuite = break.Attributes
-                ListSuites.Add(New SuitesList With {.Text = nodeSuite.GetNamedItem("NOMB_TC_ACT").Value, .Value = nodeSuite.GetNamedItem("CLAVE_TC").Value, .Status = nodeSuite.GetNamedItem("STATUS").Value})
-            Next
-
-            'END: Lectura del xml devuelto por la base de datos y llenado de los modelos del breakdown
-
-            model.ListGroupBreakdownin = BreakdownList
-            model.ListGroupBreakdownGroupByin = BreakdownListGroupBy
-            model.ListVirtualBreakdownin = BreakdownVirtual
-            model.GroupBy = GroupBy
-            model.GroupId = IdGroup
-            model.ListaSuitein = ListSuites
-
-            conn.Close()
+                End While
+            End If
         End Sub
 
+        ''' <summary>
+        ''' Metodo para contruir cadenas de filtros
+        ''' </summary>
+        ''' <param name="cadena">es el principio del campo sobre el cual aplica el filtro: a.clave in(</param>
+        ''' <param name="Valores">cadena que contiene los valores para aplicar Split: 4,2,4,5</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function Obtiene_Filtro(ByVal cadena As String, ByVal Valores As String) As String
+
+            Dim Valores_Filtro() As String = Split(Valores, ",")
+            Dim Filtro_Construido As String = cadena
+            Dim Longitud As Integer = Valores_Filtro.Count
+
+            If Longitud <> 0 Then
+
+                For i = 0 To Longitud - 1
+
+                    If Valores_Filtro(i) = "0" Then
+
+                        i = Longitud
+                        Filtro_Construido = " "
+                    Else
+                        If i = Longitud - 1 Then
+                            Filtro_Construido += "  ''" + Valores_Filtro(i) + "''  )  "
+                        Else
+                            Filtro_Construido += "  ''" + Valores_Filtro(i) + "'' ,  "
+                        End If
+
+                    End If
+
+                Next
+            End If
+
+            Return Filtro_Construido
+
+        End Function
+        Function Obtiene_Claves_Hotel(ByVal Valores As String) As String
+
+            Dim Valores_Filtro() As String = Split(Valores, ",")
+            Dim Filtro_Construido As String = ""
+            Dim Longitud As Integer = Valores_Filtro.Count
+
+            If Longitud <> 0 Then
+                For i = 0 To Longitud - 1
+                    If Valores_Filtro(i) = "0" Then
+                        i = Longitud
+                        Filtro_Construido = "null"
+                    Else
+                        Filtro_Construido += "  ''" + ObtieneHotel(Valores_Filtro(i)) + "'' ,  "
+                    End If
+                Next
+            End If
+
+            Return Filtro_Construido
+
+        End Function
+
+        Function Obtiene_Filtro_Fecha(ByVal Picker1 As String, ByVal Picker2 As String, ByVal TipoPicker As Integer) As String
+            'Picker1 <> "" And Picker2 <> "" And TipoPicker
+            Dim DatesFilters As String = ""
+            If Picker1 <> "" And Picker2 <> "" And TipoPicker <> 0 And Picker1 <> Picker2 Then
+
+
+                If TipoPicker = 1 Then
+
+                    DatesFilters = " and  (a.ArrivalDate between ''" + Picker1 + "'' and ''" + Picker2 + "''   ) "
+                End If
+
+                If TipoPicker = 2 Then
+
+                    DatesFilters = " and  (a.DepartureDate between ''" + Picker1 + "'' and ''" + Picker2 + "''   ) "
+
+                End If
+
+                If TipoPicker = 3 Then
+
+                    DatesFilters = " and  (Convert(date ,a.Date_Register)  between ''" + Picker1 + "'' and ''" + Picker2 + "''   ) "
+
+                End If
+
+                If TipoPicker = 4 Then
+
+                    DatesFilters = " and  (a.ArrivalDate between ''" + Picker1 + "'' and ''" + Picker2 + "''  or a.DepartureDate between ''" + Picker1 + "'' and ''" + Picker2 + "'' ) "
+
+                End If
+
+
+            End If
+
+
+            If Picker1 <> "" And TipoPicker <> 0 And TipoPicker <> 4 And Picker2 = "" Then
+
+
+                If TipoPicker = 1 Then
+
+                    DatesFilters = " and a.ArrivalDate=''" + Picker1 + "''     "
+                End If
+
+                If TipoPicker = 2 Then
+
+                    DatesFilters = " and  a.DepartureDate=''" + Picker1 + "''    "
+
+                End If
+
+                If TipoPicker = 3 Then
+
+                    DatesFilters = " and  Convert(date ,a.Date_Register) =''" + Picker1 + "'' "
+
+                End If
+
+            End If
+
+            Return DatesFilters
+        End Function
+
+        Function Obtiene_Order_By(ByVal OrderByList As String, ByVal OrderTypeList As String) As String
+            Dim OrderByValues() As String = Split(OrderByList, ",")
+            Dim OrderTypeValues() As String = Split(OrderTypeList, ",")
+            Dim OrderByFilters As String = ""
+
+            If OrderByValues.Count <> 0 Then
+                OrderByFilters = "  ORDER BY   "
+
+                For i = 0 To OrderByValues.Count - 1
+
+                    If OrderByValues(i) <> "0" And OrderTypeValues(i) <> "0" Then
+                        If i = OrderByValues.Count - 1 Then
+                            OrderByFilters += " , " + OrderByValues(i) + "   " + OrderTypeValues(i) + "  "
+                        Else
+                            OrderByFilters += "  " + OrderByValues(i) + "  " + OrderTypeValues(i) + "    "
+                        End If
+                    End If
+                Next
+            End If
+
+            Return OrderByFilters
+        End Function
+
+        Function Construye_Vista_Grupo(ByVal DataUser As Dictionary(Of String, String)) As List(Of GroupsListData)
+            Dim QueryDos As String
+            Dim SqlParameters() As Object
+
+            QueryDos = classQuery.GetQueryString("GetGroupList", "querys.xml", DataUser, SqlParameters)
+            Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+
+            CommandUserDos.CommandType = CommandType.StoredProcedure
+            Dim Param As System.Data.SqlClient.SqlParameter
+            For Each Param In SqlParameters
+                CommandUserDos.Parameters.Add(Param)
+            Next
+
+            Dim Results = CommandUserDos.ExecuteReader()
+            Dim GroupList = New List(Of GroupsListData)
+            Dim hotel As String = ""
+            Dim totalRevenue As Integer = 0
+
+            If Results.HasRows Then
+                While Results.Read()
+                    hotel = ObtieneHotel(Results("Cve_Hotel"))
+                    GroupList.Add(Arma_GroupsListData(Results, "GROUPLIST", hotel))
+                End While
+                Results.Close()
+            End If
+
+            totalRevenue = CommandUserDos.Parameters("@TotalRevenue").Value
+
+            Return GroupList
+        End Function
+
+        Function Obtiene_Tip_Hotel(ByVal Clave As String) As String
+            Dim tip As String = ""
+
+            For z As Integer = 0 To values.Count - 1
+                Dim value As Dictionary(Of String, String) = values(z)
+                Dim id As String = value("Clave_TC")
+                z = z + 1
+                If id = Clave Then
+                    value = values(z)
+                    tip = value("SuiteName")
+                    Exit For
+                End If
+
+            Next
+
+            Return tip
+        End Function
+
+        Sub Obtiene_Hoteles_Permisos()
+
+            Dim QueryDos As String
+            Dim DataUser As New Dictionary(Of String, String)
+            Dim CommanRate
+            Dim Results
+
+            DataUser.Add("ID_USER", Session.Item("IDUser"))
+            QueryDos = classQuery.GetQueryString("Get_Hotels_Permissions", "querys.xml", DataUser)
+            Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+
+            CommanRate = New SqlCommand(QueryDos, conn)
+            Results = CommanRate.ExecuteReader()
+            Dim GroupList = New List(Of GroupsListData)
+            Dim hotel As String = ""
+            Dim totalRevenue As Integer = 0
+            Dim Opcion As Object
+
+            If Results.HasRows Then
+                While Results.Read()
+                    Opcion = (New SelectListItem With {
+                             .Text = Results("NOMBRE"),
+                             .Value = Results("Cve_Hotel"),
+                             .Selected = False}
+                            )
+
+                    ListHotels_Global.add(Opcion)
+                End While
+                Results.Close()
+            End If
+        End Sub
+
+        Sub Construye_Detalle_Grupo(ByVal ID_GROUP As String, ByRef model As GroupsDetail)
+            Dim Query As String
+            Dim CommandUser
+            Dim Results
+            Dim RevenueFinal As Double = 0
+            Dim BanderaRevenue As Integer = 0
+            Dim i As Integer = 0
+            conn.Open()
+            Query = "select * from Groups where Status_Data=1 and id_group=" + ID_GROUP + " "
+            CommandUser = New SqlCommand(Query, conn)
+            Results = CommandUser.ExecuteReader()
+            If Results.HasRows Then
+                While Results.Read()
+                    model.EditGroupData1 = Results("Cve_Hotel")
+                    model.EditGroupData2 = Results("Wholesale")
+                    model.EditGroupData3 = Results("NumberRooms")
+
+                    Dim thisDate1 As Date = Results("ArrivalDate")
+                    model.EditGroupData4 = thisDate1.ToString("yyyy-MM-dd")
+
+                    Dim thisDate2 As Date = Results("DepartureDate")
+                    model.EditGroupData5 = thisDate2.ToString("yyyy-MM-dd")
+
+                    model.EditGroupData6 = Results("TypeRate")
+                    model.EditGroupData7 = Results("Discount")
+                    model.EditGroupData8 = Results("GroupName")
+                    model.EditGroupData9 = Results("Market")
+                    model.EditGroupData10 = Results("GroupType")
+                    model.EditGroupData11 = Results("Allotment")
+                    model.EditGroupData12 = Results("PeakRoom")
+                    model.EditGroupData34 = Results("CommissionAgent")
+                    model.EditGroupData13 = Results("AgencyType")
+                    model.EditGroupData14 = Results("Company")
+                    model.EditGroupData35 = Results("NumberNights")
+                    model.EditGroupData15 = Results("Contact")
+                    model.EditGroupData16 = Results("GroupCordinator")
+                    model.EditGroupData17 = Results("OnsiteCordinator")
+                    model.EditGroupData18 = Results("Channel")
+                    Dim thisDate3 As Date = Results("TentativeArrivalDate")
+                    model.EditGroupData19 = thisDate3.ToString("yyyy-MM-dd")
+                    Dim thisDate4 As Date = Results("TentativeDepartureDate")
+                    model.EditGroupData20 = thisDate4.ToString("yyyy-MM-dd")
+                    model.EditGroupData51 = IIf(Results("Package"), 1, 0)
+                    model.GroupTypeRate = Results("TypeRate")
+
+                End While
+            End If
+            Results.close()
+
+            conn.close()
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="UsuariosLis"></param>
+        ''' <param name="model"></param>
+        ''' <remarks></remarks>
+        Sub Construye_UsuariosLis(ByRef UsuariosLis As List(Of GroupsRatesList), ByRef model As GroupsDetail)
+
+            'aqui
+            Dim QueryDos As String
+            Dim CommanRate
+            Dim ResultsDos
+            Dim RevenueFinal As Double = 0
+            Dim DateInit As Date
+            Dim BanderaRevenue As Integer = 0
+            Dim i As Integer = 0
+            'QueryDos = "select *from Groups_Rates where Status_Data=1 and id_group=" + ID_GROUP.ToString + " order by Id_GroupRate "
+            QueryDos = classQuery.GetQueryString("GetGroupsRate", "querys.xml", Request)
+
+            CommanRate = New SqlCommand(QueryDos, conn)
+            ResultsDos = CommanRate.ExecuteReader()
+            If ResultsDos.HasRows Then
+                While ResultsDos.Read()
+                    'Para leerlo una sola vez
+                    R_Calc = ResultsDos("R_Calc")
+                    R_Show = ResultsDos("R_Show")
+                    'Para pruebas de session
+
+
+                    Session("R_Calc") = R_Calc
+                    Session("R_Show") = R_Show
+
+                    If DateInit <> ResultsDos("Init_Date") Or i = 0 Then
+                        DateInit = ResultsDos("Init_Date")
+                        If i <> 0 Then
+                            BanderaRevenue = 1
+                        End If
+                    End If
+
+                    UsuariosLis.Add(New GroupsRatesList With {
+                                    .InitDateRate = ResultsDos("Init_Date"),
+                                    .EndDateRate = ResultsDos("End_Date"),
+                                    .RateCveValue = ResultsDos(4),
+                                    .SuiteName = ResultsDos("Code_Room"),
+                                    .SuiteCode = ResultsDos("Code_Room"),
+                                    .RateSingle = Round(ResultsDos("Rate_1"), R_Show),
+                                    .RateDouble = Round(ResultsDos("Rate_2"), R_Show),
+                                    .RateTripleandFour = Round(ResultsDos("Rate_Extra"), R_Show),
+                                    .RateFiveandSix = Round(ResultsDos("Rate_ExtraX"), R_Show),
+                                    .RateChildrens = Round(ResultsDos("Rate_C"), R_Show),
+                                    .RateTeensValue = Round(ResultsDos("Rate_T"), R_Show),
+                                    .Availability = ResultsDos("Status"),
+                                    .RateRevenue = ResultsDos("Num_Rooms") * CDbl(Round(ResultsDos("Revenue"), R_Calc)),
+                                    .RatePax = ResultsDos("Num_Rooms"),
+                                    .CommissionRate = Round(ResultsDos("Commission"), R_Show),
+                                    .DiscountRate = Round(ResultsDos("Promo"), R_Show),
+                                    .RateRevenuePerRoom = Round(ResultsDos("Revenue"), R_Show),
+                                    .RateRevenueRoomNigth = CDbl(Round(ResultsDos("Rate_2"), R_Calc)) * 2,
+                                    .Formato = R_Show,
+                                    .Tip = ResultsDos("Suite_Name")})
+
+
+                    If BanderaRevenue = 0 Then
+                        RevenueFinal = RevenueFinal + ResultsDos("Num_Rooms") * CDbl(Round(ResultsDos("Revenue"), R_Calc))
+                    End If
+
+
+                    i = i + 1
+
+                End While
+                RevenueFinal = Round(RevenueFinal, R_Show)
+            End If
+            model.RevenueFinal = RevenueFinal
+            ResultsDos.close()
+
+        End Sub
+
+        Sub Construye_DocumentsList(ByRef DocumentsLis As List(Of GroupsDocList), ByVal ID_GROUP As String)
+            Dim QueryDoc As String = " SELECT *FROM Documents WHERE Id_Group=" + ID_GROUP + " order by Id_Document desc "
+            Dim CommandUserDoc = New SqlCommand(QueryDoc, conn)
+            Dim ResultsDoc = CommandUserDoc.ExecuteReader()
+
+            If ResultsDoc.HasRows Then
+                While ResultsDoc.Read()
+                    DocumentsLis.Add(New GroupsDocList With {.TypeDocument = ResultsDoc("Type_Document"), .Actions = ResultsDoc("Actions"), .User = ResultsDoc("User_Action"), .DateRegister = ResultsDoc("Date_Register"), .URL = ResultsDoc("URL")})
+                End While
+            End If
+            ResultsDoc.Close()
+        End Sub
+        Sub Obtiene_Top1_Documents(ByRef model As GroupsDetail, ByVal ID_GROUP As String)
+            Dim QueryDocSC As String = " select top 1 * from Documents where Id_Group=" + ID_GROUP + " order by Date_Register desc "
+            Dim CommandUserDocSC = New SqlCommand(QueryDocSC, conn)
+            Dim ResultsDocSC = CommandUserDocSC.ExecuteReader()
+
+            If ResultsDocSC.HasRows Then
+                While ResultsDocSC.Read()
+                    model.EditGroupData50 = ResultsDocSC("Additionanl_SC")
+                End While
+            End If
+            ResultsDocSC.Close()
+        End Sub
+
+        Sub Construye_Groups_SchemePayments(ByRef ListSchemePayments As List(Of SelectListItem), ByVal ID_GROUP As String)
+            Dim QueryScheme As String = " Select *from Groups_SchemePayments where Id_Group=" + ID_GROUP + " and Status_Data=1 order by NumberPayment   "
+            Dim CommandUserScheme = New SqlCommand(QueryScheme, conn)
+            Dim SchemeDate As Date
+            Dim ResultsScheme = CommandUserScheme.ExecuteReader()
+
+            If ResultsScheme.HasRows Then
+                While ResultsScheme.Read()
+                    SchemeDate = ResultsScheme("DatePayment")
+                    ListSchemePayments.Add(New SelectListItem With {.Text = SchemeDate.ToString("yyyy-MM-dd"), .Value = ResultsScheme("Amount")})
+                End While
+            End If
+            ResultsScheme.Close()
+        End Sub
+
+        Sub Construye_ListSuites(ByRef ListSuites As List(Of SelectListItem), ByVal Clv_Hotel As String, ByVal ID_GROUP As String)
+            Dim QuerySuites As String = " select distinct a.Clave_TC,a.Nomb_TC_Act,a.SuiteOrden from vw_Tipo_Cuarto a left join Groups_Rates b on a.Clave_TC=b.Code_Room where a.Clav_Hotel='" + Clv_Hotel + "' and b.Id_Group=" + ID_GROUP + " order by a.SuiteOrden  "
+            Dim CommandUserSuites = New SqlCommand(QuerySuites, conn)
+            Dim ResultsSuites = CommandUserSuites.ExecuteReader()
+
+            If ResultsSuites.HasRows Then
+                While ResultsSuites.Read()
+
+                    ListSuites.Add(New SelectListItem With {.Text = ResultsSuites("Nomb_TC_Act"), .Value = ResultsSuites("Clave_TC")})
+                End While
+            End If
+            ResultsSuites.Close()
+        End Sub
+
+        Sub Construye_BreakdownList(ByRef BreakdownList As List(Of GroupsBreakList), ByVal ID_GROUP As String)
+            ' Dim QueryBreak = "Select COUNT(*) NumGroup , a.Code_Room , a.Checkin , a.Checkout from BreakDown a where a.Id_Group=" + ID_GROUP.ToString + " and a.status_data=1 group by Code_Room , Checkin , Checkout order by Checkin, Code_Room "
+            Dim QueryBreak = "Select COUNT(*) NumGroup , a.Code_Room , 'N/A' as Checkin ,'N/A' as Checkout from BreakDown a  where a.Id_Group=" + ID_GROUP.ToString + " and a.status_data=1 group by a.Code_Room  order by  a.Code_Room"
+            Dim CommandBreak = New SqlCommand(QueryBreak, conn)
+            Dim ResultsBreak = CommandBreak.ExecuteReader()
+
+            If ResultsBreak.HasRows Then
+                While ResultsBreak.Read()
+                    BreakdownList.Add(New GroupsBreakList With {.RoomID = ResultsBreak("NumGroup"), .RoomCode = ResultsBreak("Code_Room"), .Checkin = ResultsBreak("Checkin"), .Checkout = ResultsBreak("Checkout")})
+                End While
+            End If
+            ResultsBreak.Close()
+        End Sub
+
+        Sub Construye_BreakdownListGroupBy(ByRef BreakdownListGroupBy As List(Of GroupsBreakList), ByVal ID_GROUP As String)
+            'Dim QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + ID_GROUP.ToString + " and a.status_data=1  order by Checkin , Code_Room "
+            Dim QueryBreakGroupBy = "Select a.*, DATEDIFF(day,a.Checkin,a.Checkout) as Nights from BreakDown a where a.Id_Group=" + ID_GROUP.ToString + " and a.status_data=1  order by Code_Room"
+            Dim CommandBreakGroupBy = New SqlCommand(QueryBreakGroupBy, conn)
+            Dim ResultsBreakGroupBy = CommandBreakGroupBy.ExecuteReader()
+
+            If ResultsBreakGroupBy.HasRows Then
+                While ResultsBreakGroupBy.Read()
+                    BreakdownListGroupBy.Add(New GroupsBreakList With {.RoomID = ResultsBreakGroupBy("Id_BreakDown"), .GuestName = ResultsBreakGroupBy("GuestName") + " " + ResultsBreakGroupBy("GuestLastname"), .RoomCode = ResultsBreakGroupBy("Code_Room"), .Adults = ResultsBreakGroupBy("Adults"), .Teens = ResultsBreakGroupBy("Teens"), .Childrens = ResultsBreakGroupBy("Childs"), .Infants = ResultsBreakGroupBy("Infants"), .Checkin = ResultsBreakGroupBy("Checkin"), .Checkout = ResultsBreakGroupBy("Checkout"), .RoomNighs = ResultsBreakGroupBy("Nights"), .StatusPayment = ResultsBreakGroupBy("Status_P"), .StatusBooking = ResultsBreakGroupBy("Status_B"), .Deposit = 0, .Balance = 0, .Revenue = ResultsBreakGroupBy("Revenue"), .TentativeRooms = ResultsBreakGroupBy("TentativeRoom"), .ComplementaryRooms = ResultsBreakGroupBy("ComplementaryRoom")})
+                End While
+            End If
+            ResultsBreakGroupBy.Close()
+        End Sub
+
+        Sub Construye_ResultsBreakTotal(ByRef model As GroupsDetail, ByVal ID_GROUP As String)
+            Dim QueryBreakTotals = "Select a.NumberRooms,COUNT(*)as TotalBreakdown,SUM(b.TentativeRoom) as TotalTentativeRooms ,SUM(b.Adults) as TotalAdults,SUM(b.Teens) as TotalTeens , SUM(b.Childs) as TotalChilds, SUM(b.Infants) as TotalInfants ,SUM(b.Revenue) as TotalRevenue from Groups a left join BreakDown b on a.Id_Group=b.Id_Group where a.Id_Group=" + ID_GROUP + "   and b.status_data=1 and b.Status_B<>3 Group By a.NumberRooms"
+            Dim CommandBreakTotals = New SqlCommand(QueryBreakTotals, conn)
+            Dim ResultsBreakTotal = CommandBreakTotals.ExecuteReader()
+
+            If ResultsBreakTotal.HasRows Then
+                While ResultsBreakTotal.Read()
+                    model.TotalNumRooms = ResultsBreakTotal("NumberRooms")
+                    model.TotalDeployRooms = ResultsBreakTotal("TotalBreakdown")
+                    model.TotalTentativeRooms = ResultsBreakTotal("TotalTentativeRooms")
+                    model.TotalAdults = ResultsBreakTotal("TotalAdults")
+                    model.TotalTeens = ResultsBreakTotal("TotalTeens")
+                    model.TotalChildrens = ResultsBreakTotal("TotalChilds")
+                    model.TotalInfants = ResultsBreakTotal("TotalInfants")
+                    model.TotalBalance = 0
+                    model.TotalDeposit = 0
+                    model.TotalRevenue = ResultsBreakTotal("TotalRevenue")
+                End While
+            End If
+            ResultsBreakTotal.Close()
+        End Sub
+
+        Sub Construye_LogBookList(ByRef LogBookList As List(Of GroupsLogBookList), ByVal ID_GROUP As String)
+            Dim QueryLogBook = "Select * from LogBook where Id_group=" + ID_GROUP + " and Status_Data=1 order by Date_Register desc "
+            Dim CommandLogBook = New SqlCommand(QueryLogBook, conn)
+            Dim ResultsLogBook = CommandLogBook.ExecuteReader()
+            If ResultsLogBook.HasRows Then
+                While ResultsLogBook.Read()
+                    LogBookList.Add(New GroupsLogBookList With {.LogBookID = ResultsLogBook("Id_LoogBook"), .InputType = ResultsLogBook("Input_Type"), .NotesLogBook = ResultsLogBook("Notes"), .UserLogBook = ResultsLogBook("User_LogBook"), .DateLogBook = ResultsLogBook("Date_Register")})
+                End While
+            End If
+            ResultsLogBook.Close()
+        End Sub
+
+        Sub Construye_PaymentList(ByRef PaymentList As List(Of GroupsPaymentsList), ByVal ID_GROUP As String)
+
+            Dim QueryPayments = "Select *from Payments where Id_group=" + ID_GROUP + " and Status_Data=1 order by Date_Register desc "
+            Dim CommandPayment = New SqlCommand(QueryPayments, conn)
+            Dim DateValidated As String
+            Dim ResultsPayment = CommandPayment.ExecuteReader()
+
+            If ResultsPayment.HasRows Then
+                While ResultsPayment.Read()
+                    If IsDBNull(ResultsPayment("Date_Validated")) Then
+                        DateValidated = ""
+                    Else
+                        DateValidated = ResultsPayment("Date_Validated")
+                    End If
+                    PaymentList.Add(New GroupsPaymentsList With {.RoomID = ResultsPayment("Id_Breakdown"), .EventID = ResultsPayment("Id_Event"), .FolioPayment = ResultsPayment("Folio_Code_PMS"), .DateValidatedPayment = DateValidated, .AppliedPayment = ResultsPayment("AppliedPayment"), .StatusPayment = ResultsPayment("Status_Payment"), .UserValidatedPayment = ResultsPayment("User_Validated"), .DateRegisterPayment = ResultsPayment("Date_Register"), .UserResgisterPayment = ResultsPayment("User_Register"), .ValidatedPayment = ResultsPayment("Status_Validated"), .AmountPayment = ResultsPayment("Quantity"), .DescriptionPayment = ResultsPayment("Special_Notes"), .TypeCurrencyPayment = ResultsPayment("Type_Currency"), .TypePayment = ResultsPayment("Type_Payment"), .PaymentID = ResultsPayment("Id_Payment")})
+
+                End While
+            End If
+            ResultsPayment.Close()
+        End Sub
+
+        Sub Construye_ListSalons(ByRef ListSalons As List(Of SelectListItem), ByVal Clv_Hotel As String)
+
+            Dim QuerySalon As String = " Select id_Salon , Nombre from vw_Locations where Clav_Hotel='" + Clv_Hotel + "' order by Nombre  "
+            Dim CommandSalon = New SqlCommand(QuerySalon, conn)
+            Dim ResultsSalon = CommandSalon.ExecuteReader()
+
+            If ResultsSalon.HasRows Then
+                While ResultsSalon.Read()
+                    ListSalons.Add(New SelectListItem With {.Text = ResultsSalon("Nombre"), .Value = ResultsSalon("id_Salon")})
+                End While
+            End If
+            ResultsSalon.Close()
+        End Sub
+
+        Sub Construye_EventsList(ByRef EventsList As List(Of GroupsEventsList), ByVal ID_GROUP As String)
+
+            Dim QueryEvetns = "Select * from Events where Id_group=" + ID_GROUP + " and Status_Data=1 order by Date_Register desc "
+            Dim CommandEvents = New SqlCommand(QueryEvetns, conn)
+            Dim ResultsEvents = CommandEvents.ExecuteReader()
+
+            If ResultsEvents.HasRows Then
+                While ResultsEvents.Read()
+                    EventsList.Add(New GroupsEventsList With {.EventID = ResultsEvents("Id_Event"), .EventName = ResultsEvents("Event_Name"), .EventDate = ResultsEvents("Event_Date"), .EventStartTime = ResultsEvents("Event_StartTime"), .EventEndTime = ResultsEvents("Event_EndTime"), .EventSalonName = ResultsEvents("SalonName"), .EventStatus = ResultsEvents("Status_Event"), .EventPax = ResultsEvents("Num_Pax"), .EventSellerName = ResultsEvents("Event_Seller"), .EventCordinatorName = ResultsEvents("Event_Cordinator"), .EventDeposits = ResultsEvents("Deposits"), .EventBalance = ResultsEvents("Balance"), .EventRevenue = ResultsEvents("Revenue"), .EventUserRegister = ResultsEvents("User_Register"), .EventDateRegister = ResultsEvents("Date_Register")})
+                End While
+            End If
+            ResultsEvents.Close()
+
+        End Sub
+
+        Sub Obtiene_Status(ByRef model As GroupsDetail, ByVal ID_GROUP As String)
+
+            Dim QueryStatus = "select a.PaymentStatus, B.BookStatus, c.HotelStatus from(select Group_Status as PaymentStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP + " and Type_Status=1 and Status_Data=1)a left join (select Group_Status as BookStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP + " and Type_Status=2 and Status_Data=1)b on a.Id_Group=b.Id_Group left join (select Group_Status as HotelStatus, Id_Group from Groups_Status where Id_Group=" + ID_GROUP + " and Type_Status=3 and Status_Data=1)c on a.Id_Group=c.Id_Group "
+            Dim CommandStatus = New SqlCommand(QueryStatus, conn)
+            Dim ResultsStatus = CommandStatus.ExecuteReader()
+
+            If ResultsStatus.HasRows Then
+                While ResultsStatus.Read()
+
+                    model.GroupStatusPayment = ResultsStatus("PaymentStatus")
+                    model.GroupStatusBook = ResultsStatus("BookStatus")
+                    model.GroupStatusHotel = ResultsStatus("HotelStatus")
+
+                End While
+            End If
+            ResultsStatus.Close()
+
+        End Sub
 
     End Class
-
-
-
 End Namespace

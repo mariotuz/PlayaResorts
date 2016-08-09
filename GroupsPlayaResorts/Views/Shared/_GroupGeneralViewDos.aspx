@@ -46,17 +46,18 @@
                                                                    
                                                                    
                                                                       <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
-                                                                           <span><small>Hotel Name *</small></span>
+                                                                            <span><small>Hotel Name *</small></span>
                                                                             <select class="selectpicker" id="HotelSelect" name="HotelSelect" data-width="100%">
-                                                                              <option <% If Model.EditGroupData1 = "GCR" Then%> selected <% End if%> value="GCR">Gran Caribe Cancun</option>
-                                                                              <option <% If Model.EditGroupData1 = "GPR" Then%> selected <% End if%> value="GPR">Gran Porto Playa del Carmen</option>
-                                                                              <option <% If Model.EditGroupData1 = "RPR" Then%> selected <% End if%> value="RPR">The Royal Playa del Carmen</option>
-                                                                              <option <% If Model.EditGroupData1 = "TRC" Then%> selected <% End if%> value="TRC">Hyatt Zilara Cancun</option>
-                                                                              <option <% If Model.EditGroupData1 = "ZLJ" Then%> selected <% End if%> value="ZLJ" >Hyatt Zilara Rose Hall Jamaica</option>
-                                                                              <option <% If Model.EditGroupData1 = "ZVC" Then%> selected <% End if%> value="ZVC">Hyatt Ziva Cancun</option>
-                                                                              <option <% If Model.EditGroupData1 = "ZVJ" Then%> selected <% End if%> value="ZVJ">Hyatt Ziva Rose Hall Jamaica</option>
-                                                                              <option <% If Model.EditGroupData1 = "ZVL" Then%> selected <% End if%> value="ZVL">Hyatt Ziva Los Cabos</option>
-                                                                              <option <% If Model.EditGroupData1 = "ZVP" Then%> selected <% End if%> value="ZVP">Hyatt Ziva Puerto Vallarta</option>
+                                                                                <option value="0" selected>ALL</option>
+                                                                                <% Dim j As Integer
+                                                                                    For j = 0 To Model.ListHotelPermissionsin.Count - 1%>
+                                                                             <option <% If Model.ListHotelPermissionsin.Item(j).Value = Model.EditGroupData1 Then
+                                                                                     Response.Write("selected='selected'")
+                                                                                 End If%> 
+                                                                                 value="<%:Model.ListHotelPermissionsin.Item(j).Value%>"><%:Model.ListHotelPermissionsin.Item(j).Text%></option>
+                                                                            <%        
+                                                                            Next
+                                                                            %>
                                                                             </select>
                                                                       </div>
 
@@ -99,7 +100,7 @@
                                                                            <span><small>Type Rate *</small></span>
                                                                             <select class="selectpicker" id="selectyperatecotizar" name="selectyperatecotizar" data-width="100%">
 
-                                                                                 <option  <% If Model.EditGroupData6 = "4" Then%> selected <% End if%> value="4">Modelo de Compensacion</option>
+                                                                                 <option  <% If Model.EditGroupData6 = "4" Then%> selected <% End if%> value="4">CoMa</option>
                                                                                  <option  <% If Model.EditGroupData6 = "5" Then%> selected <% End if%> value="5">MICE</option>
                                                                                  <option  <% If Model.EditGroupData6 = "2" Then%> selected <% End if%> value="2">Tarifario Manual</option>
                                                                                  <option  <% If Model.EditGroupData6 = "3" Then%> selected <% End if%> value="3">Tarifario Semiautomatico</option>
@@ -210,23 +211,19 @@
                                                                              
                                                                             </select>
                                                                       </div>
-                                                                        
-                                                                    
+                                                                    <!--Agregando opcion-->
+                                                                    <div class="clear"></div>
+                                                                        <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
+                                                                           <span><small>Quote Type </small></span>
+                                                                                <select class="selectpicker" id="selectquotetype" name="selectquotetype" data-width="100%">
+                                                                                    <option value="0" <% If Model.EditGroupData51 = "0" Then%> selected <% End if%> >Room Only</option>
+                                                                                    <option value="1" <% If Model.EditGroupData51 = "1" Then%> selected <% End if%> >Package</option>
+                                                                                </select>
+                                                                    </div>    
+
+                                                                    <!--Agregando opcion-->
                                                                          
                                                                       <div class="clear"></div>
-                                                                                                                                         <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
-                                                                            <span><small>Quote Type </small></span>
-                                                                            <select class="selectpicker" id="selectquotetype" name="selectquotetype" data-width="100%">
-                                                                                <option value="0" <% If Model.EditGroupData51 = "0" Then%> selected <% End if%> >Room Only</option>
-                                                                                <option value="1" <% If Model.EditGroupData51 = "1" Then%> selected <% End if%> >Package</option>
-                                                                            </select>
-                                                                      </div>
-                                                                        
-                                                                    
-                                                                         
-                                                                      <div class="clear"></div>
-
-
                                                                 </div><!-- End form-->
                                                             </div>
 
@@ -255,11 +252,13 @@
                                                                 <div>
                                                                   <h2>Group Information </h2><span class="instrucions">&nbsp;&nbsp;</span>
                                                                   <!--btn save / consult-->
-                                                                  <%
-                                                                      If (ViewData("idseccion1subseccion1edit_permission") IsNot Nothing And ViewData("idseccion1subseccion1edit_permission") > 0) Then
-                                                                          Response.Write("<div class=""right"" style=""margin-top: 15px;""><button id=""SaveGroup""  value=""Save_Group"" name=""GroupDetailBotons"" class=""btn btn-success"" style=""margin-top: 17px;"">Save Group</button></div>")
-                                                                      End If
-                                                                  %>
+                                                                  <div class="right" style="margin-top: 15px;">
+                                                                
+
+                                                                      <button id="SaveGroup"  value="Save_Group" name="GroupDetailBotons" class="btn btn-success" style="margin-top: 17px;">Save Group</button>
+
+                                                                     
+                                                                  </div>
                                                                 </div>
                                                                 <div id="Div2" class="col-xs-12 col-sm-12 col-md-12 minheight nopadding"> <!-- Start form-->
                                                                       <!-- frist row-->
@@ -422,8 +421,6 @@
 
                                                                     </script>
 
-                                                                      
-
 
                                                                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                                                                         <span><small>Company</small></span>
@@ -435,53 +432,15 @@
                                                                         </div>
                                                                       </div>
 
-
-
-<%--                                                                      <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
-                                                                            <span><small>Company </small></span>
-                                                                           <select class="selectpicker" id="selectcompany" name="selectcompany" data-width="100%">
-                                                                              <option <% If Model.EditGroupData14 = "" Then%> selected <% End if%> value=""></option>
-                                                                              <option <% If Model.EditGroupData14 = "Agencia Mundial" Then%> selected <% End if%> value="Agencia Mundial">Agencia Mundial</option>
-                                                                              
-                                                                            </select>
-                                                                      </div>--%>
-
-                                                                     <%-- <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
-                                                                            <span><small>Wholesale *</small></span>
-                                                                        
-                                                                            <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                                                    <input type="text" id="Text4" name="WhosaleDetail"  class="form-control input-custom corners-inputs" placeholder="" >
-                                                                            </div>
-
-                                                                     
-                                                                      </div>--%>
-
-                                                             <%--         <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
-                                                                          <span><small>Contact </small></span>
-                                                                          <select class="selectpicker" id="selectcontact" name="selectcontact" data-width="100%">
-                                                                             <option  <% If Model.EditGroupData15 = "" Then%> selected <% End if%> value=""></option>
-                                                                             <option  <% If Model.EditGroupData15 = "Rocio Rodriguez" Then%> selected <% End if%> value="Rocio Rodriguez">Rocio Rodriguez</option>
-                                                                            
-                                                                          </select>
-                                                                      </div>--%>
-
-
-                                                                     
-
-
                                                                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                                                                         <span><small>Contact</small></span>
                                                                         <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                                          <input type="text" id="selectcontact" name="selectcontact" value="<%:Model.EditGroupData15%>"  class="form-control input-custom corners-inputs" placeholder="" >
+                                                                          <input type="text" id="selectcontact" name="selectcontact" value="<%:Model.EditGroupData15%>"  class="form-control input-custom corners-inputs obligatorio" placeholder="" >
                                                                            <span class="input-group-btn">
                                                                             <a class="btn btn-default" id="ContacNew">+</a>
                                                                           </span>
                                                                         </div>
                                                                       </div>
-
-
-                                                                  
-
 
                                                                       <div class="btn-group col-xs-12 col-sm-6 col-md-4 col-lg-3" role="group">
                                                                           <span><small>Group Coordinator </small></span>

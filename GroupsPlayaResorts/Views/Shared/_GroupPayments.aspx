@@ -20,9 +20,7 @@
            
         });
 
-        $('#paymetnsul').find('a:first').parent().addClass('active');
-        $('#paymetnsul').find('a:first').attr('href');
-        $($('#paymetnsul').find('a:first').attr('href')).addClass('active');
+
     });
 
 </script>
@@ -39,20 +37,10 @@
 
                                                       <br>
                                                       <br>
-                                                      <ul class="nav nav-tabs dual-select" role="tablist" id="paymetnsul">
-                                                        <% 
-                                                            If (ViewData("idseccion3subseccion1consult_permission") IsNot Nothing And ViewData("idseccion3subseccion1consult_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" id=""paylist_head"" class=""col-xs-4 col-md-4 active""><a href=""#paylist"" aria-controls=""paylist"" role=""tab"" data-toggle=""tab"">Payment List</a></li>")
-                                                            End If
-                                                            
-                                                            If (ViewData("idseccion3subseccion1new_permission") IsNot Nothing And ViewData("idseccion3subseccion1new_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" id=""lpayfrm_head"" class=""col-xs-4 col-md-4""><a href=""#lpayfrm"" aria-controls=""lpayfrm"" role=""tab"" data-toggle=""tab"">Add Payment</a></li>")
-                                                            End If
-                                                            
-                                                            If (ViewData("idseccion3subseccion1edit_permission") IsNot Nothing And ViewData("idseccion3subseccion1edit_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" id=""payshead"" class=""col-xs-4 col-md-4""><a href=""#pays"" aria-controls=""pays"" role=""tab"" data-toggle=""tab"">Payments Scheme</a></li>")
-                                                            End If
-                                                        %>
+                                                      <ul class="nav nav-tabs dual-select" role="tablist" >
+                                                        <li role="presentation" id="paylist_head" class="col-xs-4 col-md-4 active"><a href="#paylist" aria-controls="paylist" role="tab" data-toggle="tab">Payment List</a></li>
+                                                        <li role="presentation" id="lpayfrm_head" class="col-xs-4 col-md-4"><a href="#lpayfrm" aria-controls="lpayfrm" role="tab" data-toggle="tab">Add Payment</a></li>
+                                                        <li role="presentation" id="payshead" class="col-xs-4 col-md-4"><a href="#pays" aria-controls="pays" role="tab" data-toggle="tab">Payments Scheme</a></li>
                                                       </ul>
                                                       <!-- end Nav tabs -->
 

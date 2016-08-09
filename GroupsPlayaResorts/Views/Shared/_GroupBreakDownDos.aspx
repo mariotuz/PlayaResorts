@@ -311,16 +311,16 @@
 
 <% End Using %>     
                                                             
-<div id="AJAX_ContainerBreakDown"> 
+                                                            <div id="AJAX_ContainerBreakDown"> 
 
                                                  
                                                                     
                                                                 
-        <% Html.RenderPartial("BreakDownConsult", Model)%>
+                                                                 <% Html.RenderPartial("BreakDownConsult", Model)%>
 
 
                                                                     
-</div>
+                                                           </div>
 
 
       

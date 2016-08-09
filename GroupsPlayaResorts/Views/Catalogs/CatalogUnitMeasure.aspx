@@ -144,9 +144,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -184,21 +181,14 @@
                                       
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new measure list-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion13new_permission") IsNot Nothing and ViewData("idseccion4subseccion13new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newMeasure_head""><a href=""#newMeasure"" aria-controls=""newMeasure"" role=""tab"" data-toggle=""tab"">Add New Unit Measure </a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion13consult_permission") IsNot Nothing And ViewData("idseccion4subseccion13consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""measureList_head""><a href=""#measureList"" aria-controls=""measureList"" role=""tab"" data-toggle=""tab"">List Units Measure</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newMeasure_head" class="active"><a href="#newMeasure" aria-controls="newMeasure" role="tab" data-toggle="tab">Add New Unit Measure </a></li>
+                                      <li role="presentation" id="measureList_head"><a href="#measureList" aria-controls="measureList" role="tab" data-toggle="tab">List Units Measure</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add measure list sections-->
 
                                          
-                                            <div role="tabpanel" class="tab-pane" id="newMeasure"><!--Star tab form measure-->
+                                            <div role="tabpanel" class="tab-pane active" id="newMeasure"><!--Star tab form measure-->
 
                                             <% Using Ajax.BeginForm("CatalogUnitMeasure", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>
 

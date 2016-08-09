@@ -66,26 +66,6 @@ Public Class CatalogCompanies
     Private EditCompanieStateValue As String
     Private EditCompanieIATAValue As String
     Private EditCompanieZIPValue As String
-    Private CityValue As String
-    Private AddressValue As String
-
-    Public Property City() As String
-        Get
-            Return CityValue
-        End Get
-        Set(ByVal value As String)
-            CityValue = value
-        End Set
-    End Property
-
-    Public Property Address() As String
-        Get
-            Return AddressValue
-        End Get
-        Set(ByVal value As String)
-            AddressValue = value
-        End Set
-    End Property
 
     <Required(ErrorMessage:=" <div class=""col-xs-12 col-sm-6 col-md-4 col-lg-4 alert alert-warning alert-dismissible fade in""   id=""AlertError"" role=""alert""><button type=""button"" class=""close"" data-dismiss=""alert"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button><strong>Warning! *{0}</strong> is required.</div> ")> _
    <Display(Name:="Company Name")> _
@@ -990,17 +970,10 @@ End Class
 
 Public Class CatalogContacts
     Private ListContacts As List(Of CatalogContactList)
-    Private ListCountry As List(Of SelectListItem)
-    Private ListState As List(Of SelectListItem)
     Private ContactNameValue As String
     Private ContactEmailValue As String
     Private ContactPhoneValue As String
     Private ContactWhosaleCompanyValue As String
-    Private CountryValue As String
-    Private StateValue As String
-    Private PostalCodeValue As String
-    Private CityValue As String
-    Private AddressValue As String
 
     Private EditContactNameValue As String
     Private EditContactEmailValue As String
@@ -1009,69 +982,6 @@ Public Class CatalogContacts
     Private EditContactTypeValue As String
     Private EditContactWhosaleCompanyValue As String
     Private EditContactidValue As String
-
-    Public Property PostalCode() As String
-        Get
-            Return PostalCodeValue
-        End Get
-        Set(ByVal value As String)
-            PostalCodeValue = value
-        End Set
-    End Property
-
-    Public Property Country() As String
-        Get
-            Return CountryValue
-        End Get
-        Set(ByVal value As String)
-            CountryValue = value
-        End Set
-    End Property
-
-    Public Property State() As String
-        Get
-            Return StateValue
-        End Get
-        Set(ByVal value As String)
-            StateValue = value
-        End Set
-    End Property
-
-    Public Property ListCountryin() As List(Of SelectListItem)
-        Get
-            Return ListCountry
-        End Get
-        Set(ByVal value As List(Of SelectListItem))
-            ListCountry = value
-        End Set
-    End Property
-
-    Public Property ListStatein() As List(Of SelectListItem)
-        Get
-            Return ListState
-        End Get
-        Set(ByVal value As List(Of SelectListItem))
-            ListState = value
-        End Set
-    End Property
-
-    Public Property City() As String
-        Get
-            Return CityValue
-        End Get
-        Set(ByVal value As String)
-            CityValue = value
-        End Set
-    End Property
-
-    Public Property Address() As String
-        Get
-            Return AddressValue
-        End Get
-        Set(ByVal value As String)
-            AddressValue = value
-        End Set
-    End Property
 
     Public Property ListContactsin() As List(Of CatalogContactList)
         Get
@@ -1203,6 +1113,8 @@ Public Class CatalogContacts
     End Property
 
 End Class
+
+
 
 Public Class CatalogChannelList
 
@@ -1689,57 +1601,6 @@ Public Class CatalogContactList
     Public Contact_TypeValue As String
     Public Contact_CompanyWhosaleValue As String
 
-    Private CountryValue As String
-    Private StateValue As String
-    Private PostalCodeValue As String
-    Private CityValue As String
-    Private AddressValue As String
-
-    Public Property PostalCode() As String
-        Get
-            Return PostalCodeValue
-        End Get
-        Set(ByVal value As String)
-            PostalCodeValue = value
-        End Set
-    End Property
-
-    Public Property Country() As String
-        Get
-            Return CountryValue
-        End Get
-        Set(ByVal value As String)
-            CountryValue = value
-        End Set
-    End Property
-
-    Public Property State() As String
-        Get
-            Return StateValue
-        End Get
-        Set(ByVal value As String)
-            StateValue = value
-        End Set
-    End Property
-
-    Public Property City() As String
-        Get
-            Return CityValue
-        End Get
-        Set(ByVal value As String)
-            CityValue = value
-        End Set
-    End Property
-
-    Public Property Address() As String
-        Get
-            Return AddressValue
-        End Get
-        Set(ByVal value As String)
-            AddressValue = value
-        End Set
-    End Property
-
 
     Public Property Id_Contact() As String
         Get
@@ -1799,6 +1660,7 @@ Public Class CatalogContactList
 
 
 End Class
+
 
 Public Class Login
 

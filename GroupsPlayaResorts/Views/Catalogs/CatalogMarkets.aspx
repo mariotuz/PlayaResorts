@@ -140,9 +140,6 @@
 
 
          $(document).ready(function () {
-             $('#myTab').find('a:first').parent().addClass('active');
-             $('#myTab').find('a:first').attr('href');
-             $($('#myTab').find('a:first').attr('href')).addClass('active');
 
              $('.load-container').fadeOut('slow');
 
@@ -179,25 +176,34 @@
                                 <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new Market list of users-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion3new_permission") IsNot Nothing and ViewData("idseccion4subseccion3new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newmarket_head""><a href=""#newmarket"" aria-controls=""newmarket"" role=""tab"" data-toggle=""tab"">Add New Market</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion3consult_permission") IsNot Nothing And ViewData("idseccion4subseccion3consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""marketlist_head""><a href=""#marketlist"" aria-controls=""marketlist"" role=""tab"" data-toggle=""tab"">Markets List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newmarket_head" class="active"><a href="#newmarket" aria-controls="newmarket" role="tab" data-toggle="tab">Add New Market</a></li>
+                                      <li role="presentation" id="marketlist_head"><a href="#marketlist" aria-controls="marketlist" role="tab" data-toggle="tab">Markets List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add market list sections-->
-                                            <div role="tabpanel" class="tab-pane" id="newmarket"><!--Star tab form Market-->
+
+                                         
+
+                                            <div role="tabpanel" class="tab-pane active" id="newmarket"><!--Star tab form Market-->
+
+                                               
+
+
                                               <% Using Ajax.BeginForm("CatalogMarkets", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"}, New With {.id = "FormAddMarket"})%>   
+
+
                                                   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 alert-wrap" > 
+
                                                       <%: Html.ValidationMessageFor(Function(m) m.MarketName)%>
-                                                      <%: Html.ValidationMessageFor(Function(m) m.MarketKey)%>
+                                                 <%: Html.ValidationMessageFor(Function(m) m.MarketKey)%>
+
+
                                                     <div class="clear"></div>
                                                 </div> 
+
+                                                
+
+
 
                                                 <header class="encabezado"><h2 class="md-display-2">Add New Market</h2><p> </p></header>
 
@@ -236,13 +242,30 @@
 
 
                                             <div role="tabpanel" class="tab-pane" id="marketlist"> <!-- Start Market list-->
+
                                                 <header class="encabezado"><h2 class="md-display-2">Markets List</h2><p> </p></header>
+
                                                 <center>
+
                                                          <div id="AJAX_Container1">
+
+                                                                          
+                                                 
                                                                   <% Html.RenderPartial("MarketsTable", Model)%>  
+                                                                   
+                                                  
+
                                                         </div>
+
+                                              
+                                                 
+                                                 
                                                 </center>
+
+                                                
                                             </div><!--end Market list--> 
+
+
                                       <div class="clear"></div>  
 
                                          

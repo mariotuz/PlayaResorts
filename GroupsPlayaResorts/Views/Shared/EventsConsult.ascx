@@ -47,13 +47,16 @@
 
 </script>
 
-    <div id="toolbar-events">
-        <%-- <button id="vpay" class="btn btn-default">Add Products & Services</button>--%>
-        <% If (ViewData("idseccion2subseccion1delete_permission") IsNot Nothing And ViewData("idseccion2subseccion1delete_permission") > 0) Then
-            Response.Write("<a id=""cancelevent"" class=""btn btn-default"">Cancel Payment</a>")
-        End If%>
-        <!--action btns table here-->
-    </div>
+
+
+
+                                                                    <div id="toolbar-events">
+
+                                                                     <%-- <button id="vpay" class="btn btn-default">Add Products & Services</button>--%>
+                                                                      <a id="cancelevent" class="btn btn-default">Cancel Payment</a>
+
+                                                                     <!--action btns table here-->
+                                                                  </div>
 
      <table class="table-no-bordered" id="table-log" data-toggle="table" data-show-export="false"  data-pagination="true" data-search="true" data-show-columns="false" data-toolbar="#toolbar-events" data-filter-control="false"  data-page-size="20"   >
                                                                         <thead>

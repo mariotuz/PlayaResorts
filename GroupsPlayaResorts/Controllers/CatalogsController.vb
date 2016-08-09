@@ -17,11 +17,9 @@ Imports System.ServiceModel
 
 Namespace GroupsPlayaResorts
     Public Class CatalogsController
-        'Inherits System.Web.Mvc.Controller
-        Inherits ApplicationController
-        'Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
-        'Public conn = New SqlConnection(coonString)
-        'Private classQuery As New Querys.Qrys
+        Inherits System.Web.Mvc.Controller
+        Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
+        Public conn = New SqlConnection(coonString)
 
         '
         ' GET: /Catalogs
@@ -30,12 +28,12 @@ Namespace GroupsPlayaResorts
             Return View()
         End Function
 
+
         '
         ' GET: /Catalogs/CatalogUsers
 
         <Authorize()> _
         Function CatalogUsers() As ActionResult
-            UserPermissions("1,2,3,4")
 
             Dim model = New CataloUsers
 
@@ -96,14 +94,40 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogUsers
         <HttpPost()> _
         Public Function CatalogUsers(ByVal model As CataloUsers, ByVal UserButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If UserButtons = "Insert_User" Then
+
+                Dim CommandUser
+
+                Dim Query As String = "Insert into Cat_Users(Id_User, User_Name, Last_Name , User_Email , User_EmailHyatt , Num_Employee , User_Login , Password , Id_Profile , Id_Channel , Max_Discount , Type_User , Date_Register , Status_Data ) VALUES(@Id_User, @User_Name, @Last_Name , @User_Email , @User_EmailHyatt , @Num_Employee , @User_Login , @Password , @Id_Profile , @Id_Channel , @Max_Discount , @Type_User , @Date_Register ,@Status_Data )"
+
+                CommandUser = New SqlCommand(Query, conn)
+                CommandUser.Parameters.AddWithValue("@Id_User", ConsecutiveValue("Id_User", "Cat_Users"))
+                CommandUser.Parameters.AddWithValue("@User_Name", model.UserName)
+                CommandUser.Parameters.AddWithValue("@Last_Name", model.UserLastname)
+                CommandUser.Parameters.AddWithValue("@User_Email", model.UserEmail)
+                CommandUser.Parameters.AddWithValue("@User_EmailHyatt", Request("UsarEmailHyatt"))
+                CommandUser.Parameters.AddWithValue("@Num_Employee", model.UserNumberEmploye)
+                CommandUser.Parameters.AddWithValue("@User_Login", model.UserLogin)
+                CommandUser.Parameters.AddWithValue("@Password", model.UserPassword)
+                CommandUser.Parameters.AddWithValue("@Id_Profile", Request("userprofile"))
+                CommandUser.Parameters.AddWithValue("@Id_Channel", Request("userchannel"))
+                CommandUser.Parameters.AddWithValue("@Max_Discount", model.UserMaxDiscount)
+                CommandUser.Parameters.AddWithValue("@Type_User", Request("usertypeuser"))
+                CommandUser.Parameters.AddWithValue("@Date_Register", Date.Now())
+                CommandUser.Parameters.AddWithValue("@Status_Data", 1)
+
+
+
+                conn.Open()
+
                 Try
-                    conn.Open()
-                    Dim Query = classQuery.GetQueryString("InsertUser", "querys.xml", Request)
-                    Dim CommandUser = New SqlCommand(Query, conn)
-                    Dim Results = CommandUser.ExecuteReader()
+                    CommandUser.ExecuteNonQuery()
+
+                    Dim QueryDos As String = "Select a.Id_User , a.[User_Name]+' '+a.Last_Name as NameUser, a.User_Login , b.Profile_Name from Cat_Users a left join Cat_Profiles b on a.Id_Profile=b.Id_Profile order by NameUser "
+                    Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+                    Dim Results = CommandUserDos.ExecuteReader()
                     Dim UsersList = New List(Of CatalogUsersList)
 
                     If Results.HasRows Then
@@ -112,7 +136,7 @@ Namespace GroupsPlayaResorts
                         End While
                     End If
 
-                    Results.Close()
+
 
                     model.ListUsersin = UsersList
 
@@ -120,7 +144,7 @@ Namespace GroupsPlayaResorts
 
                 Catch ex As Exception
 
-                    Return Content("Error")
+                    Return Content(ex.ToString)
 
                 End Try
 
@@ -252,48 +276,7 @@ Namespace GroupsPlayaResorts
             Return View(model)
         End Function
 
-        <HttpPost()> _
-        Public Function EditUser(ByVal model As CataloUsers) As ActionResult
-            UserPermissions("1,2,3,4")
-            conn.Open()
 
-            Dim Query = classQuery.GetQueryString("UpdateUser", "querys.xml", Request)
-            Dim CommandUser = New SqlCommand(Query, conn)
-            Dim Results = CommandUser.ExecuteReader()
-            Dim UsersList = New List(Of CatalogUsersList)
-
-            If Results.HasRows Then
-                While Results.Read()
-                    UsersList.Add(New CatalogUsersList With {.Id_User = Results("Id_User"), .User_Name = Results("NameUser"), .User_Login = Results("User_Login"), .User_Profile = Results("Profile_Name")})
-                End While
-            End If
-
-            Results.Close()
-
-            model.ListUsersin = UsersList
-            conn.Close()
-
-            Return PartialView("UsersTable", model)
-        End Function
-
-        <HttpPost()> _
-        Public Function GetDataUser() As ActionResult
-            conn.Open()
-
-            Dim UserXml As String
-            Dim XMLResult As System.Xml.XmlReader
-            Dim Query = classQuery.GetQueryString("GetDataUser", "querys.xml", Request)
-            Dim Command = New SqlCommand(Query, conn)
-
-            XMLResult = Command.ExecuteXmlReader()
-            XMLResult.Read()
-
-            UserXml = XMLResult.ReadOuterXml()
-
-            conn.Close()
-
-            Return Content(UserXml.ToString)
-        End Function
 
         '
         ' POST: /Catalogs/CatalogProfiles
@@ -302,72 +285,46 @@ Namespace GroupsPlayaResorts
 
 
             If ProfileButtons = "Insert_Profile" Then
+
+                Dim CommandUser
+
+                Dim Query As String = "Insert into Cat_Profiles(Id_Profile, Profile_Name, Status_Data ) VALUES(@Id_Profile,@Profile_Name ,@Status_Data )"
+
+                CommandUser = New SqlCommand(Query, conn)
+                CommandUser.Parameters.AddWithValue("@Id_Profile", ConsecutiveValue("Id_Profile", "Cat_Profiles"))
+                CommandUser.Parameters.AddWithValue("@Profile_Name", model.ProfileName)
+                CommandUser.Parameters.AddWithValue("@Status_Data", 1)
+
+
+
                 conn.Open()
 
-                Dim sqlParameters() As Object
-                Dim Query = classQuery.GetQueryString("InsertProfile", "querys.xml", Request, sqlParameters)
-                Dim CommandUser = New SqlCommand(Query, conn)
+                Try
+                    CommandUser.ExecuteNonQuery()
 
-                CommandUser.CommandType = CommandType.StoredProcedure
-                Dim param As System.Data.SqlClient.SqlParameter
-                For Each param In sqlParameters
-                    CommandUser.Parameters.Add(param)
-                Next
+                    Dim QueryDos As String = "Select *from Cat_Profiles where Status_Data=1 order by Id_Profile desc  "
+                    Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+                    Dim Results = CommandUserDos.ExecuteReader()
+                    Dim ProfilesList = New List(Of CatalogProfileList)
 
-                Dim Results = CommandUser.ExecuteReader()
-                Dim ProfileList = New List(Of CatalogProfileList)
-
-                If Results.HasRows Then
-                    While Results.Read()
-                        ProfileList.Add(New CatalogProfileList With {.Id_Profile = Results("Id_Profile"), .Profile_Name = Results("Profile_Name")})
-                    End While
-                End If
-
-                Results.Close()
-
-                model.ListProfilein = ProfileList
-
-                Return PartialView("ProfileTable", model)
-
-                'Dim CommandUser
-
-                'Dim Query As String = "Insert into Cat_Profiles(Id_Profile, Profile_Name, Status_Data ) VALUES(@Id_Profile,@Profile_Name ,@Status_Data )"
-
-                'CommandUser = New SqlCommand(Query, conn)
-                'CommandUser.Parameters.AddWithValue("@Id_Profile", ConsecutiveValue("Id_Profile", "Cat_Profiles"))
-                'CommandUser.Parameters.AddWithValue("@Profile_Name", model.ProfileName)
-                'CommandUser.Parameters.AddWithValue("@Status_Data", 1)
+                    If Results.HasRows Then
+                        While Results.Read()
+                            ProfilesList.Add(New CatalogProfileList With {.Id_Profile = Results("Id_Profile"), .Profile_Name = Results("Profile_Name")})
+                        End While
+                    End If
 
 
+                    model.ListProfilein = ProfilesList
 
-                'conn.Open()
+                    Return PartialView("ProfileTable", model)
 
-                'Try
-                '    CommandUser.ExecuteNonQuery()
+                Catch ex As Exception
 
-                '    Dim QueryDos As String = "Select *from Cat_Profiles where Status_Data=1 order by Id_Profile desc  "
-                '    Dim CommandUserDos = New SqlCommand(QueryDos, conn)
-                '    Dim Results = CommandUserDos.ExecuteReader()
-                '    Dim ProfilesList = New List(Of CatalogProfileList)
+                    Return Content("Error")
 
-                '    If Results.HasRows Then
-                '        While Results.Read()
-                '            ProfilesList.Add(New CatalogProfileList With {.Id_Profile = Results("Id_Profile"), .Profile_Name = Results("Profile_Name")})
-                '        End While
-                '    End If
+                End Try
 
-
-                '    model.ListProfilein = ProfilesList
-
-                '    Return PartialView("ProfileTable", model)
-
-                'Catch ex As Exception
-
-                '    Return Content("Error")
-
-                'End Try
-
-                'conn.close()
+                conn.close()
 
 
             End If
@@ -495,55 +452,12 @@ Namespace GroupsPlayaResorts
             Return View(model)
         End Function
 
-        <HttpPost()> _
-        Public Function EditProfile(ByVal model As CatalogProfile) As ActionResult
-            UserPermissions("1,2,3,4")
-            conn.Open()
-
-            Dim Query = classQuery.GetQueryString("UpdateProfile", "querys.xml", Request)
-            Dim CommandUser = New SqlCommand(Query, conn)
-            Dim Results = CommandUser.ExecuteReader()
-            Dim ProfileList = New List(Of CatalogProfileList)
-
-            If Results.HasRows Then
-                While Results.Read()
-                    ProfileList.Add(New CatalogProfileList With {.Id_Profile = Results("Id_Profile"), .Profile_Name = Results("Profile_Name")})
-                End While
-            End If
-
-            Results.Close()
-
-            model.ListProfilein = ProfileList
-            conn.Close()
-
-            Return PartialView("ProfileTable", model)
-        End Function
-
-        <HttpPost()> _
-        Public Function GetDataProfile() As ActionResult
-            conn.Open()
-
-            Dim Xml As String
-            Dim XMLResult As System.Xml.XmlReader
-            Dim Query = classQuery.GetQueryString("GetDataProfile", "querys.xml", Request)
-            Dim Command = New SqlCommand(Query, conn)
-
-            XMLResult = Command.ExecuteXmlReader()
-            XMLResult.Read()
-
-            Xml = XMLResult.ReadOuterXml()
-
-            conn.Close()
-
-            Return Content(Xml.ToString)
-        End Function
-
 
         '
         ' GET: /Catalogs/CatalogProfiles
         <Authorize()> _
         Function CatalogProfiles() As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             Dim model = New CatalogProfile
 
@@ -583,7 +497,6 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogProperties
         <Authorize()> _
         Function CatalogProperties() As ActionResult
-            UserPermissions("1,2,3,4")
             Return View()
         End Function
 
@@ -592,8 +505,9 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogPromotions
         <Authorize()> _
         Function CatalogPromotions() As ActionResult
-            UserPermissions("1,2,3,4")
             Dim model = New CataloPromo
+
+
             conn.Open()
 
             Try
@@ -639,7 +553,6 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogPromotions
         <HttpPost()> _
         Public Function CatalogPromotions(ByVal model As CataloPromo, ByVal PromoButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
 
             If PromoButtons = "Insert_Promo" Then
 
@@ -648,6 +561,7 @@ Namespace GroupsPlayaResorts
                 Dim Query As String = "Exec sp_T_New_Promo @Hotel='" + Request("HotelSelect") + "' , @Ano=" + Request("promoyear") + " , @Descuento=" + model.PromoDiscount.ToString + " , @VigenciaI='" + Request("datetimepickerdate1text") + "' , @VigenciaF='" + Request("datetimepickerdate2text") + "' , @BookingI='" + Request("datetimepickerdate3text") + "' , @BookingF='" + Request("datetimepickerdate4text") + "'   "
 
                 CommandUser = New SqlCommand(Query, conn)
+               
 
                 conn.Open()
 
@@ -700,7 +614,7 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogMarkets
         <Authorize()> _
         Function CatalogMarkets() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogMarket
 
 
@@ -743,7 +657,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogMarkets
         <HttpPost()> _
         Public Function CatalogMarkets(ByVal model As CatalogMarket, ByVal MarketButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
             If MarketButtons = "Insert_Market" Then
 
                 Dim CommandUser
@@ -919,8 +833,9 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogGroupType
         <Authorize()> _
         Function CatalogGroupType() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogGroupType
+
 
             conn.Open()
 
@@ -957,7 +872,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogGroupType
         <HttpPost()> _
         Public Function CatalogGroupType(ByVal model As CatalogGroupType, ByVal GroupTypeButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If GroupTypeButtons = "Insert_GroupType" Then
 
@@ -1135,7 +1050,6 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogWholesale
         <Authorize()> _
         Function CatalogWholesale() As ActionResult
-            UserPermissions("1,2,3,4")
             Return View()
         End Function
 
@@ -1143,8 +1057,8 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogCompanies
         <Authorize()> _
         Function CatalogCompanies() As ActionResult
-            UserPermissions("1,2,3,4")
             Dim model = New CatalogCompanies
+
 
             conn.Open()
 
@@ -1218,32 +1132,40 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogCompanies
         <HttpPost()> _
         Public Function CatalogCompanies(ByVal model As CatalogCompanies, ByVal CompanyButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
             If CompanyButtons = "Insert_Company" Then
+
+                Dim CommandUser
+
+                Dim Query As String = "Insert into Cat_Companies( Company_Name, Company_Key, Company_IATA , Company_ZIP , Company_Country , Company_State , Status_Data ) VALUES( @Company_Name, @Company_Key , @Company_IATA , @Company_ZIP , @Company_Country , @Company_State ,@Status_Data )"
+
+                CommandUser = New SqlCommand(Query, conn)
+                'CommandUser.Parameters.AddWithValue("@Id_Company", ConsecutiveValue("Id_Company", "Cat_Companies"))
+                CommandUser.Parameters.AddWithValue("@Company_Name", model.CompanieName)
+                CommandUser.Parameters.AddWithValue("@Company_Key", model.CompanieKey)
+                CommandUser.Parameters.AddWithValue("@Company_IATA", Request("CompanieIATA"))
+                CommandUser.Parameters.AddWithValue("@Company_ZIP", Request("CompanieZipCode"))
+                CommandUser.Parameters.AddWithValue("@Company_Country", Request("companycountry"))
+                CommandUser.Parameters.AddWithValue("@Company_State", Request("companystate"))
+                CommandUser.Parameters.AddWithValue("@Status_Data", 1)
+
+
                 conn.Open()
 
                 Try
+                    CommandUser.ExecuteNonQuery()
+
+                    Dim QueryDos As String = "Select *from Cat_Companies where Status_Data=1 order by Id_Company desc  "
+                    Dim CommandUserDos = New SqlCommand(QueryDos, conn)
+                    Dim Results = CommandUserDos.ExecuteReader()
                     Dim CompaniesList = New List(Of CatalogCompanyList)
-
-                    Dim sqlParameters() As Object
-                    Dim queryTest = classQuery.GetQueryString("InsertCompany", "querys.xml", Request, sqlParameters)
-                    Dim CommandTest = New SqlCommand(queryTest, conn)
-
-                    CommandTest.CommandType = CommandType.StoredProcedure
-
-                    Dim param As System.Data.SqlClient.SqlParameter
-
-                    For Each param In sqlParameters
-                        CommandTest.Parameters.Add(param)
-                    Next
-
-                    Dim Results = CommandTest.ExecuteReader()
 
                     If Results.HasRows Then
                         While Results.Read()
                             CompaniesList.Add(New CatalogCompanyList With {.Id_Company = Results("Id_Company"), .Company_Name = Results("Company_Name"), .Company_Key = Results("Company_Key")})
                         End While
                     End If
+
 
                     model.ListCompaniesin = CompaniesList
 
@@ -1265,7 +1187,7 @@ Namespace GroupsPlayaResorts
 
                 Dim CommandUser
 
-                Dim Query As String = "Update Cat_Companies set Company_Name=@Company_Name, Company_Key=@Company_Key , Company_IATA=@Company_IATA , Company_ZIP=@Company_ZIP , Company_Country=@Company_Country, Company_State=@Company_State, Company_city = @City, Company_Address = @Address, Modified_by = @User  where Id_Company=" + Request("EditComapnyID") + " "
+                Dim Query As String = "Update Cat_Companies set Company_Name=@Company_Name, Company_Key=@Company_Key , Company_IATA=@Company_IATA , Company_ZIP=@Company_ZIP , Company_Country=@Company_Country, Company_State=@Company_State  where Id_Company=" + Request("EditComapnyID") + " "
 
                 CommandUser = New SqlCommand(Query, conn)
 
@@ -1275,9 +1197,6 @@ Namespace GroupsPlayaResorts
                 CommandUser.Parameters.AddWithValue("@Company_ZIP", Request("EditCompanieZipCode"))
                 CommandUser.Parameters.AddWithValue("@Company_Country", Request("editcompanycountry"))
                 CommandUser.Parameters.AddWithValue("@Company_State", Request("editcompanystate"))
-                CommandUser.Parameters.AddWithValue("@City", Request("city"))
-                CommandUser.Parameters.AddWithValue("@Address", Request("address"))
-                CommandUser.Parameters.AddWithValue("@User", Request("user"))
 
                 conn.Open()
 
@@ -1318,7 +1237,7 @@ Namespace GroupsPlayaResorts
 
                 Try
 
-                    Dim QueryDos As String = "Select Id_Company,Company_Name,Company_Key,Company_IATA,Company_ZIP,Company_Country,Company_State,ISNULL(Company_City,'') as Company_City,ISNULL(Company_Address,'') as Company_Address,ISNULL(Modified_by,'') as Modified_by from Cat_Companies where Status_Data=1 and Id_Company=" + Request("CompanyRadio") + "  "
+                    Dim QueryDos As String = "Select *from Cat_Companies where Status_Data=1 and Id_Company=" + Request("CompanyRadio") + "  "
                     Dim CommandUserDos = New SqlCommand(QueryDos, conn)
                     Dim Results = CommandUserDos.ExecuteReader()
 
@@ -1332,8 +1251,6 @@ Namespace GroupsPlayaResorts
                             model.EditCompanieZIP = Results("Company_ZIP")
                             model.EditCompanieCountry = Results("Company_Country")
                             model.EditCompanieState = Results("Company_State")
-                            model.City = Results("Company_City")
-                            model.Address = Results("Company_Address")
                         End While
                     End If
                     Results.Close()
@@ -1431,12 +1348,14 @@ Namespace GroupsPlayaResorts
             Return View(model)
         End Function
 
+
+
         '
         ' GET: /Catalogs/CatalogContacts
         <Authorize()> _
         Function CatalogContacts() As ActionResult
-            UserPermissions("1,2,3,4")
             Dim model = New CatalogContacts
+
 
             conn.Open()
 
@@ -1449,47 +1368,11 @@ Namespace GroupsPlayaResorts
 
                 If Results.HasRows Then
                     While Results.Read()
-                        ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany"), .PostalCode = Results("Postal_code"), .Country = Results("Country"), .State = Results("State"), .City = Results("City"), .Address = Results("Address")})
+                        ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany")})
                     End While
                 End If
 
-                Results.Close()
 
-                Dim QueryCountry As String = "select distinct ISO_2CAR,ISO_PAIS_ES from ISO_3166 where ISO_PAIS_ES is not null and ISO_2CAR in('MX','US') order by ISO_PAIS_ES  "
-
-                Dim CommandCountry = New SqlCommand(QueryCountry, conn)
-                Dim ResultCountry = CommandCountry.ExecuteReader()
-                Dim CountryLis = New List(Of SelectListItem)
-
-                If ResultCountry.HasRows Then
-                    While ResultCountry.Read()
-
-                        CountryLis.Add(New SelectListItem With {.Text = ResultCountry("ISO_PAIS_ES"), .Value = ResultCountry("ISO_2CAR")})
-
-                    End While
-
-                End If
-                ResultCountry.Close()
-
-                Dim QueryState As String = "select Iso_pais_region,region from ISO_3166 where region<>'' and ISO_2CAR in('MX','US')  order by REGION  "
-
-
-                Dim CommandState = New SqlCommand(QueryState, conn)
-                Dim ResultState = CommandState.ExecuteReader()
-                Dim EstadoLis = New List(Of SelectListItem)
-
-                If ResultState.HasRows Then
-                    While ResultState.Read()
-
-                        EstadoLis.Add(New SelectListItem With {.Text = ResultState("region"), .Value = ResultState("Iso_pais_region")})
-
-                    End While
-
-                End If
-                ResultState.Close()
-
-                model.ListCountryin = CountryLis
-                model.ListStatein = EstadoLis
                 model.ListContactsin = ContactList
 
                 Return View(model)
@@ -1510,12 +1393,12 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogContacts
         <HttpPost()> _
         Public Function CatalogContacts(ByVal model As CatalogContacts, ByVal ContactButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
             If ContactButtons = "Insert_Contact" Then
 
                 Dim CommandUser
 
-                Dim Query As String = "Insert into Cat_Contacts( Contact_Name, Contact_Email, Phone_Uno, Phone_Dos , Contact_Type, Contact_Agency, Contact_Company , Status_Data , postal_code, country, state, city, address, modified_by) VALUES( @Contact_Name, @Contact_Email, @Phone_Uno, @Phone_Dos , @Contact_Type, @Contact_Agency, @Contact_Company , @Status_Data , @postal_code, @country, @state, @city, @address, @modifiedby)"
+                Dim Query As String = "Insert into Cat_Contacts( Contact_Name, Contact_Email, Phone_Uno, Phone_Dos , Contact_Type, Contact_Agency, Contact_Company , Status_Data ) VALUES( @Contact_Name, @Contact_Email, @Phone_Uno, @Phone_Dos , @Contact_Type, @Contact_Agency, @Contact_Company , @Status_Data )"
 
                 CommandUser = New SqlCommand(Query, conn)
                 'CommandUser.Parameters.AddWithValue("@Id_Company", ConsecutiveValue("Id_Company", "Cat_Companies"))
@@ -1524,14 +1407,8 @@ Namespace GroupsPlayaResorts
                 CommandUser.Parameters.AddWithValue("@Phone_Uno", model.ContactPhone)
                 CommandUser.Parameters.AddWithValue("@Phone_Dos", Request("phonedos"))
                 CommandUser.Parameters.AddWithValue("@Contact_Type", Request("ContactType"))
+    
                 CommandUser.Parameters.AddWithValue("@Status_Data", 1)
-
-                CommandUser.Parameters.AddWithValue("@postal_code", Request("postal_code"))
-                CommandUser.Parameters.AddWithValue("@country", Request("country"))
-                CommandUser.Parameters.AddWithValue("@state", Request("state"))
-                CommandUser.Parameters.AddWithValue("@city", Request("city"))
-                CommandUser.Parameters.AddWithValue("@address", Request("address"))
-                CommandUser.Parameters.AddWithValue("@modifiedby", Request("user"))
 
 
                 If Request("ContactType") = 1 Then
@@ -1556,47 +1433,11 @@ Namespace GroupsPlayaResorts
 
                     If Results.HasRows Then
                         While Results.Read()
-                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany"), .PostalCode = Results("Postal_code"), .Country = Results("Country"), .State = Results("State"), .City = Results("City"), .Address = Results("Address")})
+                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany")})
                         End While
                     End If
 
-                    Results.Close()
 
-                    Dim QueryCountry As String = "select distinct ISO_2CAR,ISO_PAIS_ES from ISO_3166 where ISO_PAIS_ES is not null and ISO_2CAR in('MX','US') order by ISO_PAIS_ES  "
-
-                    Dim CommandCountry = New SqlCommand(QueryCountry, conn)
-                    Dim ResultCountry = CommandCountry.ExecuteReader()
-                    Dim CountryLis = New List(Of SelectListItem)
-
-                    If ResultCountry.HasRows Then
-                        While ResultCountry.Read()
-
-                            CountryLis.Add(New SelectListItem With {.Text = ResultCountry("ISO_PAIS_ES"), .Value = ResultCountry("ISO_2CAR")})
-
-                        End While
-
-                    End If
-                    ResultCountry.Close()
-
-                    Dim QueryState As String = "select Iso_pais_region,region from ISO_3166 where region<>'' and ISO_2CAR in('MX','US')  order by REGION  "
-
-
-                    Dim CommandState = New SqlCommand(QueryState, conn)
-                    Dim ResultState = CommandState.ExecuteReader()
-                    Dim EstadoLis = New List(Of SelectListItem)
-
-                    If ResultState.HasRows Then
-                        While ResultState.Read()
-
-                            EstadoLis.Add(New SelectListItem With {.Text = ResultState("region"), .Value = ResultState("Iso_pais_region")})
-
-                        End While
-
-                    End If
-                    ResultState.Close()
-
-                    model.ListCountryin = CountryLis
-                    model.ListStatein = EstadoLis
                     model.ListContactsin = ContactList
 
                     Return PartialView("ContactsTable", model)
@@ -1617,7 +1458,7 @@ Namespace GroupsPlayaResorts
 
                 Dim CommandUser
 
-                Dim Query As String = "Update Cat_Contacts set Contact_Name=@Contact_Name, Contact_Email=@Contact_Email ,Phone_Uno=@Phone_Uno ,Phone_Dos=@Phone_Dos ,Contact_Type=@Contact_Type , Contact_Agency=@Contact_Agency , Contact_Company=@Contact_Company , Postal_code=@postal_code , Country=@Country, State=@State, City = @City, Address = @Address, Modified_by = @modifiedby where Id_Contact=" + Request("EditContactID") + " "
+                Dim Query As String = "Update Cat_Contacts set Contact_Name=@Contact_Name, Contact_Email=@Contact_Email ,Phone_Uno=@Phone_Uno ,Phone_Dos=@Phone_Dos ,Contact_Type=@Contact_Type , Contact_Agency=@Contact_Agency , Contact_Company=@Contact_Company where Id_Contact=" + Request("EditContactID") + " "
 
                 CommandUser = New SqlCommand(Query, conn)
 
@@ -1626,13 +1467,6 @@ Namespace GroupsPlayaResorts
                 CommandUser.Parameters.AddWithValue("@Phone_Uno", Request("Editcontacphoneuno"))
                 CommandUser.Parameters.AddWithValue("@Phone_Dos", Request("Editcontacphonedos"))
                 CommandUser.Parameters.AddWithValue("@Contact_Type", Request("EditContactType"))
-
-                CommandUser.Parameters.AddWithValue("@postal_code", Request("postal_code"))
-                CommandUser.Parameters.AddWithValue("@country", Request("country"))
-                CommandUser.Parameters.AddWithValue("@state", Request("state"))
-                CommandUser.Parameters.AddWithValue("@city", Request("city"))
-                CommandUser.Parameters.AddWithValue("@address", Request("address"))
-                CommandUser.Parameters.AddWithValue("@modifiedby", Request("user"))
 
 
                 If Request("EditContactType") = 1 Then
@@ -1658,54 +1492,18 @@ Namespace GroupsPlayaResorts
 
                     If Results.HasRows Then
                         While Results.Read()
-                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany"), .PostalCode = Results("Postal_code"), .Country = Results("Country"), .State = Results("State"), .City = Results("City"), .Address = Results("Address")})
+                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany")})
                         End While
                     End If
 
-                    Results.Close()
 
-                    Dim QueryCountry As String = "select distinct ISO_2CAR,ISO_PAIS_ES from ISO_3166 where ISO_PAIS_ES is not null and ISO_2CAR in('MX','US') order by ISO_PAIS_ES  "
-
-                    Dim CommandCountry = New SqlCommand(QueryCountry, conn)
-                    Dim ResultCountry = CommandCountry.ExecuteReader()
-                    Dim CountryLis = New List(Of SelectListItem)
-
-                    If ResultCountry.HasRows Then
-                        While ResultCountry.Read()
-
-                            CountryLis.Add(New SelectListItem With {.Text = ResultCountry("ISO_PAIS_ES"), .Value = ResultCountry("ISO_2CAR")})
-
-                        End While
-
-                    End If
-                    ResultCountry.Close()
-
-                    Dim QueryState As String = "select Iso_pais_region,region from ISO_3166 where region<>'' and ISO_2CAR in('MX','US')  order by REGION  "
-
-
-                    Dim CommandState = New SqlCommand(QueryState, conn)
-                    Dim ResultState = CommandState.ExecuteReader()
-                    Dim EstadoLis = New List(Of SelectListItem)
-
-                    If ResultState.HasRows Then
-                        While ResultState.Read()
-
-                            EstadoLis.Add(New SelectListItem With {.Text = ResultState("region"), .Value = ResultState("Iso_pais_region")})
-
-                        End While
-
-                    End If
-                    ResultState.Close()
-
-                    model.ListCountryin = CountryLis
-                    model.ListStatein = EstadoLis
                     model.ListContactsin = ContactList
 
                     Return PartialView("ContactsTable", model)
 
                 Catch ex As Exception
 
-                    Return Content(ex.ToString())
+                    Return Content("Error")
 
                 End Try
 
@@ -1735,51 +1533,9 @@ Namespace GroupsPlayaResorts
                             model.EditContactType = Results("Contact_Type")
                             model.EditContactid = Results("Id_Contact")
                             model.EditContactWhosaleCompany = Results("WhosaleCompany")
-                            model.PostalCode = Results("Postal_code")
-                            model.Country = Results("Country")
-                            model.State = Results("State")
-                            model.City = Results("City")
-                            model.Address = Results("Address")
+                            
                         End While
                     End If
-
-                    Results.Close()
-
-                    Dim QueryCountry As String = "select distinct ISO_2CAR,ISO_PAIS_ES from ISO_3166 where ISO_PAIS_ES is not null and ISO_2CAR in('MX','US') order by ISO_PAIS_ES  "
-
-                    Dim CommandCountry = New SqlCommand(QueryCountry, conn)
-                    Dim ResultCountry = CommandCountry.ExecuteReader()
-                    Dim CountryLis = New List(Of SelectListItem)
-
-                    If ResultCountry.HasRows Then
-                        While ResultCountry.Read()
-
-                            CountryLis.Add(New SelectListItem With {.Text = ResultCountry("ISO_PAIS_ES"), .Value = ResultCountry("ISO_2CAR")})
-
-                        End While
-
-                    End If
-                    ResultCountry.Close()
-
-                    Dim QueryState As String = "select Iso_pais_region,region from ISO_3166 where region<>'' and ISO_2CAR in('MX','US')  order by REGION  "
-
-
-                    Dim CommandState = New SqlCommand(QueryState, conn)
-                    Dim ResultState = CommandState.ExecuteReader()
-                    Dim EstadoLis = New List(Of SelectListItem)
-
-                    If ResultState.HasRows Then
-                        While ResultState.Read()
-
-                            EstadoLis.Add(New SelectListItem With {.Text = ResultState("region"), .Value = ResultState("Iso_pais_region")})
-
-                        End While
-
-                    End If
-                    ResultState.Close()
-
-                    model.ListCountryin = CountryLis
-                    model.ListStatein = EstadoLis
 
 
                     Return PartialView("ContactsModal", model)
@@ -1814,7 +1570,7 @@ Namespace GroupsPlayaResorts
 
                     If Results.HasRows Then
                         While Results.Read()
-                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany"), .PostalCode = Results("Postal_code"), .Country = Results("Country"), .State = Results("State"), .City = Results("City"), .Address = Results("Address")})
+                            ContactList.Add(New CatalogContactList With {.Id_Contact = Results("Id_Contact"), .Contact_Name = Results("Contact_Name"), .Contact_Email = Results("Contact_Email"), .Contact_Phone = Results("Phones"), .Contact_Type = Results("Contact_Type"), .Contact_CompanyWhosale = Results("WhosaleCompany")})
                         End While
                     End If
 
@@ -1842,16 +1598,17 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogPorS
         <Authorize()> _
         Function CatalogPorS() As ActionResult
-            UserPermissions("1,2,3,4")
             Return View()
         End Function
+
 
         '
         ' GET: /Catalogs/CatalogChannel
         <Authorize()> _
         Function CatalogChannel() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogChannel
+
 
             conn.Open()
 
@@ -1890,7 +1647,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogChannel
         <HttpPost()> _
         Public Function CatalogChannel(ByVal model As CatalogChannel, ByVal ChannelButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If ChannelButtons = "Insert_Channel" Then
 
@@ -2059,12 +1816,14 @@ Namespace GroupsPlayaResorts
             Return View(model)
         End Function
 
+
         '
         ' GET: /Catalogs/CatalogAgencyType
         <Authorize()> _
         Function CatalogAgencyType() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogAgencyType
+
 
             conn.Open()
 
@@ -2102,7 +1861,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogAgencyType
         <HttpPost()> _
         Public Function CatalogAgencyType(ByVal model As CatalogAgencyType, ByVal AgencyTypeButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If AgencyTypeButtons = "Insert_AgencyType" Then
 
@@ -2276,7 +2035,7 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogSupplier
         <Authorize()> _
         Function CatalogSupplier() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogSupplier
 
             conn.Open()
@@ -2351,7 +2110,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogSupplier
         <HttpPost()> _
         Public Function CatalogSupplier(ByVal model As CatalogSupplier, ByVal SupplierButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If SupplierButtons = "Insert_Supplier" Then
 
@@ -2590,7 +2349,7 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogDistribution
         <Authorize()> _
         Function CatalogDistribution() As ActionResult
-            UserPermissions("1,2,3,4")
+
             Dim model = New CatalogDistributionGroup
             Dim ListEmails = New List(Of SelectListItem)
 
@@ -2633,7 +2392,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogDistribution
         <HttpPost()> _
         Public Function CatalogDistribution(ByVal model As CatalogDistributionGroup, ByVal DistributionGroupsButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If DistributionGroupsButtons = "Insert_DistributionGroup" Then
 
@@ -2880,8 +2639,10 @@ Namespace GroupsPlayaResorts
         ' GET: /Catalogs/CatalogUnitMeasure
         <Authorize()> _
         Function CatalogUnitMeasure() As ActionResult
-            UserPermissions("1,2,3,4")
+
+
             Dim model = New CatalogDetail
+
 
             conn.Open()
 
@@ -2919,7 +2680,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Catalogs/CatalogUnitMeasure
         <HttpPost()> _
         Public Function CatalogUnitMeasure(ByVal model As CatalogDetail, ByVal UnitMeasureButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             If UnitMeasureButtons = "Insert_Measure" Then
 
@@ -2979,6 +2740,7 @@ Namespace GroupsPlayaResorts
 
                 CommandUser.Parameters.AddWithValue("@Unit_Name", Request("EditUnitMeasure"))
                 CommandUser.Parameters.AddWithValue("@Unit_Key", Request("EditUnitKey"))
+       
 
                 conn.Open()
 

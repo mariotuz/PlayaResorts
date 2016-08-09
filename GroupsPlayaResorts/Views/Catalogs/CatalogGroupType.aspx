@@ -145,9 +145,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -183,21 +180,16 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs"  role="tablist" id="myTab"><!--menu tab new group type list of users-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion4new_permission") isnot Nothing and ViewData("idseccion4subseccion4new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newgroup_head""><a href=""#newgroup"" aria-controls=""newgroup"" role=""tab"" data-toggle=""tab"">Add New Group Type</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion4consult_permission") IsNot Nothing And ViewData("idseccion4subseccion4consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""grouplist_head"" ><a href=""#grouplist"" aria-controls=""grouplist"" role=""tab"" data-toggle=""tab"">Group Types List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newgroup_head" class="active"><a href="#newgroup" aria-controls="newgroup" role="tab" data-toggle="tab">Add New Group Type</a></li>
+                                      <li role="presentation" id="grouplist_head" ><a href="#grouplist" aria-controls="grouplist" role="tab" data-toggle="tab">Group Types List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add group type list sections-->
 
+                                      
 
-                                            <div role="tabpanel" class="tab-pane" id="newgroup"><!--Star tab form group type-->
+
+                                            <div role="tabpanel" class="tab-pane active" id="newgroup"><!--Star tab form group type-->
 
                                             <% Using Ajax.BeginForm("CatalogGroupType", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>   
 

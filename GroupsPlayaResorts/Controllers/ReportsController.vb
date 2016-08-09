@@ -19,10 +19,9 @@ Imports Microsoft.Reporting.WebForms
 
 Namespace GroupsPlayaResorts
     Public Class ReportsController
-        'Inherits System.Web.Mvc.Controller
-        'Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
-        'Public conn = New SqlConnection(coonString)
-        Inherits ApplicationController
+        Inherits System.Web.Mvc.Controller
+        Public coonString = ConfigurationManager.ConnectionStrings("RemoteConnectionString").ConnectionString
+        Public conn = New SqlConnection(coonString)
 
 
         '
@@ -37,7 +36,9 @@ Namespace GroupsPlayaResorts
         ' GET: /Reports/ReportsDetail
         <Authorize()> _
         Function ReportsDetail() As ActionResult
-            UserPermissions("1,2,3,4")
+
+
+
 
             Return View()
         End Function
@@ -47,7 +48,7 @@ Namespace GroupsPlayaResorts
         ' POST: /Group/ReportsDetail
         <HttpPost()> _
         Public Function ReportsDetail(ByVal ReportButtons As String) As ActionResult
-            UserPermissions("1,2,3,4")
+
 
             Dim Reporte_Prueba = New LocalReport()
             Dim Ubicacion

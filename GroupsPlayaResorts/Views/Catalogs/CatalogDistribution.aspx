@@ -142,9 +142,6 @@
 
 
           $(document).ready(function () {
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
 
               $('.load-container').fadeOut('slow');
 
@@ -178,20 +175,13 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new distribution list-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion12new_permission") IsNot Nothing And ViewData("idseccion4subseccion12new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newDistribution_head""><a href=""#newDistribution"" aria-controls=""newDistribution"" role=""tab"" data-toggle=""tab"">Add New Distribution Group</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion12consult_permission") IsNot Nothing And ViewData("idseccion4subseccion12consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""distributionList_head""><a href=""#distributionList"" aria-controls=""distributionList"" role=""tab"" data-toggle=""tab"">Distribution Groups List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newDistribution_head" class="active"><a href="#newDistribution" aria-controls="newDistribution" role="tab" data-toggle="tab">Add New Distribution Group</a></li>
+                                      <li role="presentation" id="distributionList_head"><a href="#distributionList" aria-controls="distributionList" role="tab" data-toggle="tab">Distribution Groups List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add Cdistribution list sections-->
 
-                                            <div role="tabpanel" class="tab-pane" id="newDistribution"><!--Star tab form distribution-->
+                                            <div role="tabpanel" class="tab-pane active" id="newDistribution"><!--Star tab form distribution-->
 
                                                 <% Using Ajax.BeginForm("CatalogDistribution", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>
 

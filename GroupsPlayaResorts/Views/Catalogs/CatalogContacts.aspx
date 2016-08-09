@@ -180,10 +180,6 @@
                   }
               });
 
-              $('#myTab').find('a:first').parent().addClass('active');
-              $('#myTab').find('a:first').attr('href');
-              $($('#myTab').find('a:first').attr('href')).addClass('active');
-
               $('.load-container').fadeOut('slow');
 
           });
@@ -217,20 +213,13 @@
                               <div role="tabpanel" class="col-md-12 minheight group-tabs"><!--Start  tabs-panel 125-->
 
                                     <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab"><!--menu tab new Contact list-->
-                                        <%
-                                            If (ViewData("idseccion4subseccion7new_permission") IsNot Nothing And ViewData("idseccion4subseccion7new_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""newcontacts_head""><a href=""#newcontacs"" aria-controls=""newcontacs"" role=""tab"" data-toggle=""tab"">Add New Contact</a></li>")
-                                            End If
-                                            
-                                            If (ViewData("idseccion4subseccion7consult_permission") IsNot Nothing And ViewData("idseccion4subseccion7consult_permission") > 0) Then
-                                                Response.Write("<li role=""presentation"" id=""contactList_head"" ><a href=""#contactList"" aria-controls=""contactList"" role=""tab"" data-toggle=""tab"">Contact List</a></li>")
-                                            End If
-                                        %>
+                                      <li role="presentation" id="newcontacts_head" class="active"><a href="#newcontacs" aria-controls="newcontacs" role="tab" data-toggle="tab">Add New Contact</a></li>
+                                      <li role="presentation" id="contactList_head" ><a href="#contactList" aria-controls="contactList" role="tab" data-toggle="tab">Contact List</a></li>
                                     </ul>
 
                                     <div class="tab-content "><!--Start tabs add contact list sections-->
 
-                                            <div role="tabpanel" class="tab-pane" id="newcontacs"><!--Star tab form contact-->
+                                            <div role="tabpanel" class="tab-pane active" id="newcontacs"><!--Star tab form contact-->
 
                     <% Using Ajax.BeginForm("CatalogContacts", "Catalogs", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"})%>   
 
@@ -296,52 +285,6 @@
                                                   
                                                         </div>
                                                       </div>
-
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>Postal Code *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="postal_code" name="postal_code" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="btn-group col-xs-12 col-sm-4 col-md-4 col-lg-4" role="group">
-                                                        <span><small>Country *</small></span>
-                                                        <select class="selectpicker" name="country" id="country" data-width="100%">
-                                                            <%
-                                                        Dim i As Integer
-                                                        For i = 0 To Model.ListCountryin.Count - 1
-                                                            %>
-                                                            <option  value="<%:Model.ListCountryin.Item(i).Value%>"><%:Model.ListCountryin.Item(i).Text%></option>             
-                                                            <% Next %>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="btn-group col-xs-12 col-sm-4 col-md-4 col-lg-4" role="group">
-                                                        <span><small>State *</small></span>
-                                                        <select class="selectpicker" name="state" id="state" data-width="100%">
-                                                            <%
-                                                        For i = 0 To Model.ListStatein.Count - 1
-                                                            %>
-                                                            <option  value="<%:Model.ListStatein.Item(i).Value%>"><%:Model.ListStatein.Item(i).Text%></option>             
-                                                            <% Next%>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>City *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="city" name="city" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                                                        <span><small>Address *</small></span>
-                                                        <div class="input-group  btn-group col-xs-12 col-md-12">
-                                                            <input type="text" id="address" name="address" class="form-control input-custom corners-inputs" placeholder="" >
-                                                        </div>
-                                                    </div>
-
-                                                    <input type="hidden" name="user" value="<%: Session.Item("UserName")%>"/>
                                                       
                                                       <div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                                         <br>

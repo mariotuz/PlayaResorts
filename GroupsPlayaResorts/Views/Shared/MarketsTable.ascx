@@ -33,15 +33,11 @@
 
 
  <div id="toolbar">
-     <% 
-         If (ViewData("idseccion4subseccion3edit_permission") IsNot Nothing And ViewData("idseccion4subseccion3edit_permission") > 0) Then
-             Response.Write("<button id=""EditRequestMarket""  name=""MarketButtons"" value=""Edit_Request_Market"" class=""btn btn-default"" ><i class=""fa fa-pencil-square-o""></i> Edit</button>")
-         End If
-         
-         If (ViewData("idseccion4subseccion3delete_permission") IsNot Nothing And ViewData("idseccion4subseccion3delete_permission") > 0) Then
-             Response.Write("<a id=""DeleteRequestMarket""  class=""btn btn-default"">Delete</a>")
-         End If
-     %>
+
+                                                  <button id="EditRequestMarket"  name="MarketButtons" value="Edit_Request_Market" class="btn btn-default" ><i class="fa fa-pencil-square-o"></i> Edit</button>
+                                                 
+                                                  <a id="DeleteRequestMarket"  class="btn btn-default">Delete</a>
+                                                                                           
  </div> 
 
 

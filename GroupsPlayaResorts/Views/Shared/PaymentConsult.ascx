@@ -60,15 +60,8 @@
                                                             <header class=""><h2 class="md-display-2">Payment List</h2></header>
                                                                   <div id="toolbar-pay">
 
-                                                                      <%
-                                                                          If (ViewData("idseccion3subseccion1validate_permission") IsNot Nothing And ViewData("idseccion3subseccion1validate_permission") > 0) Then
-                                                                              Response.Write("<a id=""ValidatePayment"" class=""btn btn-default"">Validate Payment</a>")
-                                                                          End If
-                                                                          
-                                                                          If (ViewData("idseccion3subseccion1delete_permission") IsNot Nothing And ViewData("idseccion3subseccion1delete_permission") > 0) Then
-                                                                              Response.Write("<a id=""CancelPayment"" class=""btn btn-default"">Cancel Payment</a>")
-                                                                          End If
-                                                                      %>
+                                                                      <a id="ValidatePayment" class="btn btn-default">Validate Payment</a>
+                                                                      <a id="CancelPayment" class="btn btn-default">Cancel Payment</a>
 
                                                                      <!--action btns table here-->
                                                                   </div>

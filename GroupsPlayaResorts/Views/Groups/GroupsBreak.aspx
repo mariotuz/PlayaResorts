@@ -476,8 +476,7 @@
 
     <script>
         var d = new Date();
-        //document.getElementById("date").innerHTML = d.toDateString();
-        $("#date").html(d.toDateString());
+        document.getElementById("date").innerHTML = d.toDateString();
     </script>
 
     <!--select whith icons-->

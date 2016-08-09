@@ -33,16 +33,11 @@
 
 
  <div id="toolbar">
-      <%
-          If (ViewData("idseccion4subseccion9edit_permission") IsNot Nothing And ViewData("idseccion4subseccion9edit_permission") > 0) Then
-              Response.Write("<button id=""EditRequestChannel""  name=""ChannelButtons"" value=""Edit_Request_Channel"" class=""btn btn-default"" ><i class=""fa fa-pencil-square-o""></i> Edit</button>")
-          End If
-                                            
-          If (ViewData("idseccion4subseccion9delete_permission") IsNot Nothing And ViewData("idseccion4subseccion9delete_permission") > 0) Then
-              Response.Write("<a id=""DeleteRequestChannel""  class=""btn btn-default"">Delete</a>")
-          End If
-    %>
-    <%--  <button id="info" type="button" class="btn btn-default" data-toggle="modal" data-target="#infoModalmeasure">View info</button>--%>
+
+                                                  <button id="EditRequestChannel"  name="ChannelButtons" value="Edit_Request_Channel" class="btn btn-default" ><i class="fa fa-pencil-square-o"></i> Edit</button>
+                                                  <%--  <button id="info" type="button" class="btn btn-default" data-toggle="modal" data-target="#infoModalmeasure">View info</button>--%>
+                                                  <a id="DeleteRequestChannel"  class="btn btn-default">Delete</a>
+                                                                                           
  </div> 
 
                                         <table class="table-no-bordered" id="table-list"

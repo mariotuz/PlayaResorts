@@ -1,12 +1,5 @@
 ﻿<%@ Page Language="VB" Inherits="System.Web.Mvc.ViewPage" %>
 
-<script>
-    $(function () {
-        $('#eventsul').find('a:first').parent().addClass('active');
-        $('#eventsul').find('a:first').attr('href');
-        $($('#eventsul').find('a:first').attr('href')).addClass('active');
-    });
-</script>
 
                                           <div role="tabpanel"><!-- Start Contentainer tabs-->
                                                       <!-- Start Nav tabs -->
@@ -19,15 +12,9 @@
 
                                                       <br>
                                                       <br>
-                                                      <ul class="nav nav-tabs dual-select" role="tablist" id="eventsul">
-                                                        <% 
-                                                            If (ViewData("idseccion2subseccion1consult_permission") IsNot Nothing And ViewData("idseccion2subseccion1consult_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" id=""eventlist_head"" class=""col-xs-6 col-md-6 active""><a href=""#eventlist"" aria-controls=""eventlist"" role=""tab"" data-toggle=""tab"">Events List</a></li>")
-                                                            End If
-                                                            If (ViewData("idseccion2subseccion1new_permission") IsNot Nothing And ViewData("idseccion2subseccion1new_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" id=""eventfrm_head"" class=""col-xs-6 col-md-6""><a href=""#eventfrm"" aria-controls=""eventfrm"" role=""tab"" data-toggle=""tab"">Add New Event</a></li>")
-                                                            End If
-                                                        %>
+                                                      <ul class="nav nav-tabs dual-select" role="tablist" >
+                                                        <li role="presentation" id="eventlist_head" class="col-xs-6 col-md-6 active"><a href="#eventlist" aria-controls="eventlist" role="tab" data-toggle="tab">Events List</a></li>
+                                                        <li role="presentation" id="eventfrm_head" class="col-xs-6 col-md-6"><a href="#eventfrm" aria-controls="eventfrm" role="tab" data-toggle="tab">Add New Event</a></li>
                                                         <%--<li role="presentation" id="servprod_head" class="col-xs-4 col-md-4"><a href="#servprod" aria-controls="servprod" role="tab" data-toggle="tab">Products & Services List</a></li>--%>
                                                         <%--<li role="presentation" class="col-xs-6 col-md-3"><a href="#locksalon" aria-controls="locksalon" role="tab" data-toggle="tab">Lock of Ballroom</a></li>--%>
                                                       </ul>
@@ -35,8 +22,8 @@
 
                                                       <!-- Start Tab panes -->
                                                       <div class="tab-content"><br>
-                                                          <% If (ViewData("idseccion2subseccion1consult_permission") IsNot Nothing And ViewData("idseccion2subseccion1consult_permission") > 0) Then %>
-                                                                <div role="tabpanel" class="tab-pane active" id="eventlist"><!-- Start events list tabs-->
+
+                                                            <div role="tabpanel" class="tab-pane active" id="eventlist"><!-- Start events list tabs-->
                                                                  <header class=""><h2 class="md-display-2">Events List</h2></header>
                                                                   <div class="toolbar">
                                                                      <!--action btns table here-->
@@ -52,11 +39,9 @@
 
 
                                                             </div><!-- end events list tabs-->
-                                                          <% End If%>
 
-                                                          <% If (ViewData("idseccion2subseccion1new_permission") IsNot Nothing And ViewData("idseccion2subseccion1new_permission") > 0) Then%>
-                                                                  <div role="tabpanel" class="tab-pane" id="eventfrm"><!-- Start generet form events tabs-->
-                                                                <header class=""> <h2 class="md-display-2">Add New Event</h2><p> </p></header>
+                                                            <div role="tabpanel" class="tab-pane" id="eventfrm"><!-- Start generet form events tabs-->
+                                                              <header class=""> <h2 class="md-display-2">Add New Event</h2><p> </p></header>
 
                                                                   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
                                                                     <span><small>Event name *</small></span>
@@ -240,7 +225,6 @@
 
 
                                                             </div><!-- end generet form events tabs-->
-                                                         <% End If%>
 
                                                             <div role="tabpanel" class="tab-pane" id="servprod"><!-- Start events product tabs-->
                                                                  <header class=""><h2 class="md-display-2">Add New Product & Service</h2><p></p></header>

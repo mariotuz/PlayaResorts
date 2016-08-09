@@ -8,7 +8,6 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
     <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
     <LastUsedPlatform>Any CPU</LastUsedPlatform>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>\\1.0.2.34\f$\website\GroupsPlayaResorts</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
     <File Include="bin/Content/Reports/Contract.rdlc">
@@ -44,29 +43,20 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
     <File Include="bin/Content/Reports/EnrollmentForm.rdlc">
       <publishTime>04/23/2016 11:42:12</publishTime>
     </File>
-    <File Include="bin/Content/Reports/EnrollmentForm39.rdlc">
-      <publishTime>07/09/2016 12:00:23</publishTime>
-    </File>
     <File Include="bin/Content/Reports/EnrollmentFormDirectClient.rdlc">
       <publishTime>03/31/2016 10:26:08</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/EnrollmentFormDirectClient39.rdlc">
-      <publishTime>07/09/2016 12:00:27</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormDirectClientMICE.rdlc">
       <publishTime>04/01/2016 15:32:25</publishTime>
     </File>
-    <File Include="bin/Content/Reports/EnrollmentFormDirectClientMICEV2.rdlc">
-      <publishTime>07/08/2016 16:29:07</publishTime>
-    </File>
     <File Include="bin/Content/Reports/EnrollmentFormDirectClientV2.rdlc">
-      <publishTime>07/09/2016 10:01:45</publishTime>
+      <publishTime>05/02/2016 02:15:18</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormMICE.rdlc">
       <publishTime>04/01/2016 15:32:00</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormMICEV2.rdlc">
-      <publishTime>07/08/2016 16:29:08</publishTime>
+      <publishTime>05/02/2016 02:14:01</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormRespaldo.rdlc">
       <publishTime>03/18/2016 04:28:34</publishTime>
@@ -75,7 +65,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>04/01/2016 02:18:40</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormTOSpecial2V2.rdlc">
-      <publishTime>07/09/2016 11:48:50</publishTime>
+      <publishTime>04/25/2016 18:12:21</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormTOSpecialMICE.rdlc">
       <publishTime>04/01/2016 15:29:39</publishTime>
@@ -84,10 +74,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>05/02/2016 02:33:39</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormTOSpecialV2.rdlc">
-      <publishTime>07/08/2016 16:43:39</publishTime>
+      <publishTime>05/02/2016 02:32:51</publishTime>
     </File>
     <File Include="bin/Content/Reports/EnrollmentFormV2.rdlc">
-      <publishTime>07/09/2016 11:23:12</publishTime>
+      <publishTime>05/01/2016 17:38:59</publishTime>
     </File>
     <File Include="bin/Content/Reports/ErollmentFormDirectClientMICEV2.rdlc">
       <publishTime>05/02/2016 02:33:55</publishTime>
@@ -103,96 +93,6 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
     </File>
     <File Include="bin/Content/Reports/LookRoomGCR.rdlc">
       <publishTime>12/28/2015 02:51:52</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/Contract.rdlc">
-      <publishTime>10/12/2015 04:25:48</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractGCR.rdlc">
-      <publishTime>02/15/2016 11:40:10</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractGPR.rdlc">
-      <publishTime>02/15/2016 11:29:02</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractRPR.rdlc">
-      <publishTime>12/16/2015 05:24:52</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractTRC.rdlc">
-      <publishTime>12/16/2015 05:25:12</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractZLJ.rdlc">
-      <publishTime>12/29/2015 12:42:38</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractZVC.rdlc">
-      <publishTime>12/29/2015 12:42:14</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractZVJ.rdlc">
-      <publishTime>02/15/2016 11:29:06</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractZVL.rdlc">
-      <publishTime>02/15/2016 11:59:32</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ContractZVP.rdlc">
-      <publishTime>02/15/2016 11:23:42</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentForm.rdlc">
-      <publishTime>04/23/2016 11:42:12</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormDirectClient.rdlc">
-      <publishTime>03/31/2016 10:26:08</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormDirectClientMICE.rdlc">
-      <publishTime>04/01/2016 15:32:25</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormMICE.rdlc">
-      <publishTime>04/01/2016 15:32:00</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormRespaldo.rdlc">
-      <publishTime>03/18/2016 04:28:34</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormTOSpecial.rdlc">
-      <publishTime>07/08/2016 16:24:41</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/EnrollmentFormTOSpecialMICE.rdlc">
-      <publishTime>04/01/2016 15:29:39</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/Proposal.rdlc">
-      <publishTime>10/14/2015 13:02:50</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalGCR.rdlc">
-      <publishTime>12/07/2015 10:28:42</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalGPR.rdlc">
-      <publishTime>12/07/2015 10:36:08</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalRPR.rdlc">
-      <publishTime>12/07/2015 11:21:46</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalTRC.rdlc">
-      <publishTime>12/07/2015 11:52:20</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalZLJ.rdlc">
-      <publishTime>12/07/2015 12:55:58</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalZVC.rdlc">
-      <publishTime>12/07/2015 12:17:14</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalZVJ.rdlc">
-      <publishTime>12/07/2015 12:43:50</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalZVL.rdlc">
-      <publishTime>12/07/2015 12:36:34</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormarts/ProposalZVP.rdlc">
-      <publishTime>12/16/2015 03:44:26</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormats2/EnrollmentFormTOSpecialMICEV2.rdlc">
-      <publishTime>07/08/2016 16:29:14</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormats2/EnrollmentFormV2_old.rdlc">
-      <publishTime>07/05/2016 15:02:12</publishTime>
-    </File>
-    <File Include="bin/Content/Reports/OldFormats2/ErollmentFormDirectClientMICEV2_old.rdlc">
-      <publishTime>07/04/2016 18:42:24</publishTime>
     </File>
     <File Include="bin/Content/Reports/Proposal.rdlc">
       <publishTime>10/14/2015 13:02:50</publishTime>
@@ -255,10 +155,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>06/29/2015 02:30:58</publishTime>
     </File>
     <File Include="bin/GroupsPlayaResorts.dll">
-      <publishTime>07/11/2016 11:42:27</publishTime>
+      <publishTime>06/23/2016 19:20:08</publishTime>
     </File>
     <File Include="bin/GroupsPlayaResorts.xml">
-      <publishTime>07/11/2016 11:42:27</publishTime>
+      <publishTime>06/23/2016 19:20:08</publishTime>
     </File>
     <File Include="bin/Microsoft.ReportViewer.Common.dll">
       <publishTime>08/27/2015 22:11:04</publishTime>
@@ -519,10 +419,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>10/12/2015 02:02:30</publishTime>
     </File>
     <File Include="GesaDataSet.xsc">
-      <publishTime>07/05/2016 11:33:35</publishTime>
+      <publishTime>04/22/2016 16:50:31</publishTime>
     </File>
     <File Include="GesaDataSet.xss">
-      <publishTime>07/05/2016 11:33:35</publishTime>
+      <publishTime>04/22/2016 16:50:31</publishTime>
     </File>
     <File Include="Global.asax">
       <publishTime>06/29/2015 02:30:52</publishTime>
@@ -1569,7 +1469,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/20/2015 17:30:20</publishTime>
     </File>
     <File Include="Views/Shared/_GroupGeneralViewDos.aspx">
-      <publishTime>07/04/2016 10:52:09</publishTime>
+      <publishTime>05/02/2016 10:30:09</publishTime>
     </File>
     <File Include="Views/Shared/_GroupGeneralViewDos_Respaldo.aspx">
       <publishTime>08/20/2015 02:46:28</publishTime>
@@ -1593,7 +1493,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>06/29/2015 02:30:52</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>07/11/2016 11:42:34</publishTime>
+      <publishTime>06/23/2016 19:27:45</publishTime>
     </File>
   </ItemGroup>
 </Project>

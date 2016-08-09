@@ -4,7 +4,41 @@
 
 
 <asp:Content ID="GroupDetailContent" ContentPlaceHolderID="MainContentGrupos" runat="server">
-    
+    <style type="text/css">
+  .tip {
+    display: block;
+    position: relative;
+    cursor:pointer;
+  }
+  .tip:hover:after {
+    bottom: 26px;
+    content: attr(data-tip); /* este es el texto que será mostrado */
+    left: 20%;
+    position: absolute;
+    z-index: 98;
+    /* el formato gráfico */
+    background: rgba(0,0,0, 1); /* el color de fondo */
+    border-radius: 5px;
+    color: #FFF; /* el color del texto */
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 5px 15px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+    width: 180px;
+  }
+  .tip:hover:before {
+    bottom: 20px;
+    content: "";
+    left: 22%;
+    position: absolute;
+    z-index: 99;
+    /* el triángulo inferior */
+    border: solid;
+    border-color: rgba(0,0,0, 1) transparent;
+    border-width: 6px 6px 0 6px;
+  }
+</style>
     <script src="<%: Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")%>" type="text/javascript"></script>
 
     <script src="<%: Url.Content("~/Scripts/jquery.validate.min.js")%>" type="text/javascript"></script>
@@ -95,8 +129,8 @@
 
               if (objParams.cambioGeneral || (!objParams.cambioGeneral && infoActual != objParams.dataPrev)) {
                   event.preventDefault();
-                  
-                  var optDialog = {
+
+                  bootbox.dialog({
                       message: i18n["msgChangeGeneralTab"],
                       buttons: {
                           buttonNo: {
@@ -109,28 +143,22 @@
                               callback: function () {
                                   location.reload();
                               }
-                          }
-                      }
-                  }
-
-                  if ("<%: ViewData("idseccion1subseccion1edit_permission") %>" != "" && "<%: ViewData("idseccion1subseccion1edit_permission") %>" > 0) {
-                      optDialog.buttons.buttonDiscard = {
-                          label: (!objParams.cambioLocal) ? i18n["btnDiscardChanges"] : i18n["btnSaveGroup"],
-                          className: (!objParams.cambioLocal) ? 'btn-gray' : 'btn-success',
-                          callback: function () {
-                              if (!objParams.cambioLocal) {
-                                  objParams.cambioGeneral = false;
-                                  objParams.dataPrev = infoActual;
-                                  $('#myTab a[href = "#' + activeTabGeneral + '"]').tab('show');
-                              } else {
-                                  objParams.dataPrev = infoActual;
-                                  $('#SaveGroup').click();
+                          }, buttonDiscard: {
+                              label: (!objParams.cambioLocal) ? i18n["btnDiscardChanges"] : i18n["btnSaveGroup"],
+                              className: (!objParams.cambioLocal) ? 'btn-gray' : 'btn-success',
+                              callback: function () {
+                                  if (!objParams.cambioLocal) {
+                                      objParams.cambioGeneral = false;
+                                      objParams.dataPrev = infoActual;
+                                      $('#myTab a[href = "#' + activeTabGeneral + '"]').tab('show');
+                                  } else {
+                                      objParams.dataPrev = infoActual;
+                                      $('#SaveGroup').click();
+                                  }
                               }
                           }
                       }
-                  }
-
-                  bootbox.dialog(optDialog);
+                  });
               }
           });
 
@@ -161,6 +189,8 @@
               if (groupID > 0) {
                   var tipoTarifa = $('#selectyperatecotizar').val();
 
+                  console.info(objParams.data);
+
                   if (tipoTarifa == 2 && (objParams.dataPrev == $('#form-group :input').serialize())) {
                       $('#rateshead > a:first').click();
                       return false;
@@ -171,6 +201,27 @@
           });
 
           $('#SaveGroup').on('click', function (e) {
+              
+              //Nuevo 
+              var number_rooms = ''
+              var available = ''
+
+              $("input[name$='List_Pax']").each(function () {
+                  number_rooms += $(this).val() + ','
+
+                  if (!$(this).attr('disabled'))
+                      available += 1 + ',';
+                  else
+                      available += 0 + ','
+             })
+
+              var inputs = '<input type="text" hidden="" value="' + available + '" name="DISPONIBILIDAD" id="DISPONIBILIDAD">'
+                            + '<input type="text" hidden="" value="' + number_rooms + '" name="NUMBER_ROOMS" id="NUMBER_ROOMS">';
+              $('#rates').append(inputs)
+              //Termina nuevo
+
+
+
               btnClickeado = 'SaveGroup';
 
               var totHabitaciones = 0;
@@ -212,6 +263,44 @@
               }
 
               formValida = 'form-group-info';
+
+              //Tiene que tener un contaco valido 
+              if (!_Validaciones.ValidaObligatorios(formValida)) {
+                  e.preventDefault();
+              }
+              else {
+
+                  var contact = $('#selectcontact').val();
+                  $('#selectcontact').autocomplete('search', contact);
+
+                  setTimeout(function () {
+                      $('.ui-corner-all').removeAttr('style');
+                  },500);
+
+
+
+                  var idelemento = CreaIdAleatorio();
+                  var encontrado = false;
+
+                  if ($('.ui-corner-all li').length == 0)
+                      encontrado = true;
+
+                  $('.ui-corner-all').each(function () {
+                      if ($(this).text() == contact) {
+                          encontrado = true;
+                      }
+                  });
+
+
+                  if (!encontrado) {
+                      e.preventDefault();
+                      $("body").prepend('<div class="alertUl alert-error alert' + idelemento + '"><strong>Error!</strong> Contact Not Valid.</div>');
+                      $('.alert' + idelemento).fadeIn("slow").delay(2000).fadeOut("slow");
+                      setTimeout(function () { $('.alert' + idelemento).remove(); }, 4000);
+                  }
+
+  
+              }
           });
 
           $('#SaveScheme').on('click', function () {
@@ -305,7 +394,6 @@
           });
 
 
-
           $('#selectcontact').autocomplete({
               source: function (request, response) {
                   $.ajax({
@@ -313,7 +401,9 @@
                       dataType: "json",
                       contentType: 'application/json, charset=utf-8',
                       data: {
-                          search: $("#selectcontact").val()
+                          search: $("#selectcontact").val(),
+                          cia: $("#selectcompany").val(),
+                          to: $("#WhosaleDetail").val()
                       },
                       success: function (data) {
 
@@ -332,14 +422,13 @@
           });
 
 
-
           $('#NumberNights').keyup(function () {
 
-              var dat = new Date($("#datetimepicker6text").val());
+              var dat = new Date(document.getElementById("datetimepicker6text").value);
 
               //var date = Date.UTC(dat.getFullYear, dat.getMonth, dat.getDate);
 
-              var daysnew = parseInt($("#NumberNights").val()) + 1;
+              var daysnew = parseInt(document.getElementById("NumberNights").value) + 1;
 
               if (daysnew == "") {
 
@@ -369,7 +458,7 @@
               if (datenew == 'NaN-NaN-NaN') {
                   datenew = '';
               }
-              $("#datetimepicker7text").val(datenew);
+              document.getElementById("datetimepicker7text").value = datenew;
               //$('#datetimepicker7').data("DateTimePicker").minDate(datenew);
               //alert(date);  
 
@@ -767,559 +856,77 @@
         }
 
 
-        
     </script>
 
-<%--<%  If Model.Accion = 12 Then%>
+    <script type="text/javascript">
 
-  <script type="text/javascript">
-      $(document).ready(function () {
+        $(document).ready(function () {
 
-          $('#checkmiceratesmodal40paxincentive').modal('show');
+            $("#selectstatuspayment").change(function () {
 
-          $("#form-grouphead").removeClass("active");
-          $("#form-group").removeClass("active");
+                if ($("#grupoidlabeltext").val() != "0") {
 
-          $("#form-grouphead-info").removeClass("disabledTab");
-          $("#form-group-info").removeClass("disabledTab");
+                    if ($("#selectstatuspayment").val() == "3") {
 
-          $("#rateshead").removeClass("disabledTab");
-          $("#rates").removeClass("disabledTab");
+                        $('#Paymentgroupchangestatuscancelmodal').modal('show');
 
-          $("#payshead").removeClass("disabledTab");
-          $("#pays").removeClass("disabledTab");
+                    }
+                    else {
 
-          $("#rateshead").addClass("active");
-          $("#rates").addClass("active");
+                        $('#Paymentgroupchangestatusmodal').modal('show');
 
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-
-<%--<%  If Model.Accion = 11 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $('#checkmiceratesmodal75pax').modal('show');
-
-          $("#form-grouphead").removeClass("active");
-          $("#form-group").removeClass("active");
-
-          $("#form-grouphead-info").removeClass("disabledTab");
-          $("#form-group-info").removeClass("disabledTab");
-
-          $("#rateshead").removeClass("disabledTab");
-          $("#rates").removeClass("disabledTab");
-
-          $("#payshead").removeClass("disabledTab");
-          $("#pays").removeClass("disabledTab");
-
-          $("#rateshead").addClass("active");
-          $("#rates").addClass("active");
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-
-<%--<%  If Model.Accion = 10 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $('#checkmiceratesmodal').modal('show');
-
-          $("#form-grouphead").removeClass("active");
-          $("#form-group").removeClass("active");
-
-          $("#form-grouphead-info").removeClass("disabledTab");
-          $("#form-group-info").removeClass("disabledTab");
-
-          $("#rateshead").removeClass("disabledTab");
-          $("#rates").removeClass("disabledTab");
-
-          $("#payshead").removeClass("disabledTab");
-          $("#pays").removeClass("disabledTab");
-
-          $("#rateshead").addClass("active");
-          $("#rates").addClass("active");
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-
-<%--<%  If Model.Accion = 9 Then %>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-
-          var str = "<%:Model.GroupCheckExist%>";
-          var res = str.split(",");
-
-          var i;
-
-          var idresults = "";
-
-          for (i = 0 ; i < res.length - 1; i++) {
-
-              idresults += '<a  target="_blank" href="<%: Url.Content("~/Groups/GroupDetail")%>?id=' + res[i] + '" class="btn btn-default" ><%:Model.GroupHotelNew + "000"%>' + res[i] + '</a>  ';
-          }
-
-          $('#existgroupmodalids').html(idresults);
-
-          $('#existgroupmodal').modal('show');
-
-          $("#form-grouphead-info").addClass("active");
-          $("#form-group-info").addClass("active");
-
-          $("#rateshead").removeClass("active");
-          $("#rates").removeClass("active");
-
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
-
-
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>
---%>
-
-<%--<%  If Model.Accion=1 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $('#existgroupmodal').modal('hide');
-
-          $("#form-grouphead-info").addClass("active");
-          $("#form-group-info").addClass("active");
-
-          $("#rateshead").removeClass("active");
-          $("#rates").removeClass("active");
-
-          //$('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
-
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-
-<%--<%  If Model.Accion=2 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $('#checkmiceratesmodal').modal('hide');
-          $('#checkmiceratesmodal75pax').modal('hide');
-          $('#checkmiceratesmodal40paxincentive').modal('hide');
-
-          $("#form-grouphead").removeClass("active");
-          $("#form-group").removeClass("active");
-
-          $("#form-grouphead-info").removeClass("disabledTab");
-          $("#form-group-info").removeClass("disabledTab");
-
-          $("#rateshead").removeClass("disabledTab");
-          $("#rates").removeClass("disabledTab");
-
-          $("#payshead").removeClass("disabledTab");
-          $("#pays").removeClass("disabledTab");
-
-          $("#rateshead").addClass("active");
-          $("#rates").addClass("active");
-
-          //alert($("#grupoidlabeltext").value);
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          if ($("#grupoidlabeltext").val("0") || $("#grupoidlabeltext").val(0) || $("#grupoidlabeltext").val("")) {
-
-              //$('#grupoidlabel').html("<%:Model.GroupHotelNew%>");
-          }
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-
-<%--<%  If Model.Accion = 3 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $("#form-grouphead-info").removeClass("disabledTab");
-          $("#form-group-info").removeClass("disabledTab");
-
-          $("#rateshead").removeClass("disabledTab");
-          $("#rates").removeClass("disabledTab");
-
-          $("#payshead").removeClass("disabledTab");
-          $("#pays").removeClass("disabledTab");
-
-          $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000" + Model.GroupId.ToString%>");
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
-
-      });
-
-     </script>
-
-<%  End If%>
---%>
-
-<%--<%  If Model.Accion=4 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-<%--<%  If Model.Accion=5 Then%>
-
-  <script type="text/javascript">
-      $(document).ready(function () {
-
-          //$("#form-grouphead-info").addClass("active");
-          //$("#form-group-info").addClass("active");
-
-          //$("#rateshead").removeClass("active");
-          //$("#rates").removeClass("active");
-
-          $('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
-
-          $("#grupoidlabeltext").val("<%:Model.GroupId%>");
-
-          $("#grupoiddoc").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupdate").val("<%:Model.GroupId%>");
-
-          $("#grupoiddocupload").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdown").val("<%:Model.GroupId%>");
-
-          $("#grupoidbreakdowngroupby").val("<%:Model.GroupId%>");
-
-          $("#editbreakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#breakdownhotel").val("<%:Model.GroupIdLabel%>");
-
-          $("#grupoidlogbook").val("<%:Model.GroupId%>");
-
-          $("#grupoidpayments").val("<%:Model.GroupId%>");
-
-          $("#grupoidevents").val("<%:Model.GroupId%>");
-
-          $("#grupoidstatus").val("<%:Model.GroupId%>");
-
-          $("#grupohotelevents").val("<%:Model.GroupIdLabel%>");
-
-
-          $('#selectratetype').selectpicker();
-          $('#ComissionAgency').selectpicker();
-
-      });
-
-     </script>
-
-<%  End If%>--%>
-
-<script type="text/javascript">
-
-    $(document).ready(function () {
-
-        $("#selectstatuspayment").change(function () {
-
-            if ($("#grupoidlabeltext").val() != "0") {
-
-                if ($("#selectstatuspayment").val() == "3") {
-
-                    $('#Paymentgroupchangestatuscancelmodal').modal('show');
-
-                }
-                else {
-
-                    $('#Paymentgroupchangestatusmodal').modal('show');
+                    }
 
                 }
 
-            }
+
+            });
 
 
-        });
+            $("#selectstatusbook").change(function () {
 
+                if ($("#grupoidlabeltext").val() != "0") {
 
-        $("#selectstatusbook").change(function () {
+                    if ($("#selectstatusbook").val() == "3") {
 
-            if ($("#grupoidlabeltext").val() != "0") {
+                        $('#Bookgroupchangestatuscancelmodal').modal('show');
 
-                if ($("#selectstatusbook").val() == "3") {
+                    }
+                    else {
 
-                    $('#Bookgroupchangestatuscancelmodal').modal('show');
+                        $('#Bookgroupchangestatusmodal').modal('show');
 
-                }
-                else {
-
-                    $('#Bookgroupchangestatusmodal').modal('show');
-
-                }
-
-            }
-
-        });
-
-
-        $("#selectstatushotel").change(function () {
-
-            if ($("#grupoidlabeltext").val() != "0") {
-
-                if ($("#selectstatushotel").val() == "3") {
-
-                    $('#Hotelgroupchangestatuscancelmodal').modal('show');
-
-                }
-                else {
-
-                    $('#Hotelgroupchangestatusmodal').modal('show');
+                    }
 
                 }
 
-            }
+            });
 
-        });
 
-        //$('#grupoidlabel').html("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
+            $("#selectstatushotel").change(function () {
 
-        //console.log("<%:Model.GroupHotelNew + "000"+ Model.GroupId.ToString%>");
-        //console.log("<%:Model.Accion%>");
+                if ($("#grupoidlabeltext").val() != "0") {
 
-            if ($('#myTab').find('a[href=#generalview]').length == 0) {
-                $('#myTab').find('a:first').parent().addClass('active');
-                $('#myTab').find('a:first').attr('href');
-                $($('#myTab').find('a:first').attr('href')).addClass('active');
-            }
+                    if ($("#selectstatushotel").val() == "3") {
+
+                        $('#Hotelgroupchangestatuscancelmodal').modal('show');
+
+                    }
+                    else {
+
+                        $('#Hotelgroupchangestatusmodal').modal('show');
+
+                    }
+
+                }
+
+            });
+
+
 
         });
 
     </script>
-
       <div class="load-container load4"><div class="loader"></div></div>
       <div class="custom-tall">
       <div class="principal-bar">
@@ -1333,15 +940,16 @@
                 <h1><img src="<%: Url.Content("~/Content/img/icons/images/icon_group_title.png")%>"> Group : <span id="grupoidlabel"> </span></h1>
                 
 <% Using Ajax.BeginForm("GroupDetail", "Groups", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccessChangeStatus", .OnFailure = "OnFailureChangeStatus", .UpdateTargetId = "AJAX_ContainerStatus"}, New With {.autocomplete = "off"})%>
-                
-         
-    <input type="text" id="grupoidstatus" name="grupoidstatus" hidden value="0"   >
 
-    <div class="info-group" id="AJAX_ContainerStatus">
+                <input type="text" id="grupoidstatus" name="grupoidstatus" hidden value="0"   >
+
+                <div class="info-group" id="AJAX_ContainerStatus">
                         
-        <% Html.RenderPartial("StatusConsult", Model)%>
+                    <% Html.RenderPartial("StatusConsult", Model)%>
                         
-    </div>    
+                </div>   
+
+
           
  <div class="modal fade" id="Paymentgroupchangestatuscancelmodal" tabindex="-1" role="dialog" ><!-- Start info market modal-->
   <div class="modal-dialog">
@@ -1600,13 +1208,14 @@
                   <span> <%:Session("User_Name")%> </span>
                 </li>
               </ul>
+
               <ul class="sidebar-nav" id="sidebar"><!-- Menu content -->    
-                <li><a <%If Request.FilePath.ToString = "/Groups/Dashboard" Then Response.Write("class='active-menu '")%> href="<%: Url.Content("~/Groups/Dashboard")%>"><span><img src="<%: Url.Content("~/Content/img/icons/images/dashboard_off.png")%>"/></span>Dashboard<%--<span class="badge">4</span>--%></a></li>     
-                <li><a <%If Request.FilePath.ToString = "/Groups/GroupsList" Then Response.Write("class='active-menu '")%> href="<%: Url.Content("~/Groups/GroupsList")%>"><span><img src="<%: Url.Content("~/Content/img/icons/images/groups_off.png")%>"/></span>Groups<%--<span class="badge">4</span>--%></a></li>
-                <li><a <%If Request.FilePath.ToString = "/Events/EventsList" Then Response.Write("class='active-menu '")%> href="<%: Url.Content("~/Events/EventsList")%>"><span><img src="<%: Url.Content("~/Content/img/icons/images/events_off.png")%>"/> </span>Events<%--<span class="badge">1</span>--%></a></li>
-                <li><a <%If Request.FilePath.ToString = "/Catalogs/CatalogUsers" Or Request.FilePath.ToString = "/Catalogs/CatalogGroupType" Or Request.FilePath.ToString = "/Catalogs/CatalogProfiles" Or Request.FilePath.ToString = "/Catalogs/CatalogProperties" Or Request.FilePath.ToString = "/Catalogs/CatalogMarkets" Or Request.FilePath.ToString = "/Catalogs/CatalogWholesale" Or Request.FilePath.ToString = "/Catalogs/CatalogCompanies" Or Request.FilePath.ToString = "/Catalogs/CatalogContacts" Or Request.FilePath.ToString = "/Catalogs/CatalogPorS"  Or Request.FilePath.ToString = "/Catalogs/CatalogChannel" Or Request.FilePath.ToString = "/Catalogs/CatalogAgencyType" Or Request.FilePath.ToString = "/Catalogs/CatalogSupplier" Or Request.FilePath.ToString = "/Catalogs/CatalogDistribution" Or Request.FilePath.ToString = "/Catalogs/CatalogUnitMeasure" Then Response.Write("class='active-menu '")%> href="<%: Url.Content("~/Catalogs/CatalogUsers")%>"><span><img src="<%: Url.Content("~/Content/img/icons/images/cataloge_off.png")%>"/> </span>Catalogs</a></li>
-                <li><a <%If Request.FilePath.ToString = "/Reports/ReportsDetail" Then Response.Write("class='active-menu '")%> href="<%: Url.Content("~/Reports/ReportsDetail")%>"><span><img src="<%: Url.Content("~/Content/img/icons/images/payments_off.png")%>"/> </span>Reports</a></li>
-                <li id="log-out"><a href="<%: Url.Content("~/Home/LogOut")%>" ><span><img src="<%: Url.Content("~/Content/img/icons/images/logout.png")%>" /> </span>Logout</a></li>
+                <li><a <%If Request.FilePath.ToString = "/Groups/Dashboard" Then Response.Write("class='active-menu '")%> href="/Groups/Dashboard"><span><img src="<%: Url.Content("~/Content/img/icons/images/dashboard_off.png")%>"/></span>Dashboard<%--<span class="badge">4</span>--%></a></li>     
+                <li><a <%If Request.FilePath.ToString = "/Groups/GroupsList" Then Response.Write("class='active-menu '")%> href="/Groups/GroupsList"><span><img src="<%: Url.Content("~/Content/img/icons/images/groups_off.png")%>"/></span>Groups<%--<span class="badge">4</span>--%></a></li>
+                <li><a <%If Request.FilePath.ToString = "/Events/EventsList" Then Response.Write("class='active-menu '")%> href="/Events/EventsList"><span><img src="<%: Url.Content("~/Content/img/icons/images/events_off.png")%>"/> </span>Events<%--<span class="badge">1</span>--%></a></li>
+                <li><a <%If Request.FilePath.ToString = "/Catalogs/CatalogUsers" Or Request.FilePath.ToString = "/Catalogs/CatalogGroupType" Or Request.FilePath.ToString = "/Catalogs/CatalogProfiles" Or Request.FilePath.ToString = "/Catalogs/CatalogProperties" Or Request.FilePath.ToString = "/Catalogs/CatalogMarkets" Or Request.FilePath.ToString = "/Catalogs/CatalogWholesale" Or Request.FilePath.ToString = "/Catalogs/CatalogCompanies" Or Request.FilePath.ToString = "/Catalogs/CatalogContacts" Or Request.FilePath.ToString = "/Catalogs/CatalogPorS"  Or Request.FilePath.ToString = "/Catalogs/CatalogChannel" Or Request.FilePath.ToString = "/Catalogs/CatalogAgencyType" Or Request.FilePath.ToString = "/Catalogs/CatalogSupplier" Or Request.FilePath.ToString = "/Catalogs/CatalogDistribution" Or Request.FilePath.ToString = "/Catalogs/CatalogUnitMeasure" Then Response.Write("class='active-menu '")%> href="/Catalogs/CatalogUsers"><span><img src="<%: Url.Content("~/Content/img/icons/images/cataloge_off.png")%>"/> </span>Catalogs</a></li>
+                <li><a <%If Request.FilePath.ToString = "/Reports/ReportsDetail" Then Response.Write("class='active-menu '")%> href="/Reports/ReportsDetail"><span><img src="<%: Url.Content("~/Content/img/icons/images/payments_off.png")%>"/> </span>Reports</a></li>
+                <li id="log-out"><a href="/Home/LogOut" ><span><img src="<%: Url.Content("~/Content/img/icons/images/logout.png")%>" /> </span>Logout</a></li>
                 <!--<li><a><span><img src=""/> </span>Profile</a></li>-->
               </ul>
             </div><!--end Sidebar-->
@@ -1631,49 +1240,29 @@
 
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs my-tabs" role="tablist" id="myTab">
-                                  <% 
-                                      If (ViewData("idseccion1subseccion1consult_permission") IsNot Nothing And ViewData("idseccion1subseccion1consult_permission") > 0) Then
-                                          Response.Write("<li role=""presentation"" class=""active""><a href=""#generalview"" data-btnClick=""#donepay"" aria-controls=""generalview"" role=""tab"" data-toggle=""tab"">General View</a></li>")
-                                      End If
-                                      
-                                      If ((ViewData("idseccion1subseccion2new_permission") IsNot Nothing And ViewData("idseccion1subseccion2new_permission") > 0) OR (ViewData("idseccion1subseccion2consult_permission") IsNot Nothing And ViewData("idseccion1subseccion2consult_permission") > 0) or (ViewData("idseccion1subseccion2upload_permission") IsNot Nothing And ViewData("idseccion1subseccion2upload_permission") > 0)) Then
-                                          Response.Write("<li role=""presentation""><a href=""#documents"" aria-controls=""documents"" role=""tab"" data-toggle=""tab"">Documents / Formats</a></li>")
-                                      End If
-                                      
-                                      If ((ViewData("idseccion2subseccion1new_permission") IsNot Nothing And ViewData("idseccion2subseccion1new_permission") > 0) Or (ViewData("idseccion2subseccion1consult_permission") IsNot Nothing And ViewData("idseccion2subseccion1consult_permission") > 0) Or (ViewData("idseccion1subseccion2upload_permission") IsNot Nothing And ViewData("idseccion1subseccion2upload_permission") > 0)) Then
-                                          Response.Write("<li role=""presentation""><a href=""#events"" aria-controls=""events"" role=""tab"" data-toggle=""tab"">Events</a></li>")
-                                      End If
-                                      
-                                      If (ViewData("idseccion1subseccion3consult_permission") IsNot Nothing And ViewData("idseccion1subseccion3consult_permission") > 0) Then
-                                          Response.Write("<li role=""presentation""><a href=""#break"" aria-controls=""break"" role=""tab"" data-toggle=""tab"">Breakdown</a></li>")
-                                      End If
-                                      
-                                      If (ViewData("idseccion3subseccion1consult_permission") IsNot Nothing And ViewData("idseccion3subseccion1consult_permission") > 0) Then
-                                          Response.Write("<li role=""presentation""><a href=""#payment"" aria-controls=""payment"" role=""tab"" data-toggle=""tab"">Payments</a></li>")
-                                      End If
-                                      
-                                      If ((ViewData("idseccion1subseccion4new_permission") IsNot Nothing And ViewData("idseccion1subseccion4new_permission") > 0) Or (ViewData("idseccion1subseccion4consult_permission") IsNot Nothing And ViewData("idseccion1subseccion4consult_permission") > 0)) Then
-                                          Response.Write("<li role=""presentation""><a href=""#log"" aria-controls=""log"" role=""tab"" data-toggle=""tab"">LogBook</a></li>")
-                                      End If
-                                  %>
+                                  <li role="presentation" class="active"><a href="#generalview" data-btnClick="#donepay" aria-controls="generalview" role="tab" data-toggle="tab">General View</a></li>
+                                  <li role="presentation"><a href="#documents" aria-controls="documents" role="tab" data-toggle="tab">Documents / Formats</a></li>
+                                  <li role="presentation"><a href="#events" aria-controls="events" role="tab" data-toggle="tab">Events</a></li>
+                                  <li role="presentation"><a href="#break" aria-controls="break" role="tab" data-toggle="tab">Breakdown</a></li>
+                                  <li role="presentation"><a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payments</a></li>
+                                  <li role="presentation"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">LogBook</a></li>
                                 </ul>
                                 <!-- Nav tabs -->
 
 
                                                         
                                 <div class="tab-content minheight-tab" ><!-- Tab content -->
-                                    <% 
-                                      If (ViewData("idseccion1subseccion1consult_permission") IsNot Nothing And ViewData("idseccion1subseccion1consult_permission") > 0) Then
-                                    %>
+
+
                                       <div role="tabpanel" class="tab-pane minheight-wrap fade in active" id="generalview"> 
                                           <% Using Ajax.BeginForm("GroupDetail", "Groups", New AjaxOptions With {.OnBegin = "OnBegin", .OnComplete = "OnComplete", .OnSuccess = "OnSuccess", .OnFailure = "OnFailure", .UpdateTargetId = "AJAX_Container1"}, New With {.id = "formGroupCotizador",.autocomplete="off"})%>
-                                            <%: Html.Partial("_GroupGeneralViewDos")%>
+
+                                             <%: Html.Partial("_GroupGeneralViewDos")%>
+
                                           <% End Using %>
                                       </div>
-                                    <%
-                                      End If
-                                    %>
-                                    
+
+
                                       <div role="tabpanel" class="tab-pane minheight-wrap fade in" id="documents">
                                          
                                              <%: Html.Partial("_GroupDocs")%>
@@ -1690,12 +1279,12 @@
                                           <% End Using %>
 
                                       </div>
-                                        
-                                      <% If (ViewData("idseccion1subseccion3consult_permission") IsNot Nothing And ViewData("idseccion1subseccion3consult_permission") > 0) Then%>
-                                            <div role="tabpanel" class="tab-pane minheight-wrap fade in" id="break">
+
+                                      <div role="tabpanel" class="tab-pane minheight-wrap fade in" id="break">
+                                           
                                                 <%: Html.Partial("_GroupBreakDownTres")%>
-                                            </div>
-                                      <% End If%>
+
+                                      </div>
 
                                       <div role="tabpanel" class="tab-pane minheight-wrap fade in" id="payment">
                                           <% Using Ajax.BeginForm("GroupDetail", "Groups", New AjaxOptions With {.OnBegin="OnBegin",.OnComplete="OnComplete",.OnSuccess = "OnSuccessPayments", .OnFailure = "OnFailurePayments", .UpdateTargetId = "AJAX_ContainerPayments"})%>

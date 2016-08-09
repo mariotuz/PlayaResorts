@@ -1,38 +1,22 @@
 ﻿<%@ Page Language="VB" Inherits="System.Web.Mvc.ViewPage" %>
-    
-<script>
-    $(function () {
-        $('#docsLi').find('a:first').parent().addClass('active');
-        $('#docsLi').find('a:first').attr('href');
-        $($('#docsLi').find('a:first').attr('href')).addClass('active');
-    });
-</script>
+
 
 
      <div role="tabpanel"><!-- Start Contentainer tabs-->
                                                       <!-- Start Nav tabs -->
                                                       <br>
                                                       <br>
-                                                      <ul class="nav nav-tabs dual-select" role="tablist" id="docsLi">
-                                                        <% 
-                                                            If (ViewData("idseccion1subseccion2new_permission") IsNot Nothing And ViewData("idseccion1subseccion2new_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" class=""col-xs-4 col-md-4 active""><a href=""#fdft"" aria-controls=""fdft"" role=""tab"" data-toggle=""tab"">Generate Documents & Formats</a></li>")
-                                                            End If
-                                                            If (ViewData("idseccion1subseccion2upload_permission") IsNot Nothing And ViewData("idseccion1subseccion2upload_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" class=""col-xs-4 col-md-4""><a href=""#upfile"" aria-controls=""upfile"" role=""tab"" data-toggle=""tab"">Upload Documents</a></li>")
-                                                            End If
-                                                            If (ViewData("idseccion1subseccion2consult_permission") IsNot Nothing And ViewData("idseccion1subseccion2consult_permission") > 0) Then
-                                                                Response.Write("<li role=""presentation"" class=""col-xs-4 col-md-4 ""><a href=""#docsfmt"" aria-controls=""docsfmt"" role=""tab"" data-toggle=""tab"">List of Documents & Formats</a></li>")
-                                                            End If
-                                                        %>
+                                                      <ul class="nav nav-tabs dual-select" role="tablist" >
+                                                        
+                                                        <li role="presentation" class="col-xs-4 col-md-4 active"><a href="#fdft" aria-controls="fdft" role="tab" data-toggle="tab">Generate Documents & Formats</a></li>
+                                                        <li role="presentation" class="col-xs-4 col-md-4"><a href="#upfile" aria-controls="upfile" role="tab" data-toggle="tab">Upload Documents</a></li>
+                                                        <li role="presentation" class="col-xs-4 col-md-4 "><a href="#docsfmt" aria-controls="docsfmt" role="tab" data-toggle="tab">List of Documents & Formats</a></li>
                                                       </ul>
                                                       <!-- end Nav tabs -->
 
                                                       <!-- Start Tab panes -->
                                                       <div class="tab-content"><br>
-                                                          <% 
-                                                              If (ViewData("idseccion1subseccion2consult_permission") IsNot Nothing And ViewData("idseccion1subseccion2consult_permission") > 0) Then
-                                                          %>
+
                                                             <div role="tabpanel" class="tab-pane " id="docsfmt"><!-- Start documents list tabs-->
 
 
@@ -56,12 +40,10 @@
 
                                                             </div><!-- end documents list tabs-->
 
-                                                        <%End If%>
+
                                                         
-                                                    <% 
-                                                            If (ViewData("idseccion1subseccion2new_permission") IsNot Nothing And ViewData("idseccion1subseccion2new_permission") > 0) Then
-                                                    %>
-                                                     <div role="tabpanel" class="tab-pane active" id="fdft"><!-- Start generet document tabs-->
+
+                                                            <div role="tabpanel" class="tab-pane active" id="fdft"><!-- Start generet document tabs-->
 
                                                         <% Using Html.BeginForm("GroupDetail", "Groups", FormMethod.Post, New With {.id = "downloadDocument", .enctype = "multipart/form-data"})%>
 
@@ -180,14 +162,9 @@
 
                                                             </div><!-- end generet document tabs-->
 
-                                                        <%
-                                                        End If
-                                                        %>
 
-                                                <% 
-                                                    If (ViewData("idseccion1subseccion2upload_permission") IsNot Nothing And ViewData("idseccion1subseccion2upload_permission") > 0) Then
-                                                %>
-                                                  <div role="tabpanel" class="tab-pane" id="upfile"><!-- Start upload files tabs-->
+
+                                                            <div role="tabpanel" class="tab-pane" id="upfile"><!-- Start upload files tabs-->
 
                                                         <% Using Html.BeginForm("GroupDetail", "Groups", FormMethod.Post, New With {.id="subeArchivo",.enctype = "multipart/form-data"})%>
 
@@ -225,7 +202,9 @@
                                                             <% End Using %>
                                                                 
                                                             </div><!-- end upload files tabs-->
-                                                    <% End If %>
+
+                                                           
+
                                                       </div><!--end tab pane-->
                                               </div><!-- end Contentainer tabs-->
 
